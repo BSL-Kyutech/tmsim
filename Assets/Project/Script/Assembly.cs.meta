@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 6f5555d9e9880444db44e2b1117c3e92
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - basePlate: {fileID: 2882298433554285953, guid: 01fb50f2c4cecd64e9f44291a631867e, type: 3}
+  - baseStrut: {fileID: 6019696062256689233, guid: 82aa566acbbeb08409376155ace14d3c, type: 3}
+  - middleStrut: {fileID: 496332070889995177, guid: 2f92a0fe0fe3a6d4382a4a068cce07f7, type: 3}
+  - loopLine: {fileID: 2440199651309011904, guid: 8f1c1bcf30573a64a95af5058c50850a, type: 3}
+  - vertcalLine: {fileID: 5814438324172839912, guid: bea82ccdedd6b964fa19ee95da45820f, type: 3}
+  executionOrder: -2
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
