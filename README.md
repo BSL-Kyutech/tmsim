@@ -5,7 +5,7 @@
 ## How to get started
 
 1. Install the Unity Hub (https://unity.com/). You can leave Unity Editor not installed. The installation of the adequate version will be recommended at the first launch of the project.
-1. Clone this repo. For Win11 user: You can use git CLI of WSL2 but don't clone into the WSL2 volume. Move to the Win11 original volume (ex: `/mnt/c/...`).
+1. Clone this repo. For Win11 user: You can use git CLI of WSL2 but don't clone into the WSL2 volume. Move to the Win11 original volume (ex: `/mnt/c/...`) and clone it.
 1. Download the latest release of ros2-for-unity. The standalone version is easier to use and recommended.
 1. *The installation procedure may be close to being updated. Check* (https://github.com/RobotecAI/ros2-for-unity/pull/95). Extract the ZIP file and copy the `Ros2ForUnity` directory into `tmsim/Assets` directory. For Ubuntu user: Make sure `libspdlog-dev` and `libtinyxml2-dev` installed. This issue can be found here: (https://github.com/RobotecAI/ros2-for-unity/issues/78).
 1. Launch the Unity Hub installed. Click `Projects` on the left side pane and `Open` on the right. Choose the `tmsim` directory to open. Click the `tmsim` project in the list to launch. The first launch will take some time due to Unity Editor installation, etc. 
