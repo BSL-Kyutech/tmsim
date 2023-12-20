@@ -53,6 +53,8 @@
   - `Is Active`: The dynamic input pattern and the `Input ` are allowed to be updated while this is checked.
   - `Omega` and `Theta`: Parameters for the input pattern generation. Read `Demo.cs` for more details.
 
+![demo](https://github.com/BSL-Kyutech/tmsim/assets/9003707/ffc6699a-3aff-44eb-a845-4ee6a4afc2c4)
+
 ### Let the controller talk ROS2
 - The `Assets/ctrl` prefab also has `Assets/Project/Script/ROS2Interface.cs` as a component.
 - The `ROS2Interface.cs` publishes/subscribes topics for variables of `Device.cs` using `ros2-for-unity`.
