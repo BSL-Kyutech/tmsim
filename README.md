@@ -29,6 +29,8 @@
   - `Is Never Sleep`: If checked, the automatic sleep of PhysX is disabled so that the   changes will be reflected immediately.
 - The `Assembly.cs` has the highest execution priority than other scripts in `Assets/Project/Script`.
 
+![spawn](https://github.com/BSL-Kyutech/tmsim/assets/9003707/2b69008a-9e41-47a7-9b20-a0e24afc13f4)
+
 ### Make the tensegrity manipulator to be drivable
 - The `Assets/tm40` prefab also has `Assets/Project/Script/Device.cs` as a component.
 - The `Device.cs` mediates access to variables by numbering them in the appropriate order:
