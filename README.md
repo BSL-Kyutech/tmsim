@@ -1,6 +1,7 @@
 # tmsim
 
 **T**ensegrity **M**anipulator **SIM**ulator
+![top](https://github.com/BSL-Kyutech/tmsim/assets/9003707/4745c2c0-5bb5-4df6-b129-0ea4d9e00903)
 
 ## How to get started
 
