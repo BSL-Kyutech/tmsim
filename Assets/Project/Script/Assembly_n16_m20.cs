@@ -269,6 +269,9 @@ public class Assembly_n16_m20 : MonoBehaviour
 
         edgeLoop = new float[numLayer];
 
+        //int bases = numLayer/5;
+        int bases = 4;
+
         //高さ計算
         //var result=simulateTensegritylength(diffphi,diffpsi,diffRadius);
         //StrutScale=result.scale;
@@ -331,7 +334,7 @@ public class Assembly_n16_m20 : MonoBehaviour
                 
                 edgeLoop[i-1]=   2.0f * radius *(float)Math.Sin(Math.PI/(2*numPrism))/((float)Math.Cos((diffphi*i*Math.PI)/180));
             }
-            else if(mode==1){
+            else if(mode==1){ 
                 
                 edgeLoop[i-1]=   (2.0f*(radiusBase - diffRadius*((float)(i)))*(float)Math.Sin(Math.PI/(2*numPrism)))*((float)Math.Cos((diffphi*i*Math.PI)/180));
             }
@@ -351,8 +354,11 @@ public class Assembly_n16_m20 : MonoBehaviour
         //edgeLoop= new float[10] {0.05133649f, 0.0495571124f,0.0477777348f, 0.0459983572f,0.0442189796f,0.042439602f,0.039008014f,0.035576425999999994f,0.032144837999999995f,0.02871325f}; //base0.65 scale 0.6 
         //edgeLoop= new float[10] {0.04833649f, 0.0471571124f, 0.04z59777348f, 0.0447983572f,0.0436189796f,0.042439602f,0.039008014f,0.035576425999999994f,0.032144837999999995f,0.02871325f}; //base0.65 scale 0.6 
         //今のところいいやつ//
-        edgeLoop= new float[20] {0.03218528f, 0.03111535094736842f, 0.03004542189473684f, 0.02897549284210526f, 0.027905563789473682f, 0.026835634736842105f, 0.025765705684210525f, 0.024695776631578945f, 0.023625847578947368f, 0.02255591852631579f, 0.02148598947368421f, 0.02041606042105263f, 0.019346131368421053f, 0.018276202315789476f, 0.017206273263157896f, 0.016136344210526316f, 0.015066415157894739f, 0.013996486105263162f, 0.012926557052631581f, 0.011856628000000001f};  //base 0.5 strut 0.55 //2300
+        //edgeLoop= new float[20] {0.02849f, 0.026587f, 0.02338851111111f, 0.0210837766666666f, 0.0018f, 0.001f, 0.001f, 0.001f, 0.001f, 0.001f, 0.001f, 0.001f, 0.001f, 0.001f, 0.001f, 0.001f, 0.001f, 0.001f, 0.001f, 0.001f};  //base 0.5 strut 0.55 //2300
         
+        //edgeLoop= new float[13] {0.0344f, 0.030692f, 0.0268851111111f,0.02270f,0.0223f, 0.0220f,0.0218f,0.0216f,0.0214f, 0.0018f, 0.017f, 0.015f, 0.014f};
+        edgeLoop= new float[8] {0.0352f, 0.0343f, 0.0333f, 0.031f, 0.0278f, 0.025f,0.0225f,0.0215f};
+
         // Place the bottom layer's parts and connect ball joints　　//一番下の層の制作
         for (int i = 0; i < numPrism ; i++)
         {
@@ -387,20 +393,34 @@ public class Assembly_n16_m20 : MonoBehaviour
             // Instantiate and place the prefab
             for (int j = 0; j < numPrism ; j++)
             {
-                
-                struts[index(i, j)] = Instantiate(middleStrut, this.transform);                 //生成i,jの2次元配列にすることで，層と層の何個目かわかる
 
-                struts[index(i, j)].transform.localScale = new Vector3(0.02f,(float)(StrutScale*0.20f),0.02f); //デフォルトは0.2 StrutScale*
+                struts[index(i, j)] = Instantiate(middleStrut, this.transform);                 //生成i,jの2次元配列にすることで，層と層の何個目かわかる
+                if(i<(bases)){
+                    struts[index(i, j)].transform.localScale = new Vector3(0.02f,(float)(BaseScale*0.25f),0.02f); //デフォルトは0.2 StrutScale*
+                    struts[index(i, j)].transform.position = this.transform.position + new Vector3( //座標
+                        stripeshape*(radiusBase/1.5f)*(float)Math.Cos(step*j+twist*(i%2)),                        
+                        (float)(i+1)*(0.2f*BaseScale),                                                      //y 積みあがる高さ分加算
+                        stripeshape*(radiusBase/1.5f)*(float)Math.Sin(step*j+twist*(i%2))                         //z 
+                    );  
+                }
+                else{
+                    struts[index(i, j)].transform.localScale = new Vector3(0.02f,(float)(StrutScale*0.20f),0.02f); //デフォルトは0.2 StrutScale*
+                    struts[index(i, j)].transform.position = this.transform.position + new Vector3( //座標
+                        stripeshape*(radiusBase/1.5f)*(float)Math.Cos(step*j+twist*(i%2)),                        
+                        0.015f+BaseScale*0.25f+(0.2f*BaseScale)*(float)(bases-1)+(float)(i-bases)*(0.2f*StrutScale),                                                      //y 積みあがる高さ分加算
+                        stripeshape*(radiusBase/1.5f)*(float)Math.Sin(step*j+twist*(i%2))                         //z 
+                    );  
+                }
+                
+                
+
+                
                 structsEnd1[index(i, j)] = struts[index(i, j)].transform.GetChild(0);
                 structsEnd2[index(i, j)] = struts[index(i, j)].transform.GetChild(1);
                 structsEnd1[index(i, j)].transform.localScale = new Vector3(1.5f,0.15f,1.5f);
                 structsEnd2[index(i, j)].transform.localScale = new Vector3(1.5f,0.15f,1.5f);
                 
-                struts[index(i, j)].transform.position = this.transform.position + new Vector3( //座標
-                    stripeshape*(radiusBase/1.5f)*(float)Math.Cos(step*j+twist*(i%2)),                        
-                    (0.265f+BaseScale*0.25f)+(float)i*(0.3f*StrutScale),                                                      //y 積みあがる高さ分加算
-                    stripeshape*(radiusBase/1.5f)*(float)Math.Sin(step*j+twist*(i%2))                         //z 
-                    );                                                                          //rsinΘ,rcosΘで点の位置(ストラットの先端の位置が決まるが，ばねの最大の長さ，stripeshapeを変更しないと収縮する)
+                                                                                        //rsinΘ,rcosΘで点の位置(ストラットの先端の位置が決まるが，ばねの最大の長さ，stripeshapeを変更しないと収縮する)
                 struts[index(i, j)].name = $"Strut{index(i,j)}";                                //index関数から返された値の名前を付ける
                 
             }

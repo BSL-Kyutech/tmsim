@@ -22,7 +22,7 @@ public class Searcher2 : MonoBehaviour
     private float toggle =0.1f;
     private int count=0;
 
-    public float[] trueRadius={0.28710955769095553f,0.25047506156241606f,0.212640851049945f,0.18240953443903773f,0.17003731799445732f};//4-5の時の半径 {0.28710955769095553f,0.25047506156241606f,0.212640851049945f,0.18240953443903773f,0.17003731799445732f}
+    public float[] trueRadius={0.30379696284823254f,0.25485215839600045f,0.21799613961084838f,0.18262210691976397f,0.16326623536043514f};//4-5の時の半径 {0.28710955769095553f,0.25047506156241606f,0.212640851049945f,0.18240953443903773f,0.17003731799445732f}
     private float targetLength = 1.522883f;
     private float[] targetRadius;
     private int numLayer;
@@ -71,8 +71,15 @@ public class Searcher2 : MonoBehaviour
 
         Debug.Log(radiusLoss);
 
-        loss=lengthweight*highLoss+xweight*XZLoss+middleweight*middleLoss+radiusweight*radiusLoss;
+        //loss=lengthweight*highLoss+xweight*XZLoss+middleweight*middleLoss+radiusweight*radiusLoss;
         
+        if(highLoss>=0.2f){
+            loss=highLoss*lengthweight;
+        }
+        else{
+            loss=xweight*XZLoss+middleweight*middleLoss+radiusweight*radiusLoss;
+        }
+
         return loss;
     } 
 
@@ -292,17 +299,20 @@ public class Searcher2 : MonoBehaviour
  
         for(int k=0;k<numLayer-1;k++){
             underStrut=tm_g.transform.Find("Strut"+(numPrism*k).ToString()).gameObject;//隣り合うストラットとの数字の関係は+numPrismずつ増えていく(8,10の際)
+            currentStrut=tm_g.transform.Find("Strut"+(numPrism*k+4).ToString()).gameObject;
             if(k==0){
                 end1=underStrut.transform.Find("end").gameObject;
+                end2=currentStrut.transform.Find("end").gameObject;
             }
             else{
                 end1=underStrut.transform.Find("end1").gameObject;
+                end2=currentStrut.transform.Find("end1").gameObject;
             }
-            currentStrut=tm_g.transform.Find("Strut"+(numPrism*(k+1)).ToString()).gameObject;
-            end2=currentStrut.transform.Find("end2").gameObject;
-            radius[k]=((float)Math.Sqrt(Math.Pow((double)(end1.transform.position.x-end2.transform.position.x),2)+Math.Pow((double)(end1.transform.position.z-end2.transform.position.z),2)))/(2.0f*(float)Math.Sin(Math.PI/(2*numPrism))); 
             
-
+            
+            radius[k]=((float)Math.Sqrt(Math.Pow((double)(end1.transform.position.x-end2.transform.position.x),2)+Math.Pow((double)(end1.transform.position.z-end2.transform.position.z),2)+Math.Pow((double)(end1.transform.position.y-end2.transform.position.y),2))); 
+            
+            /*
             if(numLayer%2==0){
                 if(k==numLayer/2){
                     underStrut=tm_g.transform.Find("Strut"+(numPrism*k).ToString()).gameObject;//一番遠いストラットとの数字の関係は+numPrism/2ずつ増えていく(8,10の際)
@@ -320,30 +330,64 @@ public class Searcher2 : MonoBehaviour
 
                 }
             }
+            */
             
         }
         //最後の層である手先位置においては隣り合うストラットは±1であり，どちらもend1を用いる(これより上の層は存在しないため．)
+        /*
         underStrut=tm_g.transform.Find("Strut"+(numPrism*(numLayer-1)).ToString()).gameObject;//隣り合うストラットとの数字の関係は+numPrismずつ増えていく(8,10の際)
         end1=underStrut.transform.Find("end1").gameObject;
         currentStrut=tm_g.transform.Find("Strut"+(numPrism*(numLayer-1)+1).ToString()).gameObject;
         end2=currentStrut.transform.Find("end1").gameObject;
         radius[numLayer-1]=(float)Math.Sqrt(Math.Pow((double)(end1.transform.position.x-end2.transform.position.x),2)+Math.Pow((double)(end1.transform.position.z-end2.transform.position.z),2)); 
-
+        */
         ////////////////////////////////////////////////////////////////////////////////////////
                 
         //次の周回のstrut長さ変数の変更
+        float SpringForce=assembly.springForce;
         float baseScale=assembly.BaseScale;
         float strutScale=assembly.StrutScale;
         float[] edgeLoop =assembly.edgeLoop;
 
 
         float damperStrut=0.02f;
+        float damperSpring=320f;
         float damperDamperedge=0.000001f;
-        float damperedge=0.0f;
+        float damperedge=0.005f;
         
         
         //次の週へのパラメータの変更
         switch(parameterFlag){
+            case -3:
+                //縦のばねの硬さの調整
+                if(compareFlag==0){
+                    SpringForce-=damperSpring;
+
+                    PlayerPrefs.SetFloat(("EndEffecterX"),tmpos[0]);
+                    PlayerPrefs.Save();
+                    PlayerPrefs.SetFloat(("EndEffecterY"),tmpos[1]);
+                    PlayerPrefs.Save();
+                    PlayerPrefs.SetFloat(("EndEffecterZ"),tmpos[2]);
+                    PlayerPrefs.Save();
+
+                    PlayerPrefs.SetFloat("middle_x",middle[0]);
+                    PlayerPrefs.Save();
+                    PlayerPrefs.SetFloat("middle_z",middle[1]);
+                    PlayerPrefs.Save();
+
+                    for(int i=0;i<radius.Length;i++){
+                        PlayerPrefs.SetFloat(("ChangedRadius"+i.ToString()),radius[i]);
+                        PlayerPrefs.Save();
+                    }
+                }
+                else if(compareFlag==1){
+                    SpringForce+=2.0f*damperSpring;
+                    parameterFlag+=1;
+                }
+                compareFlag+=1;
+                Debug.Log("baseScale"+baseScale.ToString());
+                break;
+
             case -2:
                 //baseStrutのパラメータ調整
                 if(compareFlag==0){
@@ -434,8 +478,8 @@ public class Searcher2 : MonoBehaviour
                     edgeLoop[parameterFlag]=edgeLoop[parameterFlag]+2.0f*damperedge;
                     Debug.Log("edgeLoop"+parameterFlag.ToString()+"          "+edgeLoop[parameterFlag].ToString());
                     if(parameterFlag==numLayer-1){
-                    //パラメータflagを-2にしてstrutの調整へ
-                        parameterFlag=-2;
+                    //パラメータflagを-3にしてSpringの調整へ
+                        parameterFlag=-3;
                     }
                     else{
                         parameterFlag+=1;
@@ -489,6 +533,24 @@ public class Searcher2 : MonoBehaviour
             ChangeMiddle[1]=PlayerPrefs.GetFloat("middle_z",middle[1]);
             
             switch(parameterFlag-1){
+                case -4:
+                    errorMinus=Computeloss(ChangedRadius,targetRadius,ChangedPos, ChangeMiddle);
+                    errorPlus=Computeloss(radius,targetRadius,tmpos,middle);
+                    if(errorPlus<errorMinus){
+                        error=errorPlus;
+                        errorName="errorPlus";
+                    }
+                    else{
+                        //damperedge=-damperDamperedge*((float)((numLayer-1)/numLayer)*(float)(numLayer)+(float)numLayer);
+                        SpringForce-=2.0f*damperSpring;
+                        error=errorMinus;
+                        errorName="errorMinus";
+                    }
+
+                    Debug.Log("errortype    :" +errorName);
+                    Debug.Log("edgeloop"+(numLayer-1).ToString()+"          "+edgeLoop[numLayer-1].ToString());
+                    break;
+
                 case -3://parameterflagがnumLayer-1の次の処理おかしくなるということで追加
                     errorMinus=Computeloss(ChangedRadius,targetRadius,ChangedPos, ChangeMiddle);
                     errorPlus=Computeloss(radius,targetRadius,tmpos,middle);
@@ -498,7 +560,7 @@ public class Searcher2 : MonoBehaviour
                         errorName="errorPlus";
                     }
                     else{
-                        damperedge=-damperDamperedge*((float)((numLayer-1)/numLayer)*(float)(numLayer)+(float)numLayer);
+                        //damperedge=-damperDamperedge*((float)((numLayer-1)/numLayer)*(float)(numLayer)+(float)numLayer);
                         edgeLoop[numLayer-1]=edgeLoop[numLayer-1]-2.0f*damperedge;
                         error=errorMinus;
                         errorName="errorMinus";
@@ -506,7 +568,7 @@ public class Searcher2 : MonoBehaviour
                     
                     Debug.Log("errortype    :" +errorName);
                     Debug.Log("edgeloop"+(numLayer-1).ToString()+"          "+edgeLoop[numLayer-1].ToString());
-                   break;
+                    break;
                 case -2:
                     //diff(二つ)と今のものを最小二乗法で比較(高さ)
                     errorMinus=Computeloss(ChangedRadius,targetRadius,ChangedPos, ChangeMiddle);
@@ -557,7 +619,7 @@ public class Searcher2 : MonoBehaviour
                         errorName="errorPlus";
                     }
                     else{
-                        damperedge=-damperDamperedge*((float)((numLayer-1)/numLayer)*(float)(parameterFlag)+(float)numLayer);
+                        //damperedge=-damperDamperedge*((float)((numLayer-1)/numLayer)*(float)(parameterFlag)+(float)numLayer);
                         edgeLoop[parameterFlag-1]=edgeLoop[parameterFlag]-2.0f*damperedge;
                         error=errorMinus;
                         errorName="errorMinus";
@@ -572,6 +634,7 @@ public class Searcher2 : MonoBehaviour
             //Debug.Log(errorPlus);
 
             //制約条件
+            /*
             if(baseScale>=1.0f){
                 baseScale=0.99f;
                 Debug.Log("=====================================basescaleに制約条件が課せられました．=====================================");
@@ -598,6 +661,7 @@ public class Searcher2 : MonoBehaviour
                 edgeLoop[numLayer-1]=damperedge*2;
                 Debug.Log("=====================================edgeLoop9に制約条件が課せられました．=====================================");
             }
+            */
             /*
             for(int j=1; j<numLayer-2; j++){
                 //Debug.Log((numLayer-j-1));
@@ -612,7 +676,7 @@ public class Searcher2 : MonoBehaviour
                 }
             }
             */
-            
+            /*
             for(int j=1; j<numLayer-2; j++){
                 damperedge=-damperDamperedge*((float)((numLayer-1)/numLayer)*(j)+numLayer);
                 if(edgeLoop[j]>edgeLoop[j-1]){
@@ -631,6 +695,7 @@ public class Searcher2 : MonoBehaviour
                 edgeLoop[0]=edgeLoop_minuis1-damperedge*2.0f;
                 Debug.Log("=====================================edgeLoop0に制約条件が課せられました．=====================================");
             }
+            */
 
             
 
@@ -672,7 +737,9 @@ public class Searcher2 : MonoBehaviour
         PlayerPrefs.Save();
         PlayerPrefs.SetFloat("baseScale",baseScale);
         PlayerPrefs.Save();
-        PlayerPrefs.SetFloat("strutScale",strutScale);
+        PlayerPrefs.SetFloat("StrutScale",strutScale);
+        PlayerPrefs.Save();
+        PlayerPrefs.SetFloat("SpringForce",SpringForce);
         PlayerPrefs.Save();
         PlayerPrefs.SetInt("compareFlag",compareFlag);
         PlayerPrefs.Save();

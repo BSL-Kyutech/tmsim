@@ -55,8 +55,8 @@ public class Assembly : MonoBehaviour
     public float SpringDmaper;                                                 //層に比例するばねの強さ
 
 
-    public float StrutScale=0.7f;
-    public float BaseScale=0.7f;
+    public float StrutScale;
+    public float BaseScale;
 
     //edgeの計算方法の選択
     public bool log_x;              //edgeloopの計算にLog(x)を扱うか    (底数が10)
@@ -228,6 +228,7 @@ public class Assembly : MonoBehaviour
 
         //radiusLoopが内部に存在していた場合取得
         
+        /*
         if(PlayerPrefs.HasKey("RadiusLoop")){
             radiusLoop=PlayerPrefs.GetFloat("RadiusLoop");
         }
@@ -237,16 +238,20 @@ public class Assembly : MonoBehaviour
         }
 
         if(PlayerPrefs.HasKey("StrutScale")){
-           //StrutScale=PlayerPrefs.GetFloat("StrutScale");
+           StrutScale=PlayerPrefs.GetFloat("StrutScale");
+        }
+        if(PlayerPrefs.HasKey("baseScale")){
+           BaseScale=PlayerPrefs.GetFloat("baseScale");
         }
 
         if(PlayerPrefs.HasKey("edge")){
         
-           //edgeparameter_layers=PlayerPrefs.GetFloat("edge");
+           edgeparameter_layers=PlayerPrefs.GetFloat("edge");
         }
         if(PlayerPrefs.HasKey("mode")){
            mode=PlayerPrefs.GetInt("count");
         }
+        */
 
         
         a=edgeparameter_layers;
@@ -267,6 +272,8 @@ public class Assembly : MonoBehaviour
         float diffRadius = (radiusBase-lastRadiusloop)/((float)(numLayer-1));      //上と下の半径の差
 
         edgeLoop = new float[numLayer];
+
+        int bases = numLayer/5;
 
         //高さ計算
         //var result=simulateTensegritylength(diffphi,diffpsi,diffRadius);
@@ -293,13 +300,6 @@ public class Assembly : MonoBehaviour
         float parameter_b=0.0f;
         float radius=0.0f;
 
-        if(PlayerPrefs.HasKey("baseScale")){
-            //BaseScale=PlayerPrefs.GetFloat("baseScale");
-            
-        }
-        if(PlayerPrefs.HasKey("strutScale")){
-            //StrutScale=PlayerPrefs.GetFloat("strutScale");
-        }
 
         for (int i=1;i<=numLayer;i++)
         {
@@ -307,6 +307,7 @@ public class Assembly : MonoBehaviour
             if(PlayerPrefs.HasKey("edgeLoop"+(i-1).ToString())){
                 //edgeLoop[i-1]=PlayerPrefs.GetFloat("edgeLoop"+(i-1).ToString());
             }
+            //4本5層の値
             edgeLoop= new float[5] {0.12415123082906993f,0.11031530609675386f,0.10214850457080119f,0.09057431266995283f,0.12024559516481466f};
             
             /*
@@ -359,7 +360,7 @@ public class Assembly : MonoBehaviour
             struts[i].transform.localScale = new Vector3(0.02f,(float)(BaseScale*0.25f),0.02f); //デフォルトは0.25        
             struts[i].transform.position = this.transform.position + new Vector3(               //ストラクトの座標と生成(処理は上と同じ)
                 radiusBase*(float)Math.Cos(step*i), 
-                0.265f*StrutScale
+                0.265f*BaseScale
                 ,                                                                         //土台の高さがある分少し高い？
                 radiusBase*(float)Math.Sin(step*i)
                 );
@@ -378,20 +379,34 @@ public class Assembly : MonoBehaviour
             // Instantiate and place the prefab
             for (int j = 0; j < numPrism ; j++)
             {
-                
-                struts[index(i, j)] = Instantiate(middleStrut, this.transform);                 //生成i,jの2次元配列にすることで，層と層の何個目かわかる
 
-                struts[index(i, j)].transform.localScale = new Vector3(0.02f,(float)(StrutScale*0.20f),0.02f); //デフォルトは0.2 StrutScale*
+                struts[index(i, j)] = Instantiate(middleStrut, this.transform);                 //生成i,jの2次元配列にすることで，層と層の何個目かわかる
+                if(i<=(bases-1)){
+                    struts[index(i, j)].transform.localScale = new Vector3(0.02f,(float)(BaseScale*0.25f),0.02f); //デフォルトは0.2 StrutScale*
+                    struts[index(i, j)].transform.position = this.transform.position + new Vector3( //座標
+                        stripeshape*(radiusBase/1.5f)*(float)Math.Cos(step*j+twist*(i%2)),                        
+                        (float)(i+1)*(0.265f*BaseScale),                                                      //y 積みあがる高さ分加算
+                        stripeshape*(radiusBase/1.5f)*(float)Math.Sin(step*j+twist*(i%2))                         //z 
+                    );  
+                }
+                else{
+                    struts[index(i, j)].transform.localScale = new Vector3(0.02f,(float)(StrutScale*0.20f),0.02f); //デフォルトは0.2 StrutScale*
+                    struts[index(i, j)].transform.position = this.transform.position + new Vector3( //座標
+                        stripeshape*(radiusBase/1.5f)*(float)Math.Cos(step*j+twist*(i%2)),                        
+                        (0.265f*BaseScale)*bases+(float)(i-bases)*(0.3f*StrutScale),                                                      //y 積みあがる高さ分加算
+                        stripeshape*(radiusBase/1.5f)*(float)Math.Sin(step*j+twist*(i%2))                         //z 
+                    );  
+                }
+                
+                
+
+                
                 structsEnd1[index(i, j)] = struts[index(i, j)].transform.GetChild(0);
                 structsEnd2[index(i, j)] = struts[index(i, j)].transform.GetChild(1);
                 structsEnd1[index(i, j)].transform.localScale = new Vector3(1.5f,0.15f,1.5f);
                 structsEnd2[index(i, j)].transform.localScale = new Vector3(1.5f,0.15f,1.5f);
                 
-                struts[index(i, j)].transform.position = this.transform.position + new Vector3( //座標
-                    stripeshape*(radiusBase/1.5f)*(float)Math.Cos(step*j+twist*(i%2)),                        
-                    (0.265f*StrutScale)+(float)i*(0.3f*StrutScale),                                                      //y 積みあがる高さ分加算
-                    stripeshape*(radiusBase/1.5f)*(float)Math.Sin(step*j+twist*(i%2))                         //z 
-                    );                                                                          //rsinΘ,rcosΘで点の位置(ストラットの先端の位置が決まるが，ばねの最大の長さ，stripeshapeを変更しないと収縮する)
+                                                                                        //rsinΘ,rcosΘで点の位置(ストラットの先端の位置が決まるが，ばねの最大の長さ，stripeshapeを変更しないと収縮する)
                 struts[index(i, j)].name = $"Strut{index(i,j)}";                                //index関数から返された値の名前を付ける
                 
             }
@@ -441,6 +456,7 @@ public class Assembly : MonoBehaviour
                 spring[0].anchor = new Vector3(0, 1, 0);                                        //オブジェクトのローカル空間の位置
                 spring[0].connectedBody = struts[target1].GetComponent<Rigidbody>();            //接続されるオブジェクトの設定
                 spring[0].enableCollision=springCollision;
+                spring[0].spring=springForce;
                 
                 // #2
                 if (i == numLayer-1) {
@@ -463,6 +479,7 @@ public class Assembly : MonoBehaviour
                 spring[2].connectedAnchor = new Vector3(0, -1, 0);
                 spring[2].anchor = new Vector3(0, 1, 0);
                 spring[2].enableCollision=springCollision;
+                spring[2].spring=springForce;
 
 
                 // #4
@@ -560,8 +577,12 @@ public class Assembly : MonoBehaviour
             
                 
                 PlayerPrefs.SetFloat("RadiusLoop",radiusLoop);
+                PlayerPrefs.Save();
                 PlayerPrefs.SetFloat("SpringForce",a);
+                PlayerPrefs.Save();
                 PlayerPrefs.SetFloat("StrutScale",StrutScale);
+                PlayerPrefs.Save();
+                PlayerPrefs.SetFloat("baseScale",BaseScale);
                 PlayerPrefs.Save();
 
                 
