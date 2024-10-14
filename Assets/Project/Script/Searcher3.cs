@@ -224,11 +224,105 @@ public class Searcher3 : MonoBehaviour
         for(int i=0;i<numLayer;i++){
             Debug.Log("Layer" +i.ToString()+ "'s radius  : "+diameters[i].ToString());
         }
+
+
+        //y座標の取得用配列
+        float[] LayerYpositions;
+
+        //配列長さはレイヤーが上下の柱より構成されるため2倍
+        LayerYpositions= new float [numPrism*2];
+
+        float errors=0.0f;
+
+        //一番誤差のあるレイヤーナンバー
+        int maxErrorLayerNo=-1;
+
+        float maxError=0.0f;
+
+        float[] maxErrors;
+        maxErrors=new float [numLayer];
         
 
-        
+        //ズレの検出
+        for(int i=0;i<numLayer;i++){
+
+            //下から生えている柱からend1の取得する
+            for(int j=0;j<numPrism;j++){
+                Debug.Log(j+i*numPrism);
+                strut=tm_g.transform.Find("Strut"+(j+i*numPrism).ToString()).gameObject;
+                
+                if(i==0){
+                    //baseStrutなので，end1ではなくendのみ
+                    end=strut.transform.Find("end");
+                }
+                else{
+                    //Strutのためend1
+                    end=strut.transform.Find("end1");
+                }
+                //比較するため配列に代入
+                LayerXpositions[j]=end.transform.position.x;
+                LayerYpositions[j]=end.transform.position.y;
+                LayerZpositions[j]=end.transform.position.z;
+                //Debug.Log("i"+i.ToString()+",j"+j.ToString()+",Strut"+(j*i).ToString()+",tm_g_y"+end.transform.position.y.ToString());
+            }
+            
+             
+            //上から刺さっている柱からend2を取得する(一番上は除外)
+            if(i==(numLayer-1)){
+                operateFor=numPrism;
+            }
+            else{
+                for(int j=0;j<numPrism;j++){
+                    Debug.Log(j+(i+1)*numPrism);
+                    strut=tm_g.transform.Find("Strut"+(j+(i+1)*numPrism).ToString()).gameObject;
+                    end=strut.transform.Find("end2");
+
+                    LayerXpositions[j]=end.transform.position.x;
+                    LayerYpositions[j]=end.transform.position.y;
+                    LayerZpositions[j]=end.transform.position.z;
+                    //Debug.Log("i"+i.ToString()+",j"+j.ToString()+",Strut"+(j*i).ToString()+",tm_g_y"+end.transform.position.y.ToString());
+                }
+                operateFor=numPrism*2;
+                
+            }
+            Debug.Log(operateFor.ToString()+" zure");
+            
+            for(int j=0;j<operateFor;j++){
+                for(int k=0;k<operateFor;k++){
+                        //XとZのそれぞれの距離
+                    errors=(float)Math.Sqrt(Math.Pow((double)(LayerYpositions[k]-LayerYpositions[j]),2));
+                    
+                    if(maxError<=errors){
+                        Debug.Log("maxError"+errors.ToString());
+                        maxError=errors;
+                    }
+                }
+                
+                
+            }
+
+            
+            
+            
+            Debug.Log(i.ToString());
+            //配列にそれぞれを格納
+            maxErrors[i]=maxError;
+            maxError=0.0f;
+            
+
+            Array.Fill(LayerXpositions,0.0f);
+            Array.Fill(LayerYpositions,0.0f);
+            Array.Fill(LayerZpositions,0.0f);
+
+        }
+
+        for(int i=0;i<numLayer;i++){
+            Debug.Log("Layer" +i.ToString()+ "'s zure  : "+maxErrors[i].ToString());
+        }
 
     }
+
+    
 
     
 }
