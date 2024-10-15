@@ -19,6 +19,74 @@ public class Searcher3 : MonoBehaviour
         return radius;
     }
 
+    //座標取得
+    private (float[] LayerXpositions,float[] LayerYpositions,float[] LayerZpositions,int arrayLength) getPosition(int layerNum,int numPrism,int numLayer){
+        
+        //Asembly.csの取得
+        GameObject tm_g =GameObject.Find("tm_g");
+        Assembly assembly;
+        assembly=tm_g.GetComponent<Assembly>();
+
+        var strut=tm_g.transform.Find("Strut"+(0).ToString()).gameObject;;
+        var end=strut.transform.Find("end");
+
+        //x,y,z座標の取得用配列
+        float[] LayerXpositions;
+        float[] LayerYpositions;
+        float[] LayerZpositions;
+        int arrayLength=0;
+
+        //配列長さはレイヤーが上下の柱より構成されるため2倍
+        LayerXpositions= new float [numPrism*2];
+        LayerYpositions= new float [numPrism*2];
+        LayerZpositions= new float [numPrism*2]; 
+
+        //下から生えている柱からend1のx,y,z座標取得する
+        for(int j=0;j<numPrism;j++){
+            //Debug.Log(j+i*numPrism);
+            strut=tm_g.transform.Find("Strut"+(j+layerNum*numPrism).ToString()).gameObject;
+                
+            if(layerNum==0){
+                //baseStrutなので，end1ではなくendのみ
+                end=strut.transform.Find("end");
+            }
+            else{
+                //Strutのためend1
+                end=strut.transform.Find("end1");
+            }
+            //比較するため配列に代入
+            LayerXpositions[j]=end.transform.position.x;
+            LayerYpositions[j]=end.transform.position.y;
+            LayerZpositions[j]=end.transform.position.z;                
+            //Debug.Log("i"+i.ToString()+",j"+j.ToString()+",Strut"+(j*i).ToString()+",tm_g_y"+end.transform.position.y.ToString());
+        }
+
+        //上から刺さっている柱からend2x,y,z座標取得する(一番上は除外)
+        if(layerNum==(numLayer-1)){
+            arrayLength=numPrism;
+        }
+        else{
+            for(int j=0;j<numPrism;j++){
+                Debug.Log(j+(layerNum+1)*numPrism);
+                strut=tm_g.transform.Find("Strut"+(j+(layerNum+1)*numPrism).ToString()).gameObject;
+                end=strut.transform.Find("end2");
+
+                
+
+                LayerXpositions[j+numPrism]=end.transform.position.x;
+                LayerYpositions[j+numPrism]=end.transform.position.y;
+                LayerZpositions[j+numPrism]=end.transform.position.z;
+                //Debug.Log("i"+i.ToString()+",j"+j.ToString()+",Strut"+(j*i).ToString()+",tm_g_y"+end.transform.position.y.ToString());
+                //Debug.Log("i"+i.ToString()+",j"+j.ToString()+",Strut"+(j*i).ToString()+",tm_g_y"+end.transform.position.y.ToString());
+                }
+            arrayLength=numPrism*2;
+        }
+
+            
+        
+        return (LayerXpositions,LayerYpositions,LayerZpositions,arrayLength);
+    }
+
     //ばね定数の変更処理
     private float ConculateSpringsLoss(){
         float loss=0.0f;
@@ -79,12 +147,10 @@ public class Searcher3 : MonoBehaviour
         tm_g_layers_y = new float[numLayer];
 
 
-        GameObject[] struts;
-        GameObject[] ends;
-        struts = new GameObject[numLayer];
-        ends = new GameObject[numLayer];
+        
 
         yield return new WaitForSeconds(2.55f);
+
 
         //レイヤー層ごとの高さ
         var strut=tm_g.transform.Find("Strut"+(0).ToString()).gameObject;;
@@ -121,28 +187,7 @@ public class Searcher3 : MonoBehaviour
         //層ごとの高さ，半径，ズレの検出
         for(int i=0;i<numLayer;i++){
 
-            //下から生えている柱からend1のx,y,z座標取得する
-            for(int j=0;j<numPrism;j++){
-                //Debug.Log(j+i*numPrism);
-                strut=tm_g.transform.Find("Strut"+(j+i*numPrism).ToString()).gameObject;
-                
-                if(i==0){
-                    //baseStrutなので，end1ではなくendのみ
-                    end=strut.transform.Find("end");
-                }
-                else{
-                    //Strutのためend1
-                    end=strut.transform.Find("end1");
-                }
-                //平均計算のためにendたちのyの高さを足し合わせて行く
-                tm_g_y+=end.transform.position.y;
-                //比較するため配列に代入
-                LayerXpositions[j]=end.transform.position.x;
-                LayerYpositions[j]=end.transform.position.y;
-                LayerZpositions[j]=end.transform.position.z;
-                //Debug.Log("i"+i.ToString()+",j"+j.ToString()+",Strut"+(j*i).ToString()+",tm_g_y"+end.transform.position.y.ToString());
-            }
-            
+            getPosition(i,numPrism,numLayer);
             
              
             //上から刺さっている柱からend2x,y,z座標取得する(一番上は除外)
