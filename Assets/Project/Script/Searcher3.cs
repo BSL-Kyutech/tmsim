@@ -116,6 +116,28 @@ public class Searcher3 : MonoBehaviour
         return maxDistance;
     }
 
+    private float getDeviation(float[] LayerYpositions,int arrayLength){
+        //end同士のyの差
+        float errors=0.0f;
+        //その中でも最大値
+        float maxError=0.0f;
+        //ズレの検出の計算
+        for(int j=0;j<arrayLength;j++){
+            for(int k=0;k<arrayLength;k++){
+                //y座標のそれぞれの距離で一番離れているところを探す
+                errors=0.0f;
+                errors=(float)Math.Sqrt(Math.Pow((double)(LayerYpositions[k]-LayerYpositions[j]),2));
+                    
+                if(maxError<=errors){
+                    //Debug.Log("maxError"+errors.ToString());
+                    maxError=errors;
+                }
+            }   
+                
+        }
+        return maxError;
+    }
+
     //ばね定数の変更処理
     private float ConculateSpringsLoss(){
         float loss=0.0f;
@@ -195,7 +217,7 @@ public class Searcher3 : MonoBehaviour
         LayerYpositions= new float [numPrism*2];
         LayerZpositions= new float [numPrism*2]; 
         //試行回数
-        int operateFor=0;
+        int arrayLength=0;
         //一番長い距離
         float maxDistance=0;
 
@@ -234,8 +256,13 @@ public class Searcher3 : MonoBehaviour
 
 
             //配列にそれぞれの層の高さを格納
-            tm_g_layers_y[i]=getHigh(float[] LayerYpositions,int arrayLength);
+            tm_g_layers_y[i]=getHigh(LayerYpositions,arrayLength);
+            
+
+            //配列にそれぞれの層のずれ(end同士の高さの差)を格納
+            maxErrors[i]=getDeviation(LayerYpositions,arrayLength);
              
+            /* 
             //上から刺さっている柱からend2x,y,z座標取得する(一番上は除外)
             if(i==(numLayer-1)){
                 operateFor=numPrism;
@@ -307,8 +334,10 @@ public class Searcher3 : MonoBehaviour
             Array.Fill(LayerXpositions,0.0f);
             Array.Fill(LayerYpositions,0.0f);
             Array.Fill(LayerZpositions,0.0f);
+            */
 
         }
+        
 
         
 
