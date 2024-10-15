@@ -87,6 +87,14 @@ public class Searcher3 : MonoBehaviour
         return (LayerXpositions,LayerYpositions,LayerZpositions,arrayLength);
     }
 
+    private float getHigh(float[] LayerYpositions,int arrayLength){
+        float tm_g_y=0.0f;
+        for(int i=0;i<arrayLength;i++){
+            tm_g_y+=LayerYpositions[]
+        }
+        return tm_g_y/(float)arrayLength;
+    }
+
     //ばね定数の変更処理
     private float ConculateSpringsLoss(){
         float loss=0.0f;
