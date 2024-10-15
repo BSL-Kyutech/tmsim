@@ -90,9 +90,30 @@ public class Searcher3 : MonoBehaviour
     private float getHigh(float[] LayerYpositions,int arrayLength){
         float tm_g_y=0.0f;
         for(int i=0;i<arrayLength;i++){
-            tm_g_y+=LayerYpositions[]
+            tm_g_y+=LayerYpositions[i];
         }
         return tm_g_y/(float)arrayLength;
+    }
+
+    //直径の検出
+    private float getRadius(int arrayLength,float[] LayerXpositions,float[] LayerZpositions){
+        float tm_g_x=0.0f;
+        float tm_g_z=0.0f;
+        float maxDistance=0.0f;
+        
+        //直径の計算
+        for(int j=0;j<arrayLength;j++){
+            
+            //XとZのそれぞれの距離
+            tm_g_x=(float)Math.Pow((double)(LayerXpositions[0]-LayerXpositions[j]),2);
+            tm_g_z=(float)Math.Pow((double)(LayerZpositions[0]-LayerZpositions[j]),2);
+            //一番離れている点を直径とする
+            if(maxDistance<=(float)(Math.Sqrt(tm_g_x+tm_g_z))){
+                maxDistance=(float)Math.Sqrt(tm_g_x+tm_g_z);
+            }
+        }
+
+        return maxDistance;
     }
 
     //ばね定数の変更処理
@@ -195,8 +216,25 @@ public class Searcher3 : MonoBehaviour
         //層ごとの高さ，半径，ズレの検出
         for(int i=0;i<numLayer;i++){
 
-            getPosition(i,numPrism,numLayer);
+            //座標取得
+            var positionRetrun = getPosition(i,numPrism,numLayer);
             
+            //配列の長さの確認
+            arrayLength=positionRetrun.arrayLength;
+            //座標格納
+            LayerXpositions=positionRetrun.LayerXpositions;
+            LayerYpositions=positionRetrun.LayerYpositions;
+            LayerZpositions=positionRetrun.LayerZpositions;
+
+        
+            //配列にそれぞれの直径を格納
+            diameters[i]=getRadius(arrayLength,LayerXpositions,LayerZpositions);
+            maxDistance=0;
+
+
+
+            //配列にそれぞれの層の高さを格納
+            tm_g_layers_y[i]=getHigh(float[] LayerYpositions,int arrayLength);
              
             //上から刺さっている柱からend2x,y,z座標取得する(一番上は除外)
             if(i==(numLayer-1)){
@@ -240,10 +278,7 @@ public class Searcher3 : MonoBehaviour
                 }
             }
             
-            Debug.Log(i.ToString());
-            //配列にそれぞれの直径を格納
-            diameters[i]=maxDistance;
-            maxDistance=0;
+            
 
 
             //ズレの検出の計算
@@ -262,9 +297,7 @@ public class Searcher3 : MonoBehaviour
                 
             }
 
-            //配列にそれぞれの層の高さを格納
-            tm_g_layers_y[i]=tm_g_y;
-            tm_g_y=0;
+            
 
             Debug.Log(i.ToString());
             //配列にそれぞれのずれの誤差を格納
