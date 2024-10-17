@@ -15,7 +15,38 @@ public class Searcher3 : MonoBehaviour
         //4-5の際の層ごとの高さ
         float [] trueHigh={0.3345878f,0.5892965f,0.8675417f,1.15422f,1.48762f};
         float radius=0.0f;
-        radius=trueRadius[0];
+        float gradient=0.0f;
+        float intercept=0.0f;
+
+        //それぞれの中間の直径を一次関数で近似
+        if(y<=0.3345878f){
+            gradient=(0.44f-trueRadius[0])/(trueHigh[0]-0.0f);
+            intercept=0.0f;
+            radius=gradient*y+intercept;
+        }
+        else if(y<=0.5892965f){
+            gradient=(trueRadius[0]-trueRadius[1])/(trueHigh[1]-trueHigh[0]);
+            intercept=trueRadius[0];
+            radius=gradient*y+intercept;
+        }
+        else if(y<=1.15422f){
+            gradient=(trueRadius[1]-trueRadius[2])/(trueHigh[2]-trueHigh[1]);
+            intercept=trueRadius[1];
+            radius=gradient*y+intercept;
+        }
+        else if(y<=0.8675417f){
+            gradient=(trueRadius[2]-trueRadius[3])/(trueHigh[3]-trueHigh[2]);
+            intercept=trueRadius[2];
+            radius=gradient*y+intercept;
+        }
+        else{
+            gradient=(trueRadius[3]-trueRadius[4])/(trueHigh[4]-trueHigh[3]);
+            intercept=trueRadius[3];
+            radius=gradient*y+intercept;
+        }
+        
+        
+        
         return radius;
     }
 
@@ -27,7 +58,7 @@ public class Searcher3 : MonoBehaviour
         Assembly assembly;
         assembly=tm_g.GetComponent<Assembly>();
 
-        var strut=tm_g.transform.Find("Strut"+(0).ToString()).gameObject;;
+        var strut=tm_g.transform.Find("Strut"+(0).ToString()).gameObject;
         var end=strut.transform.Find("end");
 
         //x,y,z座標の取得用配列
@@ -116,6 +147,7 @@ public class Searcher3 : MonoBehaviour
         return maxDistance;
     }
 
+    /*
     private float getDeviation(float[] LayerYpositions,int arrayLength){
         //end同士のyの差
         float errors=0.0f;
@@ -134,6 +166,34 @@ public class Searcher3 : MonoBehaviour
                 }
             }   
                 
+        }
+        return maxError;
+    }
+    */
+
+    private float getDeviation(float[] LayerYpositions,int arrayLength){
+        //end同士のyの差
+        float errors=0.0f;
+        //その中でも最大値
+        float maxError=0.0f;
+        //ズレの検出の計算
+        for(int j=0;j<arrayLength-1;j++){
+            
+            //y座標のそれぞれの距離で一番離れているところを探す
+            errors=0.0f;
+            errors=(float)Math.Sqrt(Math.Pow((double)(LayerYpositions[j]-LayerYpositions[j+1]),2));
+                    
+            if(maxError<=errors){
+                //Debug.Log("maxError"+errors.ToString());
+                maxError=errors;
+            }
+            
+                
+        }
+        errors=(float)Math.Sqrt(Math.Pow((double)(LayerYpositions[0]-LayerYpositions[arrayLength-1]),2));
+        if(maxError<=errors){
+            //Debug.Log("maxError"+errors.ToString());
+            maxError=errors;
         }
         return maxError;
     }
@@ -252,7 +312,6 @@ public class Searcher3 : MonoBehaviour
             //配列にそれぞれの直径を格納
             diameters[i]=getRadius(arrayLength,LayerXpositions,LayerZpositions);
             maxDistance=0;
-
 
 
             //配列にそれぞれの層の高さを格納
