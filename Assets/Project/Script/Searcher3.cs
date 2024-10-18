@@ -98,7 +98,7 @@ public class Searcher3 : MonoBehaviour
         }
         else{
             for(int j=0;j<numPrism;j++){
-                Debug.Log(j+(layerNum+1)*numPrism);
+                //Debug.Log(j+(layerNum+1)*numPrism);
                 strut=tm_g.transform.Find("Strut"+(j+(layerNum+1)*numPrism).ToString()).gameObject;
                 end=strut.transform.Find("end2");
 
@@ -249,7 +249,15 @@ public class Searcher3 : MonoBehaviour
     }
 
     //高さの損失計算  　優先順位　3
-    private (float loss, bool flag) ConcurateHighLoss(float y){
+    private (float loss, bool flag) ConcurateHighLoss(float[] yArray){
+
+        float y=0.0f;
+
+        for(int i=0;i<yArray.Length/2;i++){
+            y+=yArray[i];
+        }
+        y/=(yArray.Length/2);
+
         float loss=0.0f;
         //目標値
         float targetLength = 1.522883f;
@@ -260,14 +268,21 @@ public class Searcher3 : MonoBehaviour
         if(Math.Abs((double)loss)>=0.05f){
             flag=true;
         }
+        Debug.Log("高さのロス"+loss.ToString());
 
         return (loss,flag);
     }
 
     //半径の損失計算　  優先順位　4
-    private float ConcurateRadiusLoss(){
+    private (float loss, bool flag) ConcurateRadiusLoss(float radius, float y){
         float loss=0.0f;
-        return loss;
+        bool flag=false;
+
+        float targetRadius=ReturnCorrectRadius(y);
+
+        loss=(float)Math.Pow((double)(targetRadius-radius),2);
+
+        return (loss,flag);
     }
 
     // Start is called before the first frame update
@@ -369,6 +384,10 @@ public class Searcher3 : MonoBehaviour
             //配列にそれぞれの層のずれ(end同士の高さの差)を格納
             maxErrors[i]=getDeviation(LayerYpositions,arrayLength);
 
+
+            var radiusData=ConcurateRadiusLoss(diameters[i],tm_g_layers_y[i]);
+            Debug.Log("radius Loss"+i.ToString() +"  "+radiusData.loss.ToString());
+
             
              
             /* 
@@ -448,7 +467,9 @@ public class Searcher3 : MonoBehaviour
         }
 
         //倒れているか確認
-        var springs = ConculateSpringsLoss(LayerXpositions,LayerYpositions);
+        var springs = ConculateSpringsLoss(LayerXpositions,LayerZpositions);
+        var strut_s = ConcurateHighLoss(LayerYpositions);
+        
         
 
         
