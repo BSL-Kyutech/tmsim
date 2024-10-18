@@ -147,7 +147,7 @@ public class Searcher3 : MonoBehaviour
         return maxDistance;
     }
 
-    /*
+    
     private float getDeviation(float[] LayerYpositions,int arrayLength){
         //end同士のyの差
         float errors=0.0f;
@@ -169,9 +169,9 @@ public class Searcher3 : MonoBehaviour
         }
         return maxError;
     }
-    */
-
-    private float getDeviation(float[] LayerYpositions,int arrayLength){
+    
+    //Deviationでさらに確認するやつ
+    private float getDeviationDetails(float[] LayerYpositions,int arrayLength){
         //end同士のyの差
         float errors=0.0f;
         //その中でも最大値
@@ -190,6 +190,7 @@ public class Searcher3 : MonoBehaviour
             
                 
         }
+        //numLayer-1と0の床の確認
         errors=(float)Math.Sqrt(Math.Pow((double)(LayerYpositions[0]-LayerYpositions[arrayLength-1]),2));
         if(maxError<=errors){
             //Debug.Log("maxError"+errors.ToString());
@@ -203,26 +204,64 @@ public class Searcher3 : MonoBehaviour
     private (float error, bool flag) ConcurateDeviationLoss(float error){
         //閾値は0.05くらい？
         float threshold=0.05f;
+        bool flag=false;
         //計算用のロス
         float loss=0.0f;
         if(error>threshold){
             loss=(float)Math.Pow((double)error,2);
+            flag=true;
         }
 
         
-        return loss;
+        return (loss,flag);
     }
 
     //ばね定数の変更処理　優先順位　2
-    private float ConculateSpringsLoss(){
+    //倒れているかどうか確認
+    private (float error, bool flag)  ConculateSpringsLoss(float[] xArray, float[] zArray){
+
+        //平均を求める(手先位置の真ん中の座標)
+        float x=0.0f;
+        float z=0.0f;
+        for(int i=0;i<xArray.Length;i++){
+            x+=xArray[i];
+            z+=zArray[i];
+        }
+
+        x/=xArray.Length;
+        z/=zArray.Length;
+
+        //最小二乗法での計算
         float loss=0.0f;
-        return loss;
+        loss=((float)(Math.Pow((double)(0-x),2))+(float)(Math.Pow((double)(0-z),2)));
+        Debug.Log("xz loss"+loss.ToString());
+
+        bool flag=true;
+        //閾値は0.6くらい？(4-5の際の値が0.5532593のため)
+        float threshold=0.6f;
+
+        if(loss<=threshold){
+            flag=false;
+        }
+
+        
+        return (loss,flag);
     }
 
     //高さの損失計算  　優先順位　3
-    private float ConcurateHighLoss(){
+    private (float loss, bool flag) ConcurateHighLoss(float y){
         float loss=0.0f;
-        return loss;
+        //目標値
+        float targetLength = 1.522883f;
+
+        bool flag=false;
+
+        loss=targetLength-y;
+        if(Math.Abs((double)loss)>=0.05f){
+            flag=true;
+        }
+
+        return (loss,flag);
     }
 
     //半径の損失計算　  優先順位　4
@@ -329,6 +368,8 @@ public class Searcher3 : MonoBehaviour
 
             //配列にそれぞれの層のずれ(end同士の高さの差)を格納
             maxErrors[i]=getDeviation(LayerYpositions,arrayLength);
+
+            
              
             /* 
             //上から刺さっている柱からend2x,y,z座標取得する(一番上は除外)
@@ -405,6 +446,9 @@ public class Searcher3 : MonoBehaviour
             */
 
         }
+
+        //倒れているか確認
+        var springs = ConculateSpringsLoss(LayerXpositions,LayerYpositions);
         
 
         

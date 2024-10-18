@@ -357,7 +357,7 @@ public class Assembly_n16_m20 : MonoBehaviour
         //edgeLoop= new float[20] {0.02849f, 0.026587f, 0.02338851111111f, 0.0210837766666666f, 0.0018f, 0.001f, 0.001f, 0.001f, 0.001f, 0.001f, 0.001f, 0.001f, 0.001f, 0.001f, 0.001f, 0.001f, 0.001f, 0.001f, 0.001f, 0.001f};  //base 0.5 strut 0.55 //2300
         
         //edgeLoop= new float[13] {0.0344f, 0.030692f, 0.0268851111111f,0.02270f,0.0223f, 0.0220f,0.0218f,0.0216f,0.0214f, 0.0018f, 0.017f, 0.015f, 0.014f};
-        edgeLoop= new float[8] {0.0352f, 0.0343f, 0.0333f, 0.031f, 0.0278f, 0.025f,0.0225f,0.0215f};
+        edgeLoop= new float[8] {0.0352f, 0.0342f, 0.0333f, 0.031f, 0.0278f, 0.025f,0.0225f,0.0215f};
 
         // Place the bottom layer's parts and connect ball joints　　//一番下の層の制作
         for (int i = 0; i < numPrism ; i++)
