@@ -198,25 +198,34 @@ public class Searcher3 : MonoBehaviour
         return maxError;
     }
 
-    //ばね定数の変更処理
+    //ズレの検出とその損失　優先順位　1
+    //損失と動作するかのフラグを返す
+    private (float error, bool flag) ConcurateDeviationLoss(float error){
+        //閾値は0.05くらい？
+        float threshold=0.05f;
+        //計算用のロス
+        float loss=0.0f;
+        if(error>threshold){
+            loss=(float)Math.Pow((double)error,2);
+        }
+
+        
+        return loss;
+    }
+
+    //ばね定数の変更処理　優先順位　2
     private float ConculateSpringsLoss(){
         float loss=0.0f;
         return loss;
     }
 
-    //ズレの検出とその損失
-    private float ConcurateDeviationLoss(){
-        float loss=0.0f;
-        return loss;
-    }
-
-    //高さの損失計算
+    //高さの損失計算  　優先順位　3
     private float ConcurateHighLoss(){
         float loss=0.0f;
         return loss;
     }
 
-    //半径の損失計算
+    //半径の損失計算　  優先順位　4
     private float ConcurateRadiusLoss(){
         float loss=0.0f;
         return loss;

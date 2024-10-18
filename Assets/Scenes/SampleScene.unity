@@ -651,7 +651,7 @@ MonoBehaviour:
   middleStrut: {fileID: 496332070889995177, guid: 2f92a0fe0fe3a6d4382a4a068cce07f7, type: 3}
   loopLine: {fileID: 2440199651309011904, guid: 8f1c1bcf30573a64a95af5058c50850a, type: 3}
   vertcalLine: {fileID: 5814438324172839912, guid: bea82ccdedd6b964fa19ee95da45820f, type: 3}
-  numLayer: 8
+  numLayer: 9
   numPrism: 16
   radiusBase: 0.22
   edgeLoop: []
