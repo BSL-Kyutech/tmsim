@@ -53,43 +53,44 @@ public class Searcher3 : MonoBehaviour
     private float ReturnCorrectHigha(int i,int numLayer){
         //4-5の際の層ごとの高さ
         float [] trueHigh={0.3345878f,0.5892965f,0.8675417f,1.15422f,1.48762f};
-        float radius=0.0f;
+        float high=0.0f;
         float gradient=0.0f;
         float intercept=0.0f;
 
         //今の層がどこに位置するか調べる
         int classifier=numLayer/5;
+        i=i+1;
 
         //それぞれの中間の高さを一次関数で近似
-        if(i<classifier){
+        if(i<classifier+1){
             gradient=(trueHigh[0]-0.0f)/(classifier);
             intercept=0.0f;
-            radius=gradient*i+intercept;
+            high=gradient*i+intercept;
         }
-        else if(i<(classifier*2)){
+        else if(i<(classifier*2)+1){
             gradient=(trueHigh[1]-trueHigh[0])/(classifier);
             intercept=trueHigh[0];
-            radius=gradient*i+intercept;
+            high=gradient*(i-classifier)+intercept;
         }
-        else if(i<(classifier*3)){
+        else if(i<(classifier*3)+1){
             gradient=(trueHigh[2]-trueHigh[1])/(classifier);
             intercept=trueHigh[1];
-            radius=gradient*i+intercept;
+            high=gradient*(i-classifier*2)+intercept;
         }
-        else if(i<(classifier*4)){
+        else if(i<(classifier*4)+1){
             gradient=(trueHigh[3]-trueHigh[2])/(classifier);
             intercept=trueHigh[2];
-            radius=gradient*i+intercept;
+            high=gradient*(i-classifier*3)+intercept;
         }
         else{
             gradient=(trueHigh[4]-trueHigh[3])/(classifier);
             intercept=trueHigh[3];
-            radius=gradient*i+intercept;
+            high=gradient*(i-classifier*4)+intercept;
         }
         
+        Debug.Log("high"+(i-1).ToString()+"  "+high.ToString());
         
-        
-        return radius;
+        return high;
     }
 
     //座標取得
@@ -429,6 +430,8 @@ public class Searcher3 : MonoBehaviour
 
             var radiusData=ConcurateRadiusLoss(diameters[i],tm_g_layers_y[i]);
             Debug.Log("radius Loss"+i.ToString() +"  "+radiusData.loss.ToString());
+
+            ReturnCorrectHigha(i,numLayer);
 
             
              
