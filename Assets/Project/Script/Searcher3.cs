@@ -19,30 +19,33 @@ public class Searcher3 : MonoBehaviour
         float intercept=0.0f;
 
         //それぞれの中間の直径を一次関数で近似
-        if(y<=0.3345878f){
+        if(y<=trueHigh[0]){
             gradient=(0.44f-trueRadius[0])/(trueHigh[0]-0.0f);
             intercept=0.0f;
-            radius=gradient*y+intercept;
+            radius=gradient*(y-0.0f)+intercept;
         }
-        else if(y<=0.5892965f){
+        else if(y<=trueHigh[1]){
             gradient=(trueRadius[0]-trueRadius[1])/(trueHigh[1]-trueHigh[0]);
             intercept=trueRadius[0];
-            radius=gradient*y+intercept;
+            radius=gradient*(y-trueHigh[0])+intercept;
         }
-        else if(y<=1.15422f){
+        else if(y<=trueHigh[2]){
             gradient=(trueRadius[1]-trueRadius[2])/(trueHigh[2]-trueHigh[1]);
             intercept=trueRadius[1];
-            radius=gradient*y+intercept;
+            radius=gradient*(y-trueHigh[1])+intercept;
         }
-        else if(y<=0.8675417f){
+        else if(y<=trueHigh[3]){
             gradient=(trueRadius[2]-trueRadius[3])/(trueHigh[3]-trueHigh[2]);
             intercept=trueRadius[2];
-            radius=gradient*y+intercept;
+            radius=gradient*(y-trueHigh[2])+intercept;
         }
-        else{
+        else if(y<=trueHigh[4]){
             gradient=(trueRadius[3]-trueRadius[4])/(trueHigh[4]-trueHigh[3]);
             intercept=trueRadius[3];
-            radius=gradient*y+intercept;
+            radius=gradient*(y-trueHigh[3])+intercept;
+        }
+        else{
+            radius=trueRadius[4];
         }
         
         
@@ -328,6 +331,34 @@ public class Searcher3 : MonoBehaviour
         return (loss,flag);
     }
 
+    private void parameterChanging(bool springFlag, float[] radiusLoss, bool highFlag, float highLosses){
+        if(springFlag){
+            float springForce=0.0f;
+            //パラメータの取得
+            if(PlayerPrefs.HasKey("SpringForce")){
+                springForce =PlayerPrefs.GetFloat("SpringForce");
+            }
+            //パラメータを増加
+            springForce+=80.0f;
+            //パラメータの引継ぎ
+            PlayerPrefs.SetFloat("SpringForce",springForce);
+            PlayerPrefs.Save();
+            return;
+        }
+        else{
+            //以前のlossのデータを取得
+            
+            //変化パラメータのフラグの取得
+
+            //現在が+状態か-状態か取得する．
+
+            //lossの比較
+
+                //エラーをもとにパラメータの適用
+            return;
+        }
+    }
+
     // Start is called before the first frame update
     void Start()
     {           
@@ -401,6 +432,9 @@ public class Searcher3 : MonoBehaviour
         float[] maxErrors;
         maxErrors=new float [numLayer];
 
+        float[] radiusLosses;
+        radiusLosses = new float [numLayer];
+
         //層ごとの高さ，半径，ズレの検出
         for(int i=0;i<numLayer;i++){
 
@@ -431,89 +465,22 @@ public class Searcher3 : MonoBehaviour
             var radiusData=ConcurateRadiusLoss(diameters[i],tm_g_layers_y[i]);
             Debug.Log("radius Loss"+i.ToString() +"  "+radiusData.loss.ToString());
 
-            ReturnCorrectHigha(i,numLayer);
+            radiusLosses[i]=radiusData.loss;
+
+            //ReturnCorrectHigha(i,numLayer);
 
             
              
-            /* 
-            //上から刺さっている柱からend2x,y,z座標取得する(一番上は除外)
-            if(i==(numLayer-1)){
-                operateFor=numPrism;
-                //一番上の層のため，上から刺さっている柱が存在しないため，柱の数のみで除算してその高さの平均を求める
-                tm_g_y/=numPrism;
-            }
-            else{
-                for(int j=0;j<numPrism;j++){
-                    Debug.Log(j+(i+1)*numPrism);
-                    strut=tm_g.transform.Find("Strut"+(j+(i+1)*numPrism).ToString()).gameObject;
-                    end=strut.transform.Find("end2");
-
-                    //平均計算のためにendたちのyの高さを足し合わせて行く
-                    tm_g_y+=end.transform.position.y;
-
-                    LayerXpositions[j+numPrism]=end.transform.position.x;
-                    LayerYpositions[j+numPrism]=end.transform.position.y;
-                    LayerZpositions[j+numPrism]=end.transform.position.z;
-                    //Debug.Log("i"+i.ToString()+",j"+j.ToString()+",Strut"+(j*i).ToString()+",tm_g_y"+end.transform.position.y.ToString());
-                    //Debug.Log("i"+i.ToString()+",j"+j.ToString()+",Strut"+(j*i).ToString()+",tm_g_y"+end.transform.position.y.ToString());
-                }
-                operateFor=numPrism*2;
-
-                //上にも層があるため，上から刺さっている柱により2倍に
-                tm_g_y=tm_g_y/(2*numPrism);
-            }
-            
-
-            Debug.Log(operateFor.ToString()+" zure");
-            
-            //半径の計算
-            for(int j=0;j<operateFor;j++){
-                
-                //XとZのそれぞれの距離
-                tm_g_x=(float)Math.Pow((double)(LayerXpositions[0]-LayerXpositions[j]),2);
-                tm_g_z=(float)Math.Pow((double)(LayerZpositions[0]-LayerZpositions[j]),2);
-
-                if(maxDistance<=(float)(Math.Sqrt(tm_g_x+tm_g_z))){
-                    maxDistance=(float)Math.Sqrt(tm_g_x+tm_g_z);
-                }
-            }
-            
-            
-
-
-            //ズレの検出の計算
-            for(int j=0;j<operateFor;j++){
-                for(int k=0;k<operateFor;k++){
-                    //y座標のそれぞれの距離で一番離れているところを探す
-                    errors=0.0f;
-                    errors=(float)Math.Sqrt(Math.Pow((double)(LayerYpositions[k]-LayerYpositions[j]),2));
-                    
-                    if(maxError<=errors){
-                        //Debug.Log("maxError"+errors.ToString());
-                        maxError=errors;
-                    }
-                }
-                
-                
-            }
-
-            
-
-            Debug.Log(i.ToString());
-            //配列にそれぞれのずれの誤差を格納
-            maxErrors[i]=maxError;
-            maxError=0.0f;
-
-            Array.Fill(LayerXpositions,0.0f);
-            Array.Fill(LayerYpositions,0.0f);
-            Array.Fill(LayerZpositions,0.0f);
-            */
-
+           
         }
 
         //倒れているか確認
-        var springs = ConculateSpringsLoss(LayerXpositions,LayerZpositions);
-        var strut_s = ConcurateHighLoss(LayerYpositions);
+        var springlosses = ConculateSpringsLoss(LayerXpositions,LayerZpositions);
+        var highLosses = ConcurateHighLoss(LayerYpositions);
+
+        parameterChanging(springlosses.flag,radiusLosses,highLosses.flag,highLosses.loss);
+
+
         
         
 
