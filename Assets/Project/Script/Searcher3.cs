@@ -51,8 +51,14 @@ public class Searcher3 : MonoBehaviour
         
         
         return radius;
+        
     }
 
+    private void OutputCsv(string path,string savedata ){
+
+        //File.AppendAllText("C:/Users/Yamauchi Gaito/Desktop/workspace/tmsim/data/data.csv",savedata);
+        File.AppendAllText(path,savedata);
+    }
     private float ReturnCorrectHigha(int i,int numLayer){
         //4-5の際の層ごとの高さ
         float [] trueHigh={0.3345878f,0.5892965f,0.8675417f,1.15422f,1.48762f};
@@ -91,7 +97,7 @@ public class Searcher3 : MonoBehaviour
             high=gradient*(i-classifier*4)+intercept;
         }
         
-        Debug.Log("high"+(i-1).ToString()+"  "+high.ToString());
+        //Debug.Log("high"+(i-1).ToString()+"  "+high.ToString());
         
         return high;
     }
@@ -280,17 +286,17 @@ public class Searcher3 : MonoBehaviour
         //最小二乗法での計算
         float loss=0.0f;
         loss=((float)(Math.Pow((double)(0-x),2))+(float)(Math.Pow((double)(0-z),2)));
-        Debug.Log("xz loss"+loss.ToString());
+        //Debug.Log("xz loss   "+loss.ToString());
 
         bool flag=true;
-        //閾値は0.6くらい？(4-5の際の値が0.5532593のため)
-        float threshold=0.6f;
+        //閾値は0.2くらい？(4-5の際の値が0.5532593のため)
+        float threshold=0.08f;
 
         if(loss<=threshold){
             flag=false;
         }
 
-        
+        //Debug.Log(flag);
         return (loss,flag);
     }
 
@@ -302,7 +308,9 @@ public class Searcher3 : MonoBehaviour
         for(int i=0;i<yArray.Length/2;i++){
             y+=yArray[i];
         }
+        //y座標の平均
         y/=(yArray.Length/2);
+
 
         float loss=0.0f;
         //目標値
@@ -310,11 +318,11 @@ public class Searcher3 : MonoBehaviour
 
         bool flag=false;
 
-        loss=targetLength-y;
-        if(Math.Abs((double)loss)>=0.05f){
+        loss=(float)Math.Pow((double)(targetLength-y),2);
+        if(Math.Abs((double)loss)>=0.05){
             flag=true;
         }
-        Debug.Log("高さのロス"+loss.ToString());
+        //Debug.Log("高さのロス"+loss.ToString());
 
         return (loss,flag);
     }
@@ -331,8 +339,9 @@ public class Searcher3 : MonoBehaviour
         return (loss,flag);
     }
 
-    private void parameterChanging(bool springFlag, float[] radiusLoss, bool highFlag, float highLosses){
+    private void parameterChanging(bool springFlag, float[] radiusLoss, bool highFlag, float highLoss,int numLayer){
         if(springFlag){
+            
             float springForce=0.0f;
             //パラメータの取得
             if(PlayerPrefs.HasKey("SpringForce")){
@@ -343,18 +352,300 @@ public class Searcher3 : MonoBehaviour
             //パラメータの引継ぎ
             PlayerPrefs.SetFloat("SpringForce",springForce);
             PlayerPrefs.Save();
+
+            Debug.Log("springForce ++ " + springForce.ToString());
             return;
         }
-        else{
-            //以前のlossのデータを取得
+        else{//Strutとエッジループの+-組み合わせ(4通りを確認し，一番lossが小さいものを探す)
+            //Strutの調整かエッジループの調整か確認する
+            int compareFlag = 0; //0 Strut+edgeLoop- ,1 Strut+edgeLoop+ ,2 Strut-edgeLoop-,3 Strut-edgeLoop+ 
+            float springForce=0.0f;
+            float diffphaseSpringForce=0.0f;
+
+            if(PlayerPrefs.HasKey("compareFlag")){
+                compareFlag =PlayerPrefs.GetInt("compareFlag");
+            }
+            if(PlayerPrefs.HasKey("compareFlag")){
+                compareFlag =PlayerPrefs.GetInt("compareFlag");
+            }
+            if(compareFlag==0){
+                if(PlayerPrefs.HasKey("SpringForce")){
+                    springForce =PlayerPrefs.GetFloat("SpringForce");
+                }
+            }
+            else{
+                if(PlayerPrefs.HasKey("SpringForce")){
+                    springForce =PlayerPrefs.GetFloat("SpringForce");
+                }
+                if(PlayerPrefs.HasKey("diffphaseSpringForce")){
+                    springForce =PlayerPrefs.GetFloat("diffphaseSpringForce");
+                }
+            }
             
-            //変化パラメータのフラグの取得
+            //どのedgeLoopか確認する
+            int edgeFlag =0;
+            if(PlayerPrefs.HasKey("EdgeFlag")){
+                edgeFlag =PlayerPrefs.GetInt("EdgeFlag");
+            }
 
-            //現在が+状態か-状態か取得する．
+            //過去のエラーの保存
+            float[] highLosses;
+            highLosses = new float[compareFlag+1];
 
-            //lossの比較
+            float[] radiusLosses;
+            radiusLosses = new float[compareFlag+1];
 
-                //エラーをもとにパラメータの適用
+            float[] Forces;
+            Forces = new float[4];
+            
+
+
+            //パラメータの取得(edgeLoop)
+            float[] edgeLoop;
+            edgeLoop=new float[numLayer];
+            for(int i=0;i<numLayer;i++){
+                if(PlayerPrefs.HasKey("edgeLoop"+(i).ToString())){
+                    edgeLoop[i]=PlayerPrefs.GetFloat("edgeLoop"+(i).ToString());
+                }
+            }
+
+            //パラメータの取得(Strut basestrut)
+            float strutScale=0.0f;
+            float baseScale=0.0f;
+            if(PlayerPrefs.HasKey("StrutScale")){
+                strutScale=PlayerPrefs.GetFloat("StrutScale");
+            }
+            if(PlayerPrefs.HasKey("baseScale")){
+                baseScale=PlayerPrefs.GetFloat("baseScale");
+            }
+
+            //lossの保存
+            PlayerPrefs.SetFloat("highLosses"+compareFlag.ToString(),highLoss);
+            PlayerPrefs.Save();
+            PlayerPrefs.SetFloat("radiusLosses"+compareFlag.ToString(),radiusLoss[edgeFlag]);
+            PlayerPrefs.Save();
+            PlayerPrefs.SetFloat("springForce"+compareFlag.ToString(),springForce);
+            PlayerPrefs.Save();
+
+            //出力
+            string savedata="basescale,"+baseScale.ToString()+",strutScale,"+strutScale.ToString();
+            //Debug.Log(tm_g_y);
+            for(int i=0;i<numLayer;i++){
+                savedata+=",edgeLoop"+i.ToString() +"," +edgeLoop[i].ToString(); 
+            }
+            savedata+=",highLoss,"+highLosses.ToString()+",highLoss,"+radiusLoss[edgeFlag].ToString()+"\n";
+
+            Debug.Log(savedata);
+            //Csvの出力
+            string path= "C:/Users/Yamauchi Gaito/Desktop/workspace/_tmsim/data/mountingSearch3.csv";
+            OutputCsv(path,savedata);
+
+
+            //パラメータの調整
+            float damperEdge=0.0005f;
+            float damperStrut=0.005f;
+
+            int bases=numLayer/5;
+            switch(compareFlag){
+                case 0://0 Strut+edgeLoop- 
+                    
+                    edgeLoop[edgeFlag]=edgeLoop[edgeFlag]-damperEdge;
+                    if(edgeFlag <= (bases-1)){
+                        baseScale=baseScale+damperStrut;
+                    }
+                    else{
+                        strutScale=strutScale+damperStrut;
+                    }
+                    
+                    PlayerPrefs.SetFloat("springForce"+compareFlag.ToString(),springForce);
+                    PlayerPrefs.Save();
+
+                    compareFlag=compareFlag+1;
+                    break;
+
+                case 1://1 Strut+edgeLoop+ 
+                    
+                    edgeLoop[edgeFlag]=edgeLoop[edgeFlag]+2.0f*damperEdge;
+
+                    PlayerPrefs.SetFloat("springForce"+compareFlag.ToString(),springForce);
+                    PlayerPrefs.Save();
+
+                    compareFlag=compareFlag+1;
+                    break;
+
+                case 2://2 Strut-edgeLoop-
+                    
+                    edgeLoop[edgeFlag]=edgeLoop[edgeFlag]-2.0f * damperEdge;
+                    if(edgeFlag <= (bases-1)){
+                        baseScale=baseScale-2.0f *damperStrut;
+                    }
+                    else{
+                        strutScale=strutScale-2.0f *damperStrut;
+                    }
+                    
+
+                    PlayerPrefs.SetFloat("springForce"+compareFlag.ToString(),springForce);
+                    PlayerPrefs.Save();
+
+                    compareFlag=compareFlag+1;
+                    break;
+
+                case 3://3 Strut-edgeLoop+ 
+                    
+                    edgeLoop[edgeFlag]=edgeLoop[edgeFlag]+2.0f*damperEdge;
+                    
+
+                    PlayerPrefs.SetFloat("springForce"+compareFlag.ToString(),springForce);
+                    PlayerPrefs.Save();
+
+                    compareFlag=compareFlag+1;
+                    
+                    break;
+                case 4://データの比較段階(時系列上3のデータがこの際とられている．)
+                    //最後の加算が面倒なのでパラメータを最初に戻す
+                    edgeLoop[edgeFlag]=edgeLoop[edgeFlag]- damperEdge;
+                    if(edgeFlag <= (bases-1)){
+                        baseScale=baseScale+ damperStrut;
+                    }
+                    else{
+                        strutScale=strutScale+ damperStrut;
+                    }
+                    compareFlag=0;
+                    break;
+
+            }
+            //Debug.Log(compareFlag);
+
+            //compareFlag+1されているため，最後のデータは=0の際に取得される。
+            if(compareFlag==0){
+                Debug.Log("----------------------- Compare phase -------------------------------");
+                //以前のlossのデータを取得
+                for(int i=0;i<4;i++){
+                    highLosses[i]=10000000000.0f;
+                    radiusLosses[i]=10000000000.0f;
+                    Forces[i]=springForce;
+                    if(PlayerPrefs.HasKey("highLosses"+i.ToString())){
+                        highLosses[i]=PlayerPrefs.GetFloat("highLosses"+i.ToString());
+                    } 
+                    if(PlayerPrefs.HasKey("radiusLosses"+i.ToString())){
+                        radiusLosses[i]=PlayerPrefs.GetFloat("radiusLosses"+i.ToString());
+                    }  
+                    if(PlayerPrefs.HasKey("springForce"+i.ToString())){
+                        Forces[i]=PlayerPrefs.GetFloat("springForce"+i.ToString());
+                    }
+                }
+
+
+                //lossの比較
+                float minloss=10000000.0f;
+                int mins=0;
+                //高さが良いやつを選抜する
+                int count=0;
+                for(int i=0;i<4;i++){
+                    if(Math.Abs((double)highLosses[i])<=0.05){
+                        count++;
+                    }
+                }
+                switch(count){ 
+                    case 0:
+                        for(int i=0;i<4;i++){
+                            if(minloss>=highLosses[i]){
+                                minloss=highLosses[i];
+                                mins=i;
+                                Debug.Log(minloss);
+                            }
+                        }
+                        break;
+
+                    default:
+                        minloss=10000000.0f;
+                        for(int i=0;i<compareFlag;i++){
+                            if(minloss>=radiusLosses[i]){
+                                minloss=radiusLosses[i];
+                                mins=i;
+                            }
+                        }
+                        break;
+                }
+
+                
+
+                //エラーをもとにパラメータの適用(case 3の際の値になっているので，そこから適用するとどうなる？)
+                switch(mins){
+                    case 0://0 Strut+edgeLoop- 
+                    
+                        edgeLoop[edgeFlag]=edgeLoop[edgeFlag]-damperEdge;
+                        if(edgeFlag <= (bases-1)){
+                            baseScale=baseScale+damperStrut;
+                        }
+                        else{
+                            strutScale=strutScale+damperStrut;
+                        }
+                        springForce=Forces[0];
+                        edgeFlag+=1;
+                        break;
+
+                    case 1://1 Strut+edgeLoop+ 
+                        if(edgeFlag <= (bases-1)){
+                            baseScale=baseScale+1.0f *damperStrut;
+                        }
+                        else{
+                            strutScale=strutScale+1.0f *damperStrut;
+                        }
+                    
+                        edgeLoop[edgeFlag]=edgeLoop[edgeFlag]+1.0f*damperEdge;
+                        springForce=Forces[1];
+                        edgeFlag+=1;
+                        break;
+
+                    case 2://2 Strut-edgeLoop-
+                    
+                        edgeLoop[edgeFlag]=edgeLoop[edgeFlag]-1.0f * damperEdge;
+                        if(edgeFlag <= (bases-1)){
+                            baseScale=baseScale-1.0f *damperStrut;
+                        }
+                        else{
+                            strutScale=strutScale-1.0f *damperStrut;
+                        }
+                        springForce=Forces[2];
+                        edgeFlag+=1;
+                        break;
+
+                    case 3://3 Strut-edgeLoop+ 
+                        if(edgeFlag <= (bases-1)){
+                            baseScale=baseScale+1.0f *damperStrut;
+                        }
+                        else{
+                            strutScale=strutScale+1.0f *damperStrut;
+                        }
+                    
+                        edgeLoop[edgeFlag]=edgeLoop[edgeFlag]-damperEdge;
+                        springForce=Forces[3];
+                        edgeFlag+=1;
+                        break;
+                }
+            }
+
+            if(edgeFlag>=numLayer){
+                edgeFlag=0;
+            }
+
+            //パラメータの引継ぎ
+            for(int i=0;i<numLayer;i++){
+                PlayerPrefs.SetFloat("edgeLoop"+(i).ToString(),edgeLoop[i]);
+                PlayerPrefs.Save();
+            }
+            PlayerPrefs.SetFloat("springForce",springForce);
+            PlayerPrefs.Save();
+            PlayerPrefs.SetInt("compareFlag",compareFlag);
+            PlayerPrefs.Save();
+            PlayerPrefs.SetFloat("StrutScale",strutScale);
+            PlayerPrefs.Save();
+            PlayerPrefs.SetFloat("baseScale",baseScale);
+            PlayerPrefs.Save();
+            PlayerPrefs.SetInt("EdgeFlag",edgeFlag);
+            PlayerPrefs.Save();
+            
             return;
         }
     }
@@ -463,7 +754,7 @@ public class Searcher3 : MonoBehaviour
 
 
             var radiusData=ConcurateRadiusLoss(diameters[i],tm_g_layers_y[i]);
-            Debug.Log("radius Loss"+i.ToString() +"  "+radiusData.loss.ToString());
+            //Debug.Log("radius Loss"+i.ToString() +"  "+radiusData.loss.ToString());
 
             radiusLosses[i]=radiusData.loss;
 
@@ -478,15 +769,15 @@ public class Searcher3 : MonoBehaviour
         var springlosses = ConculateSpringsLoss(LayerXpositions,LayerZpositions);
         var highLosses = ConcurateHighLoss(LayerYpositions);
 
-        parameterChanging(springlosses.flag,radiusLosses,highLosses.flag,highLosses.loss);
+        parameterChanging(springlosses.flag,radiusLosses,highLosses.flag,highLosses.loss,numLayer);
 
 
         
-        
+        SceneManager.LoadScene("SampleScene");
 
         
 
-        
+        /*
         for(int i=0;i<numLayer;i++){
             Debug.Log("Layer" +i.ToString()+ "'s high  : "+tm_g_layers_y[i].ToString());
         }
@@ -497,6 +788,7 @@ public class Searcher3 : MonoBehaviour
         for(int i=0;i<numLayer;i++){
             Debug.Log("Layer" +i.ToString()+ "'s zure  : "+maxErrors[i].ToString());
         }
+        */
     }
 
     

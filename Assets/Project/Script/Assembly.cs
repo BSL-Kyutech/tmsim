@@ -71,7 +71,6 @@ public class Assembly : MonoBehaviour
     public float edgeparameter_layers=1.0f;  //レイヤー数とかで変わる減衰率
 
     public float predict;
-    public float a;
     public double psi0;
     public double psiFin;
     public double phi0;
@@ -228,13 +227,13 @@ public class Assembly : MonoBehaviour
 
         //radiusLoopが内部に存在していた場合取得
         
-        /*
+        
         if(PlayerPrefs.HasKey("RadiusLoop")){
-            radiusLoop=PlayerPrefs.GetFloat("RadiusLoop");
+            //radiusLoop=PlayerPrefs.GetFloat("RadiusLoop");
         }
 
         if(PlayerPrefs.HasKey("SpringForce")){
-            a =PlayerPrefs.GetFloat("SpringForce");
+            springForce =PlayerPrefs.GetFloat("SpringForce");
         }
 
         if(PlayerPrefs.HasKey("StrutScale")){
@@ -246,15 +245,14 @@ public class Assembly : MonoBehaviour
 
         if(PlayerPrefs.HasKey("edge")){
         
-           edgeparameter_layers=PlayerPrefs.GetFloat("edge");
+           //edgeparameter_layers=PlayerPrefs.GetFloat("edge");
         }
         if(PlayerPrefs.HasKey("mode")){
-           mode=PlayerPrefs.GetInt("count");
+           //mode=PlayerPrefs.GetInt("count");
         }
-        */
+        
 
         
-        a=edgeparameter_layers;
         diffRadiusLoop=radiusLoop;
         diffspringForce=springForce;
         diffStrutScale=StrutScale;
@@ -305,11 +303,12 @@ public class Assembly : MonoBehaviour
         {
             edgeLoop[i-1]=(2.0f*(radiusBase - diffRadius*((float)(i)))*(float)Math.Sin(Math.PI/(2*numPrism)))*((float)Math.Cos((diffphi*i*Math.PI)/180));
             if(PlayerPrefs.HasKey("edgeLoop"+(i-1).ToString())){
-                //edgeLoop[i-1]=PlayerPrefs.GetFloat("edgeLoop"+(i-1).ToString());
+                edgeLoop[i-1]=PlayerPrefs.GetFloat("edgeLoop"+(i-1).ToString());
             }
             //4本5層の値
             //edgeLoop= new float[5] {0.12415123082906993f,0.11031530609675386f,0.10214850457080119f,0.09057431266995283f,0.12024559516481466f};
-            edgeLoop=new float[10]{0.065649f, 0.05787f, 0.05438851111111f, 0.05100837766666666f, 0.04738228702222222f, 0.043882287022222224f, 0.039228702222222f, 0.03882287022222223f, 0.03838228702222223f, 0.054f};
+            //edgeLoop=new float[10]{0.05f, 0.04f, 0.03f, 0.02857142857142857f, 0.027142857142857142f, 0.025714285714285714f, 0.024285714285714285f, 0.022857142857142857f, 0.02142857142857143f, 0.02f};
+            //edgeLoop=new float[10]{0.065649f, 0.05787f, 0.05438851111111f, 0.05100837766666666f, 0.04738228702222222f, 0.043882287022222224f, 0.039228702222222f, 0.03882287022222223f, 0.03838228702222223f, 0.054f};
             /*
             if(mode==0){
                 edgeLoop[i-1]=   (2.0f*(radiusBase - diffRadius*((float)(i)))*(float)Math.Sin(Math.PI/(2*numPrism)))*((float)Math.Cos((diffphi*i*Math.PI)/180));
@@ -557,6 +556,20 @@ public class Assembly : MonoBehaviour
             }
         }
 
+        for(int i=0;i<numLayer;i++){
+            PlayerPrefs.SetFloat("edgeLoop"+(i).ToString(),edgeLoop[i]);
+            PlayerPrefs.Save();
+        }
+
+        PlayerPrefs.SetFloat("RadiusLoop",radiusLoop);
+        PlayerPrefs.Save();
+        PlayerPrefs.SetFloat("SpringForce",springForce);
+        PlayerPrefs.Save();
+        PlayerPrefs.SetFloat("StrutScale",StrutScale);
+        PlayerPrefs.Save();
+        PlayerPrefs.SetFloat("baseScale",BaseScale);
+        PlayerPrefs.Save();
+
         isReady = true;
     }
 
@@ -566,32 +579,14 @@ public class Assembly : MonoBehaviour
 
         
         
+        
         if((Time.frameCount%1000)==0){
             //Debug.Log(StrutScale);
             
             
                 
-            //Debug.Log(StrutScale);
-            if(diffRadiusLoop!=radiusLoop || diffspringForce!=a ||  StrutScale!=diffStrutScale){
-                //変更されていた場合，保存
             
-                
-                PlayerPrefs.SetFloat("RadiusLoop",radiusLoop);
-                PlayerPrefs.Save();
-                PlayerPrefs.SetFloat("SpringForce",a);
-                PlayerPrefs.Save();
-                PlayerPrefs.SetFloat("StrutScale",StrutScale);
-                PlayerPrefs.Save();
-                PlayerPrefs.SetFloat("baseScale",BaseScale);
-                PlayerPrefs.Save();
-
-                
-
-                //シーンの再読み込み
-                //SceneManager.LoadScene("SampleScene");
-            }
             diffRadiusLoop=radiusLoop;
-            diffspringForce=a;
             diffStrutScale=StrutScale;
         }
         
