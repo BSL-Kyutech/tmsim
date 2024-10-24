@@ -8,7 +8,14 @@ using UnityEngine.SceneManagement;
 
 public class Searcher3 : MonoBehaviour
 {
+    //csv 出力
+    private void OutputCsv(string path,string savedata ){
 
+        //File.AppendAllText("C:/Users/Yamauchi Gaito/Desktop/workspace/tmsim/data/data.csv",savedata);
+        File.AppendAllText(path,savedata);
+    }
+
+    //半径の正解値を返す
     private float ReturnCorrectRadius(float y){
         //4-5の際の半径
         float [] trueRadius={0.3232192f,0.2661974f,0.2253503f,0.1690026f,0.1804611f};
@@ -54,11 +61,7 @@ public class Searcher3 : MonoBehaviour
         
     }
 
-    private void OutputCsv(string path,string savedata ){
-
-        //File.AppendAllText("C:/Users/Yamauchi Gaito/Desktop/workspace/tmsim/data/data.csv",savedata);
-        File.AppendAllText(path,savedata);
-    }
+    //高さの正解値を返す
     private float ReturnCorrectHigha(int i,int numLayer){
         //4-5の際の層ごとの高さ
         float [] trueHigh={0.3345878f,0.5892965f,0.8675417f,1.15422f,1.48762f};
@@ -91,10 +94,13 @@ public class Searcher3 : MonoBehaviour
             intercept=trueHigh[2];
             high=gradient*(i-classifier*3)+intercept;
         }
-        else{
+        else if(i<(classifier*5)+1){
             gradient=(trueHigh[4]-trueHigh[3])/(classifier);
             intercept=trueHigh[3];
             high=gradient*(i-classifier*4)+intercept;
+        }
+        else{
+            high=trueHigh[4];
         }
         
         //Debug.Log("high"+(i-1).ToString()+"  "+high.ToString());
@@ -199,7 +205,7 @@ public class Searcher3 : MonoBehaviour
         return maxDistance;
     }
 
-    
+    //ズレの検出
     private float getDeviation(float[] LayerYpositions,int arrayLength){
         //end同士のyの差
         float errors=0.0f;
@@ -338,7 +344,7 @@ public class Searcher3 : MonoBehaviour
 
         return (loss,flag);
     }
-
+    
     private void parameterChanging(bool springFlag, float[] radiusLoss, bool highFlag, float highLoss,int numLayer){
         if(springFlag){
             
