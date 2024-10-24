@@ -469,7 +469,7 @@ public class Searcher3 : MonoBehaviour
                         baseScale=baseScale+damperStrut;
                     }
                     else{
-                        strutScale=strutScale+damperStrut;
+                        strutScale=strutScale+damperStrut/(float)numLayer;
                     }
                     
                     PlayerPrefs.SetFloat("springForce"+compareFlag.ToString(),springForce);
@@ -495,7 +495,7 @@ public class Searcher3 : MonoBehaviour
                         baseScale=baseScale-2.0f *damperStrut;
                     }
                     else{
-                        strutScale=strutScale-2.0f *damperStrut;
+                        strutScale=strutScale-2.0f *damperStrut/(float)numLayer;
                     }
                     
 
@@ -579,7 +579,7 @@ public class Searcher3 : MonoBehaviour
                             baseScale=baseScale+damperStrut;
                         }
                         else{
-                            strutScale=strutScale+damperStrut;
+                            strutScale=strutScale+damperStrut/(float)numLayer;
                         }
                         springForce=Forces[0];
                         edgeFlag+=1;
@@ -590,7 +590,7 @@ public class Searcher3 : MonoBehaviour
                             baseScale=baseScale+1.0f *damperStrut;
                         }
                         else{
-                            strutScale=strutScale+1.0f *damperStrut;
+                            strutScale=strutScale+1.0f *damperStrut/(float)numLayer;
                         }
                     
                         edgeLoop[edgeFlag]=edgeLoop[edgeFlag]+1.0f*damperEdge;
@@ -605,7 +605,7 @@ public class Searcher3 : MonoBehaviour
                             baseScale=baseScale-1.0f *damperStrut;
                         }
                         else{
-                            strutScale=strutScale-1.0f *damperStrut;
+                            strutScale=strutScale-1.0f *damperStrut/(float)numLayer;
                         }
                         springForce=Forces[2];
                         edgeFlag+=1;
@@ -616,7 +616,7 @@ public class Searcher3 : MonoBehaviour
                             baseScale=baseScale+1.0f *damperStrut;
                         }
                         else{
-                            strutScale=strutScale+1.0f *damperStrut;
+                            strutScale=strutScale+1.0f *damperStrut/(float)numLayer;
                         }
                     
                         edgeLoop[edgeFlag]=edgeLoop[edgeFlag]-damperEdge;
