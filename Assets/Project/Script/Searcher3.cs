@@ -545,7 +545,8 @@ public class Searcher3 : MonoBehaviour
                     //変更前のばね定数の保存
                     Forces[i]=springForce;
                     if(PlayerPrefs.HasKey("Loss"+compareFlag.ToString())){
-                        losses[i]=PlayerPrefs.GetFloat("Loss"+compareFlag.ToString(),loss);
+                        //Debug.Log(PlayerPrefs.GetFloat("Loss"+i.ToString()));
+                        losses[i]=PlayerPrefs.GetFloat("Loss"+i.ToString());
                     }  
                     if(PlayerPrefs.HasKey("springForce"+i.ToString())){
                         Forces[i]=PlayerPrefs.GetFloat("springForce"+i.ToString());
@@ -565,7 +566,7 @@ public class Searcher3 : MonoBehaviour
                     if(minloss>=losses[i]){
                         minloss=losses[i];
                         mins=i;
-                        Debug.Log(minloss);
+                        //Debug.Log(minloss);
                     }
                 }
 
@@ -778,6 +779,7 @@ public class Searcher3 : MonoBehaviour
 
         //層ごと高さと直径のlossの合成
         float allLoss=highLosses.loss+radiusData.loss+handPositionLoss;
+        //Debug.Log(allLoss);
         
         //パラメータの変更処理
         parameterChanging(springlosses.flag,allLoss,numLayer);
