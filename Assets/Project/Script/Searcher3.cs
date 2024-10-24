@@ -15,9 +15,9 @@ public class Searcher3 : MonoBehaviour
         File.AppendAllText(path,savedata);
     }
 
-    //半径の正解値を返す
+    //直径の正解値を返す
     private float ReturnCorrectRadius(float y){
-        //4-5の際の半径
+        //4-5の際の直径
         float [] trueRadius={0.3232192f,0.2661974f,0.2253503f,0.1690026f,0.1804611f};
         //4-5の際の層ごとの高さ
         float [] trueHigh={0.3345878f,0.5892965f,0.8675417f,1.15422f,1.48762f};
@@ -306,21 +306,30 @@ public class Searcher3 : MonoBehaviour
         return (loss,flag);
     }
 
-    //高さの損失計算  　優先順位　3
-    private (float loss, bool flag) ConcurateHighLoss(float[] yArray){
-
-        float y=0.0f;
-
-        for(int i=0;i<yArray.Length/2;i++){
-            y+=yArray[i];
+    //すべてのレイヤーの高さの損失計算
+    private (float loss, bool flag) ConcurateAllHighLoss(float[] yArray){
+        //loss
+        float loss=0.0f;
+        float targetLength=0.0f;
+        bool flag=false;
+        
+        for (int i=0;i<yArray.Length;i++){
+            //レイヤーが目指すべき高さを計算
+            targetLength=ReturnCorrectHigha(i,yArray.Length);
+            //lossを計算
+            loss+=ConcurateHighLoss(yArray[i],targetLength);
         }
-        //y座標の平均
-        y/=(yArray.Length/2);
+
+        return (loss,flag);
+    }
+
+    //高さの損失計算  　優先順位　3
+    private float ConcurateHighLoss(float y,float targetLength){
 
 
         float loss=0.0f;
         //目標値
-        float targetLength = 1.522883f;
+        //float targetLength = 1.522883f;
 
         bool flag=false;
 
@@ -330,22 +339,34 @@ public class Searcher3 : MonoBehaviour
         }
         //Debug.Log("高さのロス"+loss.ToString());
 
-        return (loss,flag);
+        return loss;
     }
 
-    //半径の損失計算　  優先順位　4
-    private (float loss, bool flag) ConcurateRadiusLoss(float radius, float y){
+    //直径の損失計算　  優先順位　4
+    private float ConcurateRadiusLoss(float radius, float y){
         float loss=0.0f;
-        bool flag=false;
 
         float targetRadius=ReturnCorrectRadius(y);
 
         loss=(float)Math.Pow((double)(targetRadius-radius),2);
 
+        return loss;
+    }
+
+    //直径の損失計算(すべて)
+    private (float loss, bool flag) ConcurateAllRadiusLoss(float[] layersRadius/*レイヤーごとの直径*/, float[] layersHighs /*レイヤーごとの高さ*/){
+        float loss=0.0f; //ロス
+        bool flag=false; //あくまで念のためのフラグ
+
+        //配列内のlossの計算
+        for (int i=0; i<layersRadius.Length;i++){
+            loss += ConcurateRadiusLoss(layersRadius[i],layersHighs[i]);
+        }
+
         return (loss,flag);
     }
     
-    private void parameterChanging(bool springFlag, float[] radiusLoss, bool highFlag, float highLoss,int numLayer){
+    private void parameterChanging(bool springFlag, float loss,int numLayer){
         if(springFlag){
             
             float springForce=0.0f;
@@ -394,13 +415,6 @@ public class Searcher3 : MonoBehaviour
                 edgeFlag =PlayerPrefs.GetInt("EdgeFlag");
             }
 
-            //過去のエラーの保存
-            float[] highLosses;
-            highLosses = new float[compareFlag+1];
-
-            float[] radiusLosses;
-            radiusLosses = new float[compareFlag+1];
-
             float[] Forces;
             Forces = new float[4];
             
@@ -426,11 +440,7 @@ public class Searcher3 : MonoBehaviour
             }
 
             //lossの保存
-            PlayerPrefs.SetFloat("highLosses"+compareFlag.ToString(),highLoss);
-            PlayerPrefs.Save();
-            PlayerPrefs.SetFloat("radiusLosses"+compareFlag.ToString(),radiusLoss[edgeFlag]);
-            PlayerPrefs.Save();
-            PlayerPrefs.SetFloat("springForce"+compareFlag.ToString(),springForce);
+            PlayerPrefs.SetFloat("Loss"+compareFlag.ToString(),loss);
             PlayerPrefs.Save();
 
             //出力
@@ -439,11 +449,12 @@ public class Searcher3 : MonoBehaviour
             for(int i=0;i<numLayer;i++){
                 savedata+=",edgeLoop"+i.ToString() +"," +edgeLoop[i].ToString(); 
             }
-            savedata+=",highLoss,"+highLosses.ToString()+",highLoss,"+radiusLoss[edgeFlag].ToString()+"\n";
+            //savedata+=",highLoss,"+highLosses.ToString()+",highLoss,"+radiusLoss[edgeFlag].ToString()+"\n";
+            savedata+=",loss,"+loss.ToString()+"\n";
 
             Debug.Log(savedata);
             //Csvの出力
-            string path= "C:/Users/Yamauchi Gaito/Desktop/workspace/_tmsim/data/mountingSearch3.csv";
+            string path= "C:/Users/Yamauchi Gaito/Desktop/workspace/_tmsim/data/mountingSearc3_1.csv";
             OutputCsv(path,savedata);
 
 
@@ -526,15 +537,15 @@ public class Searcher3 : MonoBehaviour
             if(compareFlag==0){
                 Debug.Log("----------------------- Compare phase -------------------------------");
                 //以前のlossのデータを取得
+                float[] losses;
+                losses = new float[4];
+
                 for(int i=0;i<4;i++){
-                    highLosses[i]=10000000000.0f;
-                    radiusLosses[i]=10000000000.0f;
+                    losses[i]=10000000000.0f;
+                    //変更前のばね定数の保存
                     Forces[i]=springForce;
-                    if(PlayerPrefs.HasKey("highLosses"+i.ToString())){
-                        highLosses[i]=PlayerPrefs.GetFloat("highLosses"+i.ToString());
-                    } 
-                    if(PlayerPrefs.HasKey("radiusLosses"+i.ToString())){
-                        radiusLosses[i]=PlayerPrefs.GetFloat("radiusLosses"+i.ToString());
+                    if(PlayerPrefs.HasKey("Loss"+compareFlag.ToString())){
+                        losses[i]=PlayerPrefs.GetFloat("Loss"+compareFlag.ToString(),loss);
                     }  
                     if(PlayerPrefs.HasKey("springForce"+i.ToString())){
                         Forces[i]=PlayerPrefs.GetFloat("springForce"+i.ToString());
@@ -547,31 +558,15 @@ public class Searcher3 : MonoBehaviour
                 int mins=0;
                 //高さが良いやつを選抜する
                 int count=0;
-                for(int i=0;i<4;i++){
-                    if(Math.Abs((double)highLosses[i])<=0.05){
-                        count++;
-                    }
-                }
-                switch(count){ 
-                    case 0:
-                        for(int i=0;i<4;i++){
-                            if(minloss>=highLosses[i]){
-                                minloss=highLosses[i];
-                                mins=i;
-                                Debug.Log(minloss);
-                            }
-                        }
-                        break;
 
-                    default:
-                        minloss=10000000.0f;
-                        for(int i=0;i<compareFlag;i++){
-                            if(minloss>=radiusLosses[i]){
-                                minloss=radiusLosses[i];
-                                mins=i;
-                            }
-                        }
-                        break;
+                
+                
+                for(int i=0;i<4;i++){
+                    if(minloss>=losses[i]){
+                        minloss=losses[i];
+                        mins=i;
+                        Debug.Log(minloss);
+                    }
                 }
 
                 
@@ -732,7 +727,7 @@ public class Searcher3 : MonoBehaviour
         float[] radiusLosses;
         radiusLosses = new float [numLayer];
 
-        //層ごとの高さ，半径，ズレの検出
+        //層ごとの高さ，直径，ズレの検出
         for(int i=0;i<numLayer;i++){
 
             //座標取得
@@ -759,10 +754,7 @@ public class Searcher3 : MonoBehaviour
             maxErrors[i]=getDeviation(LayerYpositions,arrayLength);
 
 
-            var radiusData=ConcurateRadiusLoss(diameters[i],tm_g_layers_y[i]);
-            //Debug.Log("radius Loss"+i.ToString() +"  "+radiusData.loss.ToString());
-
-            radiusLosses[i]=radiusData.loss;
+            
 
             //ReturnCorrectHigha(i,numLayer);
 
@@ -770,31 +762,30 @@ public class Searcher3 : MonoBehaviour
              
            
         }
+        
+        //層ごとの半径のロス
+        var radiusData=ConcurateAllRadiusLoss(diameters,tm_g_layers_y);
+        //Debug.Log("radius Loss"+i.ToString() +"  "+radiusData.loss.ToString());
+
+        //層ごとの高さのロス
+        var highLosses = ConcurateAllHighLoss(tm_g_layers_y);
+
+        //手先位置(一番上の高さのロス)
+        float handPositionLoss=(float)(numLayer*numPrism/*重み*/)*ConcurateHighLoss(tm_g_layers_y[numLayer-1],1.48762f);
 
         //倒れているか確認
         var springlosses = ConculateSpringsLoss(LayerXpositions,LayerZpositions);
-        var highLosses = ConcurateHighLoss(LayerYpositions);
 
-        parameterChanging(springlosses.flag,radiusLosses,highLosses.flag,highLosses.loss,numLayer);
+        //層ごと高さと直径のlossの合成
+        float allLoss=highLosses.loss+radiusData.loss+handPositionLoss;
+        
+        //パラメータの変更処理
+        parameterChanging(springlosses.flag,allLoss,numLayer);
 
 
         
         SceneManager.LoadScene("SampleScene");
 
-        
-
-        /*
-        for(int i=0;i<numLayer;i++){
-            Debug.Log("Layer" +i.ToString()+ "'s high  : "+tm_g_layers_y[i].ToString());
-        }
-
-        for(int i=0;i<numLayer;i++){
-            Debug.Log("Layer" +i.ToString()+ "'s radius  : "+diameters[i].ToString());
-        }
-        for(int i=0;i<numLayer;i++){
-            Debug.Log("Layer" +i.ToString()+ "'s zure  : "+maxErrors[i].ToString());
-        }
-        */
     }
 
     
