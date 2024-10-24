@@ -296,7 +296,7 @@ public class Searcher3 : MonoBehaviour
 
         bool flag=true;
         //閾値は0.2くらい？(4-5の際の値が0.5532593のため)
-        float threshold=0.08f;
+        float threshold=0.02f;
 
         if(loss<=threshold){
             flag=false;
@@ -392,9 +392,7 @@ public class Searcher3 : MonoBehaviour
             if(PlayerPrefs.HasKey("compareFlag")){
                 compareFlag =PlayerPrefs.GetInt("compareFlag");
             }
-            if(PlayerPrefs.HasKey("compareFlag")){
-                compareFlag =PlayerPrefs.GetInt("compareFlag");
-            }
+            
             if(compareFlag==0){
                 if(PlayerPrefs.HasKey("SpringForce")){
                     springForce =PlayerPrefs.GetFloat("SpringForce");
