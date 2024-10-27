@@ -313,13 +313,7 @@ public class Assembly : MonoBehaviour
             //4本5層の値
             //edgeLoop= new float[5] {0.12415123082906993f,0.11031530609675386f,0.10214850457080119f,0.09057431266995283f,0.12024559516481466f};
             //edgeLoop=new float[10]{0.05f, 0.04f, 0.03f, 0.02857142857142857f, 0.027142857142857142f, 0.025714285714285714f, 0.024285714285714285f, 0.022857142857142857f, 0.02142857142857143f, 0.02f};
-            if(initializer){
-                edgeLoop=new float[10]{0.065649f, 0.05787f, 0.05438851111111f, 0.05100837766666666f, 0.04738228702222222f, 0.043882287022222224f, 0.039228702222222f, 0.03882287022222223f, 0.03838228702222223f, 0.054f};
-                initializer=false;
-                if(PlayerPrefs.HasKey("compareFlag"))
-                PlayerPrefs.SetInt("compareFlag",0);
-                PlayerPrefs.Save();
-            }
+            
             /*
             if(mode==0){
                 edgeLoop[i-1]=   (2.0f*(radiusBase - diffRadius*((float)(i)))*(float)Math.Sin(Math.PI/(2*numPrism)))*((float)Math.Cos((diffphi*i*Math.PI)/180));
@@ -350,6 +344,15 @@ public class Assembly : MonoBehaviour
             //2rsin(θ)/(縦側の角度φのcos)
             */
         } 
+        if(initializer){
+            edgeLoop=new float[10]{0.065649f, 0.05787f, 0.05438851111111f, 0.05100837766666666f, 0.04738228702222222f, 0.043882287022222224f, 0.039228702222222f, 0.03882287022222223f, 0.03838228702222223f, 0.054f};
+            //edgeLoop=new float[10]{0.065649f, 0.06289442f, 0.0731718f, 0.04244859f, 0.04472593f, 0.0510033f, 0.05128067f, 0.04755802f, 0.04683538f, 0.03011275f};
+            //edgeLoop=new float[10]{0.065149f, 0.07389444f, 0.0701718f, 0.0634491f, 0.05972644f, 0.0550038f, 0.05028115f, 0.0455585f, 0.04183586f, 0.03461323f};
+            initializer=false;
+            if(PlayerPrefs.HasKey("compareFlag"))
+            PlayerPrefs.SetInt("compareFlag",0);
+            PlayerPrefs.Save();
+        }
         //edgeLoop= new float[10] {0.05733649f,0.0482649f,0.0458912f,0.04588119f,0.04587119f,0.02872325f,0.02871325f,0.02873325f,0.02870325f,0.02871325f};
         //slackで送ったやつ//edgeLoop= new float[10] {0.05133649f,0.0482649f,0.0458912f,0.04588119f,0.04587119f,0.042439602f,0.039008014f,0.035576425999999994f,0.032144837999999995f,0.02871325f}; //base0.65 scale 0.6 
         //edgeLoop= new float[10] {0.05133649f, 0.0495571124f,0.0477777348f, 0.0459983572f,0.0442189796f,0.042439602f,0.039008014f,0.035576425999999994f,0.032144837999999995f,0.02871325f}; //base0.65 scale 0.6 
