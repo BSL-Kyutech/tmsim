@@ -448,11 +448,11 @@ public class Searcher3 : MonoBehaviour
                 savedata+=",edgeLoop"+i.ToString() +"," +edgeLoop[i].ToString(); 
             }
             //savedata+=",highLoss,"+highLosses.ToString()+",highLoss,"+radiusLoss[edgeFlag].ToString()+"\n";
-            savedata+=",loss,"+loss.ToString()+"\n";
+            savedata+=",loss,"+loss.ToString()+",springForce,"+springForce+"\n";
 
             Debug.Log(savedata);
             //Csvの出力
-            string path= "C:/Users/Yamauchi Gaito/Desktop/workspace/_tmsim/data/mountingSearc3_1.csv";
+            string path= "C:/Users/Yamauchi Gaito/Desktop/workspace/_tmsim/data/mountingSearc3_2.csv";
             OutputCsv(path,savedata);
 
 
@@ -469,7 +469,7 @@ public class Searcher3 : MonoBehaviour
                         baseScale=baseScale+damperStrut;
                     }
                     else{
-                        strutScale=strutScale+damperStrut/(float)(numLayer*2);
+                        strutScale=strutScale+damperStrut/(float)(numLayer);
                     }
                     
                     PlayerPrefs.SetFloat("springForce"+compareFlag.ToString(),springForce);
@@ -495,7 +495,7 @@ public class Searcher3 : MonoBehaviour
                         baseScale=baseScale-2.0f *damperStrut;
                     }
                     else{
-                        strutScale=strutScale-2.0f *damperStrut/(float)(numLayer*2);
+                        strutScale=strutScale-2.0f *damperStrut/(float)(numLayer);
                     }
                     
 
@@ -523,7 +523,7 @@ public class Searcher3 : MonoBehaviour
                         baseScale=baseScale+ damperStrut;
                     }
                     else{
-                        strutScale=strutScale+ damperStrut/(float)(numLayer*2);
+                        strutScale=strutScale+ damperStrut/(float)(numLayer);
                     }
                     compareFlag=0;
                     break;
@@ -579,7 +579,7 @@ public class Searcher3 : MonoBehaviour
                             baseScale=baseScale+damperStrut;
                         }
                         else{
-                            strutScale=strutScale+damperStrut/(float)(numLayer*2);
+                            strutScale=strutScale+damperStrut/(float)(numLayer);
                         }
                         springForce=Forces[0];
                         edgeFlag+=1;
@@ -590,7 +590,7 @@ public class Searcher3 : MonoBehaviour
                             baseScale=baseScale+1.0f *damperStrut;
                         }
                         else{
-                            strutScale=strutScale+damperStrut/(float)(numLayer*2);
+                            strutScale=strutScale+damperStrut/(float)(numLayer);
                         }
                     
                         edgeLoop[edgeFlag]=edgeLoop[edgeFlag]+1.0f*damperEdge;
@@ -605,7 +605,7 @@ public class Searcher3 : MonoBehaviour
                             baseScale=baseScale-damperStrut;
                         }
                         else{
-                            strutScale=strutScale-damperStrut/(float)(numLayer*2);
+                            strutScale=strutScale-damperStrut/(float)(numLayer);
                         }
                         springForce=Forces[2];
                         edgeFlag+=1;
@@ -616,7 +616,7 @@ public class Searcher3 : MonoBehaviour
                             baseScale=baseScale+1.0f *damperStrut;
                         }
                         else{
-                            strutScale=strutScale+damperStrut/(float)(numLayer*2);
+                            strutScale=strutScale+damperStrut/(float)(numLayer);
                         }
                     
                         edgeLoop[edgeFlag]=edgeLoop[edgeFlag]-damperEdge;
@@ -776,7 +776,8 @@ public class Searcher3 : MonoBehaviour
         var springlosses = ConculateSpringsLoss(LayerXpositions,LayerZpositions);
 
         //層ごと高さと直径のlossの合成
-        float allLoss=highLosses.loss+radiusData.loss+handPositionLoss;
+        //float allLoss=highLosses.loss+radiusData.loss+handPositionLoss;
+        float allLoss=highLosses.loss+radiusData.loss;
         //Debug.Log(allLoss);
         
         //パラメータの変更処理
