@@ -452,7 +452,7 @@ public class Searcher3 : MonoBehaviour
 
             Debug.Log(savedata);
             //Csvの出力
-            string path= "C:/Users/Yamauchi Gaito/Desktop/workspace/_tmsim/data/mountingSearc3_3.csv";
+            string path= "C:/Users/Yamauchi Gaito/Desktop/workspace/_tmsim/data/mountingSearc3_4.csv";
             OutputCsv(path,savedata);
 
 
@@ -678,7 +678,8 @@ public class Searcher3 : MonoBehaviour
                 PlayerPrefs.SetFloat("edgeLoop"+(i).ToString(),edgeLoop[i]);
                 PlayerPrefs.Save();
             }
-            PlayerPrefs.SetFloat("springForce",springForce);
+            
+            PlayerPrefs.SetFloat("springForce",640.0f);//つぶれ始めるから，毎回リセットかければいいのでは？
             PlayerPrefs.Save();
             PlayerPrefs.SetInt("compareFlag",compareFlag);
             PlayerPrefs.Save();
