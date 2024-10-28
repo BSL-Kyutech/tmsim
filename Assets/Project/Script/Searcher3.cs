@@ -576,8 +576,10 @@ public class Searcher3 : MonoBehaviour
                     diffloss=PlayerPrefs.GetFloat("diffloss");
                 }
                 if(minloss>=diffloss){
+                    Debug.Log("minloss : "+minloss +"  >  diff loss :"  +diffloss);
                     mins=-1;
                     minloss=diffloss;
+                    
                 }
                 
                 
@@ -585,6 +587,7 @@ public class Searcher3 : MonoBehaviour
                 //エラーをもとにパラメータの適用(case 3の際の値になっているので，そこから適用するとどうなる？)
                 switch(mins){
                     case -1:
+                        Debug.Log("***********************lossが大きいため無変更で次のコンペに入ります*************************");
                         for(int i=0;i<numLayer;i++){
                             edgeLoop[i]=PlayerPrefs.GetFloat("diffedgeLoop"+(i).ToString());
                         }
@@ -592,6 +595,8 @@ public class Searcher3 : MonoBehaviour
                         strutScale=PlayerPrefs.GetFloat("diffStrutScale");
                         baseScale=PlayerPrefs.GetFloat("diffbaseScale");
                         edgeFlag+=1;
+
+                    
                         break;
 
                     case 0://0 Strut+edgeLoop- 
