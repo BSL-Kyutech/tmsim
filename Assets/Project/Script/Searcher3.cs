@@ -452,7 +452,7 @@ public class Searcher3 : MonoBehaviour
 
             Debug.Log(savedata);
             //Csvの出力
-            string path= "C:/Users/Yamauchi Gaito/Desktop/workspace/_tmsim/data/mountingSearc3_2.csv";
+            string path= "C:/Users/Yamauchi Gaito/Desktop/workspace/_tmsim/data/mountingSearc3_3.csv";
             OutputCsv(path,savedata);
 
 
@@ -569,9 +569,31 @@ public class Searcher3 : MonoBehaviour
                 }
 
                 
+                        
+                //minlosssを過去のデータと比較．ロスが一個前のやつより小さければ更新
+                float diffloss=10000.0f;
+                if(PlayerPrefs.HasKey("diffloss")){
+                    diffloss=PlayerPrefs.GetFloat("diffloss");
+                }
+                if(minloss>=diffloss){
+                    mins=-1;
+                    minloss=diffloss;
+                }
+                
+                
 
                 //エラーをもとにパラメータの適用(case 3の際の値になっているので，そこから適用するとどうなる？)
                 switch(mins){
+                    case -1:
+                        for(int i=0;i<numLayer;i++){
+                            edgeLoop[i]=PlayerPrefs.GetFloat("diffedgeLoop"+(i).ToString());
+                        }
+                        springForce=PlayerPrefs.GetFloat("diffspringForce");
+                        strutScale=PlayerPrefs.GetFloat("diffStrutScale");
+                        baseScale=PlayerPrefs.GetFloat("diffbaseScale");
+                        edgeFlag+=1;
+                        break;
+
                     case 0://0 Strut+edgeLoop- 
                     
                         edgeLoop[edgeFlag]=edgeLoop[edgeFlag]-damperEdge;
@@ -624,11 +646,27 @@ public class Searcher3 : MonoBehaviour
                         edgeFlag+=1;
                         break;
                 }
+
+                //lossが大きかったときにもとに戻すためのバックアップたち
+                for(int i=0;i<numLayer;i++){
+                PlayerPrefs.SetFloat("diffedgeLoop"+(i).ToString(),edgeLoop[i]);
+                PlayerPrefs.Save();
+                }
+                PlayerPrefs.SetFloat("diffloss",minloss);
+                PlayerPrefs.Save();
+                PlayerPrefs.SetFloat("diffspringForce",springForce);
+                PlayerPrefs.Save();
+                PlayerPrefs.SetFloat("diffStrutScale",strutScale);
+                PlayerPrefs.Save();
+                PlayerPrefs.SetFloat("diffbaseScale",baseScale);
+                PlayerPrefs.Save();
             }
 
             if(edgeFlag>=numLayer){
                 edgeFlag=0;
             }
+            
+            
 
             //パラメータの引継ぎ
             for(int i=0;i<numLayer;i++){
@@ -645,6 +683,7 @@ public class Searcher3 : MonoBehaviour
             PlayerPrefs.Save();
             PlayerPrefs.SetInt("EdgeFlag",edgeFlag);
             PlayerPrefs.Save();
+            
             
             return;
         }

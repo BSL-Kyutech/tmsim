@@ -1427,7 +1427,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7302967286791488144, guid: 6ef8a9d6d5dcc9138801b2cfbbede2a5, type: 3}
       propertyPath: initializer
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7302967286791488144, guid: 6ef8a9d6d5dcc9138801b2cfbbede2a5, type: 3}
       propertyPath: springForce
