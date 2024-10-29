@@ -452,7 +452,7 @@ public class Searcher3 : MonoBehaviour
 
             Debug.Log(savedata);
             //Csvの出力
-            string path= "C:/Users/Yamauchi Gaito/Desktop/workspace/_tmsim/data/mountingSearc3_4.csv";
+            string path= "C:/Users/Yamauchi Gaito/Desktop/workspace/_tmsim/data/mountingSearc3_5.csv";
             OutputCsv(path,savedata);
 
 
@@ -462,6 +462,9 @@ public class Searcher3 : MonoBehaviour
 
             int bases=numLayer/5;
             switch(compareFlag){
+                case -1:
+                    compareFlag+=1;
+                    break;
                 case 0://0 Strut+edgeLoop- 
                     
                     edgeLoop[edgeFlag]=edgeLoop[edgeFlag]-damperEdge;
@@ -525,7 +528,7 @@ public class Searcher3 : MonoBehaviour
                     else{
                         strutScale=strutScale+ damperStrut/(float)(numLayer);
                     }
-                    compareFlag=0;
+                    compareFlag=-1;
                     break;
 
             }
@@ -571,6 +574,7 @@ public class Searcher3 : MonoBehaviour
                 
                         
                 //minlosssを過去のデータと比較．ロスが一個前のやつより小さければ更新
+                /*
                 float diffloss=10000.0f;
                 if(PlayerPrefs.HasKey("diffloss")){
                     diffloss=PlayerPrefs.GetFloat("diffloss");
@@ -581,6 +585,7 @@ public class Searcher3 : MonoBehaviour
                     minloss=diffloss;
                     
                 }
+                */
                 
                 
 
@@ -679,7 +684,7 @@ public class Searcher3 : MonoBehaviour
                 PlayerPrefs.Save();
             }
             
-            PlayerPrefs.SetFloat("springForce",640.0f);//つぶれ始めるから，毎回リセットかければいいのでは？
+            PlayerPrefs.SetFloat("SpringForce",1280.0f);//つぶれ始めるから，毎回リセットかければいいのでは？
             PlayerPrefs.Save();
             PlayerPrefs.SetInt("compareFlag",compareFlag);
             PlayerPrefs.Save();
@@ -821,8 +826,8 @@ public class Searcher3 : MonoBehaviour
         var springlosses = ConculateSpringsLoss(LayerXpositions,LayerZpositions);
 
         //層ごと高さと直径のlossの合成
-        //float allLoss=highLosses.loss+radiusData.loss+handPositionLoss;
-        float allLoss=highLosses.loss+radiusData.loss;
+        float allLoss=highLosses.loss+radiusData.loss+handPositionLoss;
+        //float allLoss=highLosses.loss+radiusData.loss;
         //Debug.Log(allLoss);
         
         //パラメータの変更処理
