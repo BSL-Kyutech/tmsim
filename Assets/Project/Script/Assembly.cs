@@ -227,6 +227,7 @@ public class Assembly : MonoBehaviour
     // Start is called before the first frame update        最初の初期起動時の処理
     void Start()
     {
+        Time.timeScale=60.0f;
 
         //radiusLoopが内部に存在していた場合取得
         
