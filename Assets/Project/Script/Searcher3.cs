@@ -346,7 +346,7 @@ public class Searcher3 : MonoBehaviour
     private float ConcurateRadiusLoss(float radius, float y){
         float loss=0.0f;
 
-        float targetRadius=ReturnCorrectRadius(y);
+        float targetRadius=ReturnCorrectRadiusy();
 
         loss=(float)Math.Pow((double)(targetRadius-radius),2);
 
@@ -354,13 +354,15 @@ public class Searcher3 : MonoBehaviour
     }
 
     //直径の損失計算(すべて)
-    private (float loss, bool flag) ConcurateAllRadiusLoss(float[] layersRadius/*レイヤーごとの直径*/, float[] layersHighs /*レイヤーごとの高さ*/){
+    private (float loss, bool flag) ConcurateAllRadiusLoss(float[] layersRadius/*レイヤーごとの直径*/){
         float loss=0.0f; //ロス
         bool flag=false; //あくまで念のためのフラグ
 
+        
+
         //配列内のlossの計算
         for (int i=0; i<layersRadius.Length;i++){
-            loss += ConcurateRadiusLoss(layersRadius[i],layersHighs[i]);
+            loss += ConcurateRadiusLoss(layersRadius[i],ReturnCorrectHigha(i,layersRadius.Length));
         }
 
         return (loss,flag);
@@ -813,7 +815,7 @@ public class Searcher3 : MonoBehaviour
         }
         
         //層ごとの半径のロス
-        var radiusData=ConcurateAllRadiusLoss(diameters,tm_g_layers_y);
+        var radiusData=ConcurateAllRadiusLoss(diameters);
         //Debug.Log("radius Loss"+i.ToString() +"  "+radiusData.loss.ToString());
 
         //層ごとの高さのロス
