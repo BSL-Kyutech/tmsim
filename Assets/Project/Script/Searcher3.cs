@@ -648,13 +648,13 @@ public class Searcher3 : MonoBehaviour
 
                     case 3://3 Strut-edgeLoop+ 
                         if(edgeFlag <= (bases-1)){
-                            baseScale=baseScale+1.0f *damperStrut;
+                            baseScale=baseScale-damperStrut;
                         }
                         else{
-                            strutScale=strutScale+damperStrut/(float)(numLayer);
+                            strutScale=strutScale-damperStrut/(float)(numLayer);
                         }
                     
-                        edgeLoop[edgeFlag]=edgeLoop[edgeFlag]-damperEdge;
+                        edgeLoop[edgeFlag]=edgeLoop[edgeFlag]+damperEdge;
                         springForce=Forces[3];
                         edgeFlag+=1;
                         break;
