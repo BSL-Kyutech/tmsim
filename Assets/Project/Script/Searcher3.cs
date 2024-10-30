@@ -346,7 +346,7 @@ public class Searcher3 : MonoBehaviour
     private float ConcurateRadiusLoss(float radius, float y){
         float loss=0.0f;
 
-        float targetRadius=ReturnCorrectRadiusy();
+        float targetRadius=ReturnCorrectRadius(y);
 
         loss=(float)Math.Pow((double)(targetRadius-radius),2);
 
@@ -454,7 +454,7 @@ public class Searcher3 : MonoBehaviour
 
             Debug.Log(savedata);
             //Csvの出力
-            string path= "C:/Users/Yamauchi Gaito/Desktop/workspace/_tmsim/data/mountingSearc3_5.csv";
+            string path= "C:/Users/Yamauchi Gaito/Desktop/workspace/_tmsim/data/mountingSearc3_6.csv";
             OutputCsv(path,savedata);
 
 
@@ -828,8 +828,8 @@ public class Searcher3 : MonoBehaviour
         var springlosses = ConculateSpringsLoss(LayerXpositions,LayerZpositions);
 
         //層ごと高さと直径のlossの合成
-        float allLoss=highLosses.loss+radiusData.loss+handPositionLoss;
-        //float allLoss=highLosses.loss+radiusData.loss;
+        //float allLoss=highLosses.loss+radiusData.loss+handPositionLoss;
+        float allLoss=5.0f*highLosses.loss+radiusData.loss;
         //Debug.Log(allLoss);
         
         //パラメータの変更処理
