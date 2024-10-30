@@ -227,7 +227,7 @@ public class Assembly : MonoBehaviour
     // Start is called before the first frame update        最初の初期起動時の処理
     void Start()
     {
-        Time.timeScale=60.0f;
+        Time.timeScale=1.0f;
 
         //radiusLoopが内部に存在していた場合取得
         
@@ -348,7 +348,7 @@ public class Assembly : MonoBehaviour
         if(initializer){
             edgeLoop=new float[10]{0.065649f, 0.05787f, 0.05438851111111f, 0.05100837766666666f, 0.04738228702222222f, 0.043882287022222224f, 0.039228702222222f, 0.03882287022222223f, 0.03838228702222223f, 0.054f};
             //edgeLoop=new float[10]{0.065649f, 0.06289442f, 0.0731718f, 0.04244859f, 0.04472593f, 0.0510033f, 0.05128067f, 0.04755802f, 0.04683538f, 0.03011275f};
-            //edgeLoop=new float[10]{0.065149f, 0.07389444f, 0.0701718f, 0.0634491f, 0.05972644f, 0.0550038f, 0.05028115f, 0.0455585f, 0.04183586f, 0.03461323f};
+            edgeLoop=new float[10]{0.06114898f, 0.05136993f, 0.05088845f, 0.04650831f, 0.04238221f, 0.04138223f, 0.03572864f, 0.03632281f, 0.03338221f, 0.03288222f};
             initializer=false;
             PlayerPrefs.SetInt("compareFlag",0);
             PlayerPrefs.Save();
