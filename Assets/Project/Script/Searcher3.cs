@@ -450,7 +450,7 @@ public class Searcher3 : MonoBehaviour
                 savedata+=",edgeLoop"+i.ToString() +"," +edgeLoop[i].ToString(); 
             }
             //savedata+=",highLoss,"+highLosses.ToString()+",highLoss,"+radiusLoss[edgeFlag].ToString()+"\n";
-            savedata+=",loss,"+loss.ToString()+",springForce,"+springForce+"\n";
+            savedata+=",loss,"+loss.ToString()+",springForce,"+springForce.ToString()+",compareFlag,"+compareFlag.ToString()+"\n";
 
             Debug.Log(savedata);
             //Csvの出力
@@ -530,7 +530,7 @@ public class Searcher3 : MonoBehaviour
                     else{
                         strutScale=strutScale+ damperStrut/(float)(numLayer);
                     }
-                    compareFlag=-1;
+                    compareFlag=0;
                     break;
 
             }
@@ -589,6 +589,7 @@ public class Searcher3 : MonoBehaviour
                 }
                 */
                 
+                Debug.Log("mins  "+mins.ToString());
                 
 
                 //エラーをもとにパラメータの適用(case 3の際の値になっているので，そこから適用するとどうなる？)
@@ -829,6 +830,9 @@ public class Searcher3 : MonoBehaviour
 
         //層ごと高さと直径のlossの合成
         //float allLoss=highLosses.loss+radiusData.loss+handPositionLoss;
+
+        Debug.Log(highLosses.loss);
+        Debug.Log(radiusData.loss);
         float allLoss=5.0f*highLosses.loss+radiusData.loss;
         //Debug.Log(allLoss);
         
