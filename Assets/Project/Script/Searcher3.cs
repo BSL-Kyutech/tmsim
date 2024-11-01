@@ -317,6 +317,7 @@ public class Searcher3 : MonoBehaviour
             //レイヤーが目指すべき高さを計算
             targetLength=ReturnCorrectHigha(i,yArray.Length);
             //lossを計算
+            //おそらく高さによって重みを変えたほうがいいと思う(下の部分が大きくなるのでそれを解消するために下のほうの重みを小さくして計算したほうがいいかも)
             loss+=ConcurateHighLoss(yArray[i],targetLength);
         }
 
