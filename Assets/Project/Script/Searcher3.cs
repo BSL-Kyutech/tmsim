@@ -8,6 +8,13 @@ using UnityEngine.SceneManagement;
 
 public class Searcher3 : MonoBehaviour
 {
+
+    //スクショ関数
+    void OnScrrenCapture(string path){
+        ScreenCapture.CaptureScreenshot(path);
+    }
+
+
     //csv 出力
     private void OutputCsv(string path,string savedata ){
 
@@ -455,12 +462,34 @@ public class Searcher3 : MonoBehaviour
                 savedata+=",edgeLoop"+i.ToString() +"," +edgeLoop[i].ToString(); 
             }
             //savedata+=",highLoss,"+highLosses.ToString()+",highLoss,"+radiusLoss[edgeFlag].ToString()+"\n";
-            savedata+=",loss,"+loss.ToString()+",springForce,"+springForce.ToString()+",compareFlag,"+compareFlag.ToString()+"\n";
+            if(loss>=0.4f){
+                int photonumber=0;
+                string picturePath="C:/Users/Yamauchi Gaito/Desktop/workspace/_tmsim/data/picture/";
+                if(PlayerPrefs.HasKey("photonumber")){
+                    photonumber=PlayerPrefs.GetInt("photonumber");
+                }
+                if(System.IO.File.Exists(picturePath+"4_8")==false){
+                    System.IO.Directory.CreateDirectory(picturePath+"4_8");
+                }
+                
+                OnScrrenCapture(picturePath+"4_8/"+photonumber.ToString()+".png");
+                
+                savedata+=",loss,"+loss.ToString()+",springForce,"+springForce.ToString()+",compareFlag,"+compareFlag.ToString()+",photonumber"+photonumber.ToString()+"\n";
+                photonumber+=1;
+                PlayerPrefs.SetInt("photonumber",photonumber);
+                PlayerPrefs.Save();
+            }
+            else{
+                savedata+=",loss,"+loss.ToString()+",springForce,"+springForce.ToString()+",compareFlag,"+compareFlag.ToString()+"\n";
+            }
+            
+            
+            string path= "C:/Users/Yamauchi Gaito/Desktop/workspace/_tmsim/data/mountingSearc4_8.csv";
+            OutputCsv(path,savedata);
 
             Debug.Log(savedata);
             //Csvの出力
-            string path= "C:/Users/Yamauchi Gaito/Desktop/workspace/_tmsim/data/mountingSearc4_8.csv";
-            OutputCsv(path,savedata);
+            
 
 
             //パラメータの調整
@@ -780,7 +809,7 @@ public class Searcher3 : MonoBehaviour
                         edgeFlag+=1;
                         UnchangFlag+=1;
                         break;
-                    case 8:
+                    case 8://変更なし
                         springForce=Forces[8];
                         edgeFlag+=1;
                         
@@ -970,6 +999,8 @@ public class Searcher3 : MonoBehaviour
         Debug.Log(highLosses.loss);
         Debug.Log(radiusData.loss);
         float allLoss=highLosses.loss+radiusData.loss;
+
+        
         //Debug.Log(allLoss);
         
         //パラメータの変更処理

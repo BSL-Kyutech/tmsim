@@ -354,7 +354,7 @@ public class Assembly : MonoBehaviour
             //PlayerPrefs.Save();
             PlayerPrefs.SetInt("EdgeFlag",0);
             PlayerPrefs.Save();
-            PlayerPrefs.SetInt("countUnchange");
+            PlayerPrefs.SetInt("countUnchange",0);
             PlayerPrefs.Save();
             PlayerPrefs.SetFloat("diffloss",10000.0f);
             PlayerPrefs.SetInt("changed",0);
