@@ -350,9 +350,11 @@ public class Assembly : MonoBehaviour
             //edgeLoop=new float[10]{0.065649f, 0.06289442f, 0.0731718f, 0.04244859f, 0.04472593f, 0.0510033f, 0.05128067f, 0.04755802f, 0.04683538f, 0.03011275f};
             edgeLoop=new float[10]{0.05314891f, 0.04836987f, 0.04488838f, 0.04350825f, 0.03888217f, 0.03488217f, 0.02922862f, 0.03382276f, 0.03138219f, 0.04899989f};
             initializer=false;
-            //PlayerPrefs.SetInt("compareFlag",0);
+            //PlayerPrefs.SetInt("compareFlag",0);//compareflagの初期化は後でコメントアウト外さないといけない
             //PlayerPrefs.Save();
             PlayerPrefs.SetInt("EdgeFlag",0);
+            PlayerPrefs.Save();
+            PlayerPrefs.SetInt("countUnchange");
             PlayerPrefs.Save();
             PlayerPrefs.SetFloat("diffloss",10000.0f);
             PlayerPrefs.SetInt("changed",0);
