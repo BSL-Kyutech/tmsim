@@ -318,7 +318,7 @@ public class Searcher3 : MonoBehaviour
             targetLength=ReturnCorrectHigha(i,yArray.Length);
             //lossを計算
             //おそらく高さによって重みを変えたほうがいいと思う(下の部分が大きくなるのでそれを解消するために下のほうの重みを小さくして計算したほうがいいかも)
-            loss+=ConcurateHighLoss(yArray[i],targetLength);
+            loss+=ConcurateHighLoss(yArray[i],targetLength)*(float)i;
         }
 
         return (loss,flag);
@@ -455,7 +455,7 @@ public class Searcher3 : MonoBehaviour
 
             Debug.Log(savedata);
             //Csvの出力
-            string path= "C:/Users/Yamauchi Gaito/Desktop/workspace/_tmsim/data/mountingSearc4_5.csv";
+            string path= "C:/Users/Yamauchi Gaito/Desktop/workspace/_tmsim/data/mountingSearc4_6.csv";
             OutputCsv(path,savedata);
 
 
