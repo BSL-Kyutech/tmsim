@@ -34,6 +34,7 @@ public class Searcher3 : MonoBehaviour
 
         //それぞれの中間の直径を一次関数で近似
         if(y<=trueHigh[0]){
+            //0.06ぐらいかえっさせる
             gradient=(0.44f-trueRadius[0])/(trueHigh[0]-0.0f);
             intercept=0.0f;
             radius=gradient*(y-0.0f)+intercept;
@@ -321,11 +322,32 @@ public class Searcher3 : MonoBehaviour
         bool flag=false;
         
         for (int i=0;i<yArray.Length;i++){
+            //11/14に試す
+            //int bases =yArray.Length/5;
+            /*if(i<bases-1){
+                loss+=0.2f*ConcurateHighLoss(yArray[i],targetLength);
+            }
+            else if(i==bases-1){
+                loss+=2.0f*ConcurateHighLoss(yArray[i],targetLength);
+            }
+            else if(i<(bases-1)+bases){
+                loss+=0.0f*ConcurateHighLoss(yArray[i],targetLength);
+            }
+            else{
+                loss+=1.0f*ConcurateHighLoss(yArray[i],targetLength);
+            }
+            */
             //レイヤーが目指すべき高さを計算
             targetLength=ReturnCorrectHigha(i,yArray.Length);
             //lossを計算
             //おそらく高さによって重みを変えたほうがいいと思う(下の部分が大きくなるのでそれを解消するために下のほうの重みを小さくして計算したほうがいいかも)
-            if(i!=0){
+            if(i==0){
+                loss+=0.0f*ConcurateHighLoss(yArray[i],targetLength);
+            }
+            else if(i==1){
+                loss+=2.0f*ConcurateHighLoss(yArray[i],targetLength);
+            }
+            else{
                 loss+=ConcurateHighLoss(yArray[i],targetLength);
                 //0層以外が加算
             }
@@ -462,17 +484,17 @@ public class Searcher3 : MonoBehaviour
                 savedata+=",edgeLoop"+i.ToString() +"," +edgeLoop[i].ToString(); 
             }
             //savedata+=",highLoss,"+highLosses.ToString()+",highLoss,"+radiusLoss[edgeFlag].ToString()+"\n";
-            if(loss>=0.4f){
+            if(loss<=0.35f){
                 int photonumber=0;
                 string picturePath="C:/Users/Yamauchi Gaito/Desktop/workspace/_tmsim/data/picture/";
                 if(PlayerPrefs.HasKey("photonumber")){
                     photonumber=PlayerPrefs.GetInt("photonumber");
                 }
-                if(System.IO.File.Exists(picturePath+"4_8")==false){
-                    System.IO.Directory.CreateDirectory(picturePath+"4_8");
+                if(System.IO.File.Exists(picturePath+"4_9")==false){
+                    System.IO.Directory.CreateDirectory(picturePath+"4_9");
                 }
                 
-                OnScrrenCapture(picturePath+"4_8/"+photonumber.ToString()+".png");
+                OnScrrenCapture(picturePath+"4_9/"+photonumber.ToString()+".png");
                 
                 savedata+=",loss,"+loss.ToString()+",springForce,"+springForce.ToString()+",compareFlag,"+compareFlag.ToString()+",photonumber"+photonumber.ToString()+"\n";
                 photonumber+=1;
@@ -484,7 +506,7 @@ public class Searcher3 : MonoBehaviour
             }
             
             
-            string path= "C:/Users/Yamauchi Gaito/Desktop/workspace/_tmsim/data/mountingSearc4_8.csv";
+            string path= "C:/Users/Yamauchi Gaito/Desktop/workspace/_tmsim/data/mountingSearc4_9.csv";
             OutputCsv(path,savedata);
 
             Debug.Log(savedata);
@@ -998,7 +1020,7 @@ public class Searcher3 : MonoBehaviour
 
         Debug.Log(highLosses.loss);
         Debug.Log(radiusData.loss);
-        float allLoss=highLosses.loss+radiusData.loss;
+        float allLoss=2.0f*highLosses.loss+radiusData.loss*0.5f;
 
         
         //Debug.Log(allLoss);
