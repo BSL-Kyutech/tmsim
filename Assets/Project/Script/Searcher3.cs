@@ -322,35 +322,27 @@ public class Searcher3 : MonoBehaviour
         bool flag=false;
         
         for (int i=0;i<yArray.Length;i++){
+
+            //レイヤーが目指すべき高さを計算
+            targetLength=ReturnCorrectHigha(i,yArray.Length);
             //11/14に試す
-            //int bases =yArray.Length/5;
-            /*if(i<bases-1){
-                loss+=0.2f*ConcurateHighLoss(yArray[i],targetLength);
+            int bases =yArray.Length/5;
+            if(i<bases-1){
+                loss+=0.1f*ConcurateHighLoss(yArray[i],targetLength);
             }
             else if(i==bases-1){
                 loss+=2.0f*ConcurateHighLoss(yArray[i],targetLength);
             }
             else if(i<(bases-1)+bases){
-                loss+=0.0f*ConcurateHighLoss(yArray[i],targetLength);
-            }
-            else{
-                loss+=1.0f*ConcurateHighLoss(yArray[i],targetLength);
-            }
-            */
-            //レイヤーが目指すべき高さを計算
-            targetLength=ReturnCorrectHigha(i,yArray.Length);
-            //lossを計算
-            //おそらく高さによって重みを変えたほうがいいと思う(下の部分が大きくなるのでそれを解消するために下のほうの重みを小さくして計算したほうがいいかも)
-            if(i==0){
-                loss+=0.0f*ConcurateHighLoss(yArray[i],targetLength);
-            }
-            else if(i==1){
+                //basesの上の層がつぶれるからそこを強化
                 loss+=2.0f*ConcurateHighLoss(yArray[i],targetLength);
             }
             else{
-                loss+=ConcurateHighLoss(yArray[i],targetLength);
-                //0層以外が加算
+                //
+                loss+=1.0f*ConcurateHighLoss(yArray[i],targetLength);
             }
+            
+        
             
         }
 
@@ -1020,7 +1012,7 @@ public class Searcher3 : MonoBehaviour
 
         Debug.Log(highLosses.loss);
         Debug.Log(radiusData.loss);
-        float allLoss=2.0f*highLosses.loss+radiusData.loss*0.5f;
+        float allLoss=highLosses.loss+radiusData.loss;
 
         
         //Debug.Log(allLoss);
