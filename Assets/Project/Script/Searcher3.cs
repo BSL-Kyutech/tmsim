@@ -476,17 +476,21 @@ public class Searcher3 : MonoBehaviour
                 savedata+=",edgeLoop"+i.ToString() +"," +edgeLoop[i].ToString(); 
             }
             //savedata+=",highLoss,"+highLosses.ToString()+",highLoss,"+radiusLoss[edgeFlag].ToString()+"\n";
+            
+            float sikiiti=0.35f;
+            string filename="4_10";
+            
             if(loss<=0.35f){
                 int photonumber=0;
                 string picturePath="C:/Users/Yamauchi Gaito/Desktop/workspace/_tmsim/data/picture/";
                 if(PlayerPrefs.HasKey("photonumber")){
                     photonumber=PlayerPrefs.GetInt("photonumber");
                 }
-                if(System.IO.File.Exists(picturePath+"4_9")==false){
-                    System.IO.Directory.CreateDirectory(picturePath+"4_9");
+                if(System.IO.File.Exists(picturePath+filename)==false){
+                    System.IO.Directory.CreateDirectory(picturePath+filename);
                 }
                 
-                OnScrrenCapture(picturePath+"4_9/"+photonumber.ToString()+".png");
+                OnScrrenCapture(picturePath+filename+"/"+photonumber.ToString()+".png");
                 
                 savedata+=",loss,"+loss.ToString()+",springForce,"+springForce.ToString()+",compareFlag,"+compareFlag.ToString()+",photonumber"+photonumber.ToString()+"\n";
                 photonumber+=1;
@@ -498,7 +502,7 @@ public class Searcher3 : MonoBehaviour
             }
             
             
-            string path= "C:/Users/Yamauchi Gaito/Desktop/workspace/_tmsim/data/mountingSearc4_9.csv";
+            string path= "C:/Users/Yamauchi Gaito/Desktop/workspace/_tmsim/data/mountingSearc"+filename+".csv";
             OutputCsv(path,savedata);
 
             Debug.Log(savedata);
