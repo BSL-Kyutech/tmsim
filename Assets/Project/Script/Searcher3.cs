@@ -36,28 +36,28 @@ public class Searcher3 : MonoBehaviour
         if(y<=trueHigh[0]){
             //0.06ぐらいかえっさせる
             gradient=(0.44f-trueRadius[0])/(trueHigh[0]-0.0f);
-            intercept=0.0f;
-            radius=gradient*(y-0.0f)+intercept;
+            intercept=0.44f;
+            radius=-gradient*(y-0.0f)+intercept;
         }
         else if(y<=trueHigh[1]){
             gradient=(trueRadius[0]-trueRadius[1])/(trueHigh[1]-trueHigh[0]);
             intercept=trueRadius[0];
-            radius=gradient*(y-trueHigh[0])+intercept;
+            radius=-gradient*(y-trueHigh[0])+intercept;
         }
         else if(y<=trueHigh[2]){
             gradient=(trueRadius[1]-trueRadius[2])/(trueHigh[2]-trueHigh[1]);
             intercept=trueRadius[1];
-            radius=gradient*(y-trueHigh[1])+intercept;
+            radius=-gradient*(y-trueHigh[1])+intercept;
         }
         else if(y<=trueHigh[3]){
             gradient=(trueRadius[2]-trueRadius[3])/(trueHigh[3]-trueHigh[2]);
             intercept=trueRadius[2];
-            radius=gradient*(y-trueHigh[2])+intercept;
+            radius=-gradient*(y-trueHigh[2])+intercept;
         }
         else if(y<=trueHigh[4]){
             gradient=(trueRadius[3]-trueRadius[4])/(trueHigh[4]-trueHigh[3]);
             intercept=trueRadius[3];
-            radius=gradient*(y-trueHigh[3])+intercept;
+            radius=-gradient*(y-trueHigh[3])+intercept;
         }
         else{
             radius=trueRadius[4];
@@ -324,23 +324,12 @@ public class Searcher3 : MonoBehaviour
         for (int i=0;i<yArray.Length;i++){
 
             //レイヤーが目指すべき高さを計算
+            
             targetLength=ReturnCorrectHigha(i,yArray.Length);
-            //11/14に試す
-            int bases =yArray.Length/5;
-            if(i<bases-1){
-                loss+=0.1f*ConcurateHighLoss(yArray[i],targetLength);
-            }
-            else if(i==bases-1){
-                loss+=2.0f*ConcurateHighLoss(yArray[i],targetLength);
-            }
-            else if(i<(bases-1)+bases){
-                //basesの上の層がつぶれるからそこを強化
-                loss+=2.0f*ConcurateHighLoss(yArray[i],targetLength);
-            }
-            else{
-                //
-                loss+=1.0f*ConcurateHighLoss(yArray[i],targetLength);
-            }
+
+            Debug.Log("High"+i.ToString()+" : "+yArray[i].ToString() +"Correct High"+i.ToString() + " : " + targetLength);
+            loss+=1.0f*ConcurateHighLoss(yArray[i],targetLength);
+            
             
         
             
@@ -374,13 +363,15 @@ public class Searcher3 : MonoBehaviour
 
         float targetRadius=ReturnCorrectRadius(y);
 
+        Debug.Log("diameters"+" : "+radius.ToString()+" " +" Correct Diameters :" +targetRadius.ToString() );
+
         loss=(float)Math.Pow((double)(targetRadius-radius),2);
 
         return loss;
     }
 
     //直径の損失計算(すべて)
-    private (float loss, bool flag) ConcurateAllRadiusLoss(float[] layersRadius/*レイヤーごとの直径*/){
+    private (float loss, bool flag) ConcurateAllRadiusLoss(float[] layersRadius/*レイヤーごとの直径*/,float[] layersHigh){
         float loss=0.0f; //ロス
         bool flag=false; //あくまで念のためのフラグ
 
@@ -388,6 +379,7 @@ public class Searcher3 : MonoBehaviour
 
         //配列内のlossの計算
         for (int i=0; i<layersRadius.Length;i++){
+            
             loss += ConcurateRadiusLoss(layersRadius[i],ReturnCorrectHigha(i,layersRadius.Length));
         }
 
@@ -477,8 +469,8 @@ public class Searcher3 : MonoBehaviour
             }
             //savedata+=",highLoss,"+highLosses.ToString()+",highLoss,"+radiusLoss[edgeFlag].ToString()+"\n";
             
-            float sikiiti=0.35f;
-            string filename="4_10";
+            float sikiiti=0.11f;
+            string filename="4_14";
             
             if(loss<=sikiiti){
                 int photonumber=0;
@@ -859,6 +851,9 @@ public class Searcher3 : MonoBehaviour
                 if(UnchangFlag==0){
                     countUnchange+=1;
                 }
+                else if(UnchangFlag!=0){
+                    countUnchange=1;
+                }
             }
             PlayerPrefs.SetInt("UnchangFlag",UnchangFlag);
             PlayerPrefs.Save();
@@ -1002,7 +997,7 @@ public class Searcher3 : MonoBehaviour
         }
         
         //層ごとの半径のロス
-        var radiusData=ConcurateAllRadiusLoss(diameters);
+        var radiusData=ConcurateAllRadiusLoss(diameters,tm_g_layers_y);
         //Debug.Log("radius Loss"+i.ToString() +"  "+radiusData.loss.ToString());
 
         //層ごとの高さのロス
@@ -1019,7 +1014,8 @@ public class Searcher3 : MonoBehaviour
 
         Debug.Log(highLosses.loss);
         Debug.Log(radiusData.loss);
-        float allLoss=highLosses.loss+radiusData.loss;
+        //float allLoss=0.8f*highLosses.loss+1.25f*radiusData.loss;
+        float allLoss=radiusData.loss+handPositionLoss;
 
         
         //Debug.Log(allLoss);
@@ -1027,9 +1023,15 @@ public class Searcher3 : MonoBehaviour
         //パラメータの変更処理
         parameterChanging(springlosses.flag,allLoss,numLayer);
 
-
+        int photonumber=0;
         
-        SceneManager.LoadScene("SampleScene");
+        if(PlayerPrefs.HasKey("photonumber")){
+            photonumber=PlayerPrefs.GetInt("photonumber");
+        }
+        if(photonumber<=53948){
+            SceneManager.LoadScene("SampleScene");
+        }
+        
 
     }
 
