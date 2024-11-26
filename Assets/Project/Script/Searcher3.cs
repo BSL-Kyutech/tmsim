@@ -449,12 +449,8 @@ public class Searcher3 : MonoBehaviour
 
             //パラメータの取得(Strut basestrut)
             float strutScale=0.0f;
-            float baseScale=0.0f;
             if(PlayerPrefs.HasKey("StrutScale")){
                 strutScale=PlayerPrefs.GetFloat("StrutScale");
-            }
-            if(PlayerPrefs.HasKey("baseScale")){
-                baseScale=PlayerPrefs.GetFloat("baseScale");
             }
 
             //lossの保存
@@ -462,7 +458,7 @@ public class Searcher3 : MonoBehaviour
             PlayerPrefs.Save();
 
             //出力
-            string savedata="basescale,"+baseScale.ToString()+",strutScale,"+strutScale.ToString();
+            string savedata="strutScale,"+strutScale.ToString();
             //Debug.Log(tm_g_y);
             for(int i=0;i<numLayer;i++){
                 savedata+=",edgeLoop"+i.ToString() +"," +edgeLoop[i].ToString(); 
@@ -470,7 +466,7 @@ public class Searcher3 : MonoBehaviour
             //savedata+=",highLoss,"+highLosses.ToString()+",highLoss,"+radiusLoss[edgeFlag].ToString()+"\n";
             
             float sikiiti=0.11f;
-            string filename="45_1";
+            string filename="45_2";
             
             if(loss<=sikiiti){
                 int photonumber=0;
@@ -510,7 +506,6 @@ public class Searcher3 : MonoBehaviour
                 countUnchange=PlayerPrefs.GetInt("countUnchange");
             }
 
-            int bases=numLayer/5;
 
             //一度も変化していない場合(0変化してない，1変化した)
             int UnchangFlag=0;
@@ -525,13 +520,10 @@ public class Searcher3 : MonoBehaviour
                 case 0://0 Strut+edgeLoop- 
                     
                     edgeLoop[edgeFlag]=edgeLoop[edgeFlag]-damperEdge*(float)countUnchange;
-                    if(edgeFlag <= (bases-1)){
-                        baseScale=baseScale+damperStrut*(float)countUnchange;
-                    }
-                    else{
-                        strutScale=strutScale+damperStrut*(float)countUnchange/(float)(numLayer-bases);
-                    }
                     
+                    strutScale=strutScale+damperStrut*(float)countUnchange;
+                    
+                
                     PlayerPrefs.SetFloat("springForce"+compareFlag.ToString(),springForce);
                     PlayerPrefs.Save();
 
@@ -551,12 +543,10 @@ public class Searcher3 : MonoBehaviour
                 case 2://2 Strut-edgeLoop-
                     
                     edgeLoop[edgeFlag]=edgeLoop[edgeFlag]-2.0f * damperEdge*(float)countUnchange;
-                    if(edgeFlag <= (bases-1)){
-                        baseScale=baseScale-2.0f *damperStrut*(float)countUnchange;
-                    }
-                    else{
-                        strutScale=strutScale-2.0f *damperStrut*(float)countUnchange/(float)(numLayer-bases);
-                    }
+                    
+                    
+                    strutScale=strutScale-2.0f *damperStrut*(float)countUnchange;
+                    
                     
 
                     PlayerPrefs.SetFloat("springForce"+compareFlag.ToString(),springForce);
@@ -579,12 +569,10 @@ public class Searcher3 : MonoBehaviour
                 
 
                 case 4: //Strutそのままedge+
-                    if(edgeFlag <= (bases-1)){
-                        baseScale=baseScale+ damperStrut*(float)countUnchange;
-                    }
-                    else{
-                        strutScale=strutScale+ damperStrut*(float)countUnchange/(float)(numLayer-bases);
-                    }
+                    
+                    
+                    strutScale=strutScale+ damperStrut*(float)countUnchange;
+                    
                     PlayerPrefs.SetFloat("springForce"+compareFlag.ToString(),springForce);
                     PlayerPrefs.Save();
                     compareFlag=compareFlag+1;
@@ -602,12 +590,10 @@ public class Searcher3 : MonoBehaviour
 
                 case 6: //edgeそのままstrut+
                     edgeLoop[edgeFlag]=edgeLoop[edgeFlag]+damperEdge*(float)countUnchange;
-                    if(edgeFlag <= (bases-1)){
-                        baseScale=baseScale+ damperStrut*(float)countUnchange;
-                    }
-                    else{
-                        strutScale=strutScale+ damperStrut*(float)countUnchange/(float)(numLayer-bases);
-                    }
+                    
+                    
+                    strutScale=strutScale+ damperStrut*(float)countUnchange;
+                    
 
                     PlayerPrefs.SetFloat("springForce"+compareFlag.ToString(),springForce);
                     PlayerPrefs.Save();
@@ -616,12 +602,9 @@ public class Searcher3 : MonoBehaviour
                     break;
 
                 case 7: //edgeそのままstrut-
-                    if(edgeFlag <= (bases-1)){
-                        baseScale=baseScale-2.0f* damperStrut*(float)countUnchange;
-                    }
-                    else{
-                        strutScale=strutScale-2.0f* damperStrut*(float)countUnchange/(float)(numLayer-bases);
-                    }
+                    
+                    strutScale=strutScale-2.0f* damperStrut*(float)countUnchange;
+                    
 
                     PlayerPrefs.SetFloat("springForce"+compareFlag.ToString(),springForce);
                     PlayerPrefs.Save();
@@ -632,12 +615,10 @@ public class Searcher3 : MonoBehaviour
                 case 8://データの比較段階(時系列上3のデータがこの際とられている．)
                     //最後の加算が面倒なのでパラメータを最初に戻しておくついでに、前のデータとのloss比較する。
                     
-                    if(edgeFlag <= (bases-1)){
-                        baseScale=baseScale+ damperStrut*(float)countUnchange;
-                    }
-                    else{
-                        strutScale=strutScale+ damperStrut*(float)countUnchange/(float)(numLayer-bases);
-                    }
+                    
+                    
+                    strutScale=strutScale+ damperStrut*(float)countUnchange;
+                    
 
                     PlayerPrefs.SetFloat("springForce"+compareFlag.ToString(),springForce);
                     PlayerPrefs.Save();
@@ -716,7 +697,7 @@ public class Searcher3 : MonoBehaviour
                         }
                         springForce=PlayerPrefs.GetFloat("diffspringForce");
                         strutScale=PlayerPrefs.GetFloat("diffStrutScale");
-                        baseScale=PlayerPrefs.GetFloat("diffbaseScale");
+                        
                         edgeFlag+=1;
 
                     
@@ -732,24 +713,20 @@ public class Searcher3 : MonoBehaviour
                     case 1://0 Strut+edgeLoop- 
                     
                         edgeLoop[edgeFlag]=edgeLoop[edgeFlag]-damperEdge*(float)countUnchange;
-                        if(edgeFlag <= (bases-1)){
-                            baseScale=baseScale+damperStrut*(float)countUnchange;
-                        }
-                        else{
-                            strutScale=strutScale+damperStrut*(float)countUnchange/(float)(numLayer-bases);
-                        }
+                        
+                        
+                        strutScale=strutScale+damperStrut*(float)countUnchange;
+                        
                         springForce=Forces[0];
                         edgeFlag+=1;
                         UnchangFlag+=1;
                         break;
 
                     case 2://1 Strut+edgeLoop+ 
-                        if(edgeFlag <= (bases-1)){
-                            baseScale=baseScale+1.0f *damperStrut*(float)countUnchange;
-                        }
-                        else{
-                            strutScale=strutScale+damperStrut*(float)countUnchange/(float)(numLayer-bases);
-                        }
+                        
+                       
+                        strutScale=strutScale+damperStrut*(float)countUnchange;
+                        
                     
                         edgeLoop[edgeFlag]=edgeLoop[edgeFlag]+1.0f*damperEdge*(float)countUnchange;
                         springForce=Forces[1];
@@ -760,24 +737,19 @@ public class Searcher3 : MonoBehaviour
                     case 3://2 Strut-edgeLoop-
                     
                         edgeLoop[edgeFlag]=edgeLoop[edgeFlag]-1.0f * damperEdge*(float)countUnchange;
-                        if(edgeFlag <= (bases-1)){
-                            baseScale=baseScale-damperStrut*(float)countUnchange;
-                        }
-                        else{
-                            strutScale=strutScale-damperStrut*(float)countUnchange/(float)(numLayer-bases);
-                        }
+                        
+                        
+                        strutScale=strutScale-damperStrut*(float)countUnchange;
+                        
                         springForce=Forces[2];
                         edgeFlag+=1;
                         UnchangFlag+=1;
                         break;
 
                     case 4://3 Strut-edgeLoop+ 
-                        if(edgeFlag <= (bases-1)){
-                            baseScale=baseScale-damperStrut*(float)countUnchange;
-                        }
-                        else{
-                            strutScale=strutScale-damperStrut*(float)countUnchange/(float)(numLayer-bases);
-                        }
+                        
+                        strutScale=strutScale-damperStrut*(float)countUnchange;
+                        
                     
                         edgeLoop[edgeFlag]=edgeLoop[edgeFlag]+damperEdge*(float)countUnchange;
                         springForce=Forces[3];
@@ -802,12 +774,9 @@ public class Searcher3 : MonoBehaviour
                         break;
 
                     case 7://3 Strut+
-                        if(edgeFlag <= (bases-1)){
-                            baseScale=baseScale+damperStrut*(float)countUnchange;
-                        }
-                        else{
-                            strutScale=strutScale+damperStrut*(float)countUnchange/(float)(numLayer-bases);
-                        }
+                        
+                        strutScale=strutScale+damperStrut*(float)countUnchange;
+                        
 
                         springForce=Forces[6];
                         edgeFlag+=1;
@@ -815,12 +784,10 @@ public class Searcher3 : MonoBehaviour
                         break;
                     
                     case 8://3 Strut- 
-                        if(edgeFlag <= (bases-1)){
-                            baseScale=baseScale-damperStrut*(float)countUnchange;
-                        }
-                        else{
-                            strutScale=strutScale-damperStrut*(float)countUnchange/(float)(numLayer-bases);
-                        }
+                        
+                        
+                        strutScale=strutScale-damperStrut*(float)countUnchange;
+                        
 
                         springForce=Forces[7];
                         edgeFlag+=1;
@@ -840,8 +807,7 @@ public class Searcher3 : MonoBehaviour
                 PlayerPrefs.Save();
                 PlayerPrefs.SetFloat("diffStrutScale",strutScale);
                 PlayerPrefs.Save();
-                PlayerPrefs.SetFloat("diffbaseScale",baseScale);
-                PlayerPrefs.Save();
+                
             }
 
             //edgeFlagのループさせる処理
@@ -873,8 +839,6 @@ public class Searcher3 : MonoBehaviour
             PlayerPrefs.SetInt("compareFlag",compareFlag);
             PlayerPrefs.Save();
             PlayerPrefs.SetFloat("StrutScale",strutScale);
-            PlayerPrefs.Save();
-            PlayerPrefs.SetFloat("baseScale",baseScale);
             PlayerPrefs.Save();
             PlayerPrefs.SetInt("EdgeFlag",edgeFlag);
             PlayerPrefs.Save();
