@@ -56,7 +56,6 @@ public class Assembly : MonoBehaviour
 
 
     public float StrutScale;
-    public float BaseScale;
 
     //edgeの計算方法の選択
     public bool log_x;              //edgeloopの計算にLog(x)を扱うか    (底数が10)
@@ -243,9 +242,6 @@ public class Assembly : MonoBehaviour
             if(PlayerPrefs.HasKey("StrutScale")){
                 StrutScale=PlayerPrefs.GetFloat("StrutScale");
             }
-            if(PlayerPrefs.HasKey("baseScale")){
-                BaseScale=PlayerPrefs.GetFloat("baseScale");
-            }
 
             if(PlayerPrefs.HasKey("edge")){
         
@@ -403,10 +399,10 @@ public class Assembly : MonoBehaviour
                 radiusBase*(float)Math.Sin(step*i));                                            //z=radiusBase(半径)×sin((2π/ストラットの数)×i)極座標→直交座標への変換プロセス
             baseblocks[i].name = $"Base{i}";                                                    //名前の決定(object管理のため)
             struts[i] = Instantiate(baseStrut, this.transform);                                 //ストラクト(支柱)の制作
-            struts[i].transform.localScale = new Vector3(0.02f,(float)(BaseScale*0.25f),0.02f); //デフォルトは0.25        
+            struts[i].transform.localScale = new Vector3(0.02f,(float)(StrutScale*0.25f),0.02f); //デフォルトは0.25        
             struts[i].transform.position = this.transform.position + new Vector3(               //ストラクトの座標と生成(処理は上と同じ)
                 radiusBase*(float)Math.Cos(step*i), 
-                0.265f*BaseScale
+                0.265f*StrutScale
                 ,                                                                         //土台の高さがある分少し高い？
                 radiusBase*(float)Math.Sin(step*i)
                 );
@@ -428,10 +424,10 @@ public class Assembly : MonoBehaviour
 
                 struts[index(i, j)] = Instantiate(middleStrut, this.transform);                 //生成i,jの2次元配列にすることで，層と層の何個目かわかる
                 if(i<=(bases-1)){
-                    struts[index(i, j)].transform.localScale = new Vector3(0.02f,(float)(BaseScale*0.25f),0.02f); //デフォルトは0.2 StrutScale*
+                    struts[index(i, j)].transform.localScale = new Vector3(0.02f,(float)(StrutScale*0.25f),0.02f); //デフォルトは0.2 StrutScale*
                     struts[index(i, j)].transform.position = this.transform.position + new Vector3( //座標
                         stripeshape*(radiusBase/1.5f)*(float)Math.Cos(step*j+twist*(i%2)),                        
-                        (float)(i+1)*(0.265f*BaseScale),                                                      //y 積みあがる高さ分加算
+                        (float)(i+1)*(0.265f*StrutScale),                                                      //y 積みあがる高さ分加算
                         stripeshape*(radiusBase/1.5f)*(float)Math.Sin(step*j+twist*(i%2))                         //z 
                     );  
                 }
@@ -439,7 +435,7 @@ public class Assembly : MonoBehaviour
                     struts[index(i, j)].transform.localScale = new Vector3(0.02f,(float)(StrutScale*0.20f),0.02f); //デフォルトは0.2 StrutScale*
                     struts[index(i, j)].transform.position = this.transform.position + new Vector3( //座標
                         stripeshape*(radiusBase/1.5f)*(float)Math.Cos(step*j+twist*(i%2)),                        
-                        (0.265f*BaseScale)*bases+(float)(i-bases)*(0.3f*StrutScale),                                                      //y 積みあがる高さ分加算
+                        (0.265f*StrutScale)*bases+(float)(i-bases)*(0.3f*StrutScale),                                                      //y 積みあがる高さ分加算
                         stripeshape*(radiusBase/1.5f)*(float)Math.Sin(step*j+twist*(i%2))                         //z 
                     );  
                 }
@@ -614,8 +610,7 @@ public class Assembly : MonoBehaviour
         PlayerPrefs.Save();
         PlayerPrefs.SetFloat("StrutScale",StrutScale);
         PlayerPrefs.Save();
-        PlayerPrefs.SetFloat("baseScale",BaseScale);
-        PlayerPrefs.Save();
+
 
         isReady = true;
     }
