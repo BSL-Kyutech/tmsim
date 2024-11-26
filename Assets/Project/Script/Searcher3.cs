@@ -471,9 +471,9 @@ public class Searcher3 : MonoBehaviour
                     break;
                 case 0://0 Strut+edgeLoop- 
                     
-                    edgeLoop[edgeFlag]=edgeLoop[edgeFlag]-damperEdge*(float)countUnchange;
+                    edgeLoop[edgeFlag]=edgeLoop[edgeFlag]-damperEdge*(float)(1/countUnchange);
                     
-                    strutScale[edgeFlag]=strutScale[edgeFlag]+damperStrut*(float)countUnchange;
+                    strutScale[edgeFlag]=strutScale[edgeFlag]+damperStrut*(float)(1/countUnchange);
                     
                 
                     PlayerPrefs.SetFloat("springForce"+compareFlag.ToString(),springForce);
@@ -484,7 +484,7 @@ public class Searcher3 : MonoBehaviour
 
                 case 1://1 Strut+edgeLoop+ 
                     
-                    edgeLoop[edgeFlag]=edgeLoop[edgeFlag]+2.0f*damperEdge*(float)countUnchange;
+                    edgeLoop[edgeFlag]=edgeLoop[edgeFlag]+2.0f*damperEdge*(float)(1/countUnchange);
 
                     PlayerPrefs.SetFloat("springForce"+compareFlag.ToString(),springForce);
                     PlayerPrefs.Save();
@@ -494,10 +494,10 @@ public class Searcher3 : MonoBehaviour
 
                 case 2://2 Strut-edgeLoop-
                     
-                    edgeLoop[edgeFlag]=edgeLoop[edgeFlag]-2.0f * damperEdge*(float)countUnchange;
+                    edgeLoop[edgeFlag]=edgeLoop[edgeFlag]-2.0f * damperEdge*(float)(1/countUnchange);
                     
                     
-                    strutScale[edgeFlag]=strutScale[edgeFlag]-2.0f *damperStrut*(float)countUnchange;
+                    strutScale[edgeFlag]=strutScale[edgeFlag]-2.0f *damperStrut*(float)(1/countUnchange);
                     
                     
 
@@ -509,7 +509,7 @@ public class Searcher3 : MonoBehaviour
 
                 case 3://3 Strut-edgeLoop+ 
                     
-                    edgeLoop[edgeFlag]=edgeLoop[edgeFlag]+2.0f*damperEdge*(float)countUnchange;
+                    edgeLoop[edgeFlag]=edgeLoop[edgeFlag]+2.0f*damperEdge*(float)(1/countUnchange);
                     
 
                     PlayerPrefs.SetFloat("springForce"+compareFlag.ToString(),springForce);
@@ -523,7 +523,7 @@ public class Searcher3 : MonoBehaviour
                 case 4: //Strutそのままedge+
                     
                     
-                    strutScale[edgeFlag]=strutScale[edgeFlag]+ damperStrut*(float)countUnchange;
+                    strutScale[edgeFlag]=strutScale[edgeFlag]+ damperStrut*(float)(1/countUnchange);
                     
                     PlayerPrefs.SetFloat("springForce"+compareFlag.ToString(),springForce);
                     PlayerPrefs.Save();
@@ -532,7 +532,7 @@ public class Searcher3 : MonoBehaviour
                     break;
 
                 case 5: //Strutそのままedge-
-                    edgeLoop[edgeFlag]=edgeLoop[edgeFlag]-2.0f*damperEdge*(float)countUnchange;
+                    edgeLoop[edgeFlag]=edgeLoop[edgeFlag]-2.0f*damperEdge*(float)(1/countUnchange);
 
                     PlayerPrefs.SetFloat("springForce"+compareFlag.ToString(),springForce);
                     PlayerPrefs.Save();
@@ -541,10 +541,10 @@ public class Searcher3 : MonoBehaviour
                     break;
 
                 case 6: //edgeそのままstrut+
-                    edgeLoop[edgeFlag]=edgeLoop[edgeFlag]+damperEdge*(float)countUnchange;
+                    edgeLoop[edgeFlag]=edgeLoop[edgeFlag]+damperEdge*(float)(1/countUnchange);
                     
                     
-                    strutScale[edgeFlag]=strutScale[edgeFlag]+ damperStrut*(float)countUnchange;
+                    strutScale[edgeFlag]=strutScale[edgeFlag]+ damperStrut*(float)(1/countUnchange);
                     
 
                     PlayerPrefs.SetFloat("springForce"+compareFlag.ToString(),springForce);
@@ -555,7 +555,7 @@ public class Searcher3 : MonoBehaviour
 
                 case 7: //edgeそのままstrut-
                     
-                    strutScale[edgeFlag]=strutScale[edgeFlag]-2.0f* damperStrut*(float)countUnchange;
+                    strutScale[edgeFlag]=strutScale[edgeFlag]-2.0f* damperStrut*(float)(1/countUnchange);
                     
 
                     PlayerPrefs.SetFloat("springForce"+compareFlag.ToString(),springForce);
@@ -569,7 +569,7 @@ public class Searcher3 : MonoBehaviour
                     
                     
                     
-                    strutScale[edgeFlag]=strutScale[edgeFlag]+ damperStrut*(float)countUnchange;
+                    strutScale[edgeFlag]=strutScale[edgeFlag]+ damperStrut*(float)(1/countUnchange);
                     
 
                     PlayerPrefs.SetFloat("springForce"+compareFlag.ToString(),springForce);
@@ -653,10 +653,10 @@ public class Searcher3 : MonoBehaviour
 
                     case 1://0 Strut+edgeLoop- 
                     
-                        edgeLoop[edgeFlag]=edgeLoop[edgeFlag]-damperEdge*(float)countUnchange;
+                        edgeLoop[edgeFlag]=edgeLoop[edgeFlag]-damperEdge*(float)(1/countUnchange);
                         
                         
-                        strutScale[edgeFlag]=strutScale[edgeFlag]+damperStrut*(float)countUnchange;
+                        strutScale[edgeFlag]=strutScale[edgeFlag]+damperStrut*(float)(1/countUnchange);
                         
                         springForce=Forces[0];
                         edgeFlag+=1;
@@ -666,10 +666,10 @@ public class Searcher3 : MonoBehaviour
                     case 2://1 Strut+edgeLoop+ 
                         
                        
-                        strutScale[edgeFlag]=strutScale[edgeFlag]+damperStrut*(float)countUnchange;
+                        strutScale[edgeFlag]=strutScale[edgeFlag]+damperStrut*(float)(1/countUnchange);
                         
                     
-                        edgeLoop[edgeFlag]=edgeLoop[edgeFlag]+1.0f*damperEdge*(float)countUnchange;
+                        edgeLoop[edgeFlag]=edgeLoop[edgeFlag]+1.0f*damperEdge*(float)(1/countUnchange);
                         springForce=Forces[1];
                         edgeFlag+=1;
                         UnchangFlag+=1;
@@ -677,10 +677,10 @@ public class Searcher3 : MonoBehaviour
 
                     case 3://2 Strut-edgeLoop-
                     
-                        edgeLoop[edgeFlag]=edgeLoop[edgeFlag]-1.0f * damperEdge*(float)countUnchange;
+                        edgeLoop[edgeFlag]=edgeLoop[edgeFlag]-1.0f * damperEdge*(float)(1/countUnchange);
                         
                         
-                        strutScale[edgeFlag]=strutScale[edgeFlag]-damperStrut*(float)countUnchange;
+                        strutScale[edgeFlag]=strutScale[edgeFlag]-damperStrut*(float)(1/countUnchange);
                         
                         springForce=Forces[2];
                         edgeFlag+=1;
@@ -689,10 +689,10 @@ public class Searcher3 : MonoBehaviour
 
                     case 4://3 Strut-edgeLoop+ 
                         
-                        strutScale[edgeFlag]=strutScale[edgeFlag]-damperStrut*(float)countUnchange;
+                        strutScale[edgeFlag]=strutScale[edgeFlag]-damperStrut*(float)(1/countUnchange);
                         
                     
-                        edgeLoop[edgeFlag]=edgeLoop[edgeFlag]+damperEdge*(float)countUnchange;
+                        edgeLoop[edgeFlag]=edgeLoop[edgeFlag]+damperEdge*(float)(1/countUnchange);
                         springForce=Forces[3];
                         edgeFlag+=1;
                         UnchangFlag+=1;
@@ -700,7 +700,7 @@ public class Searcher3 : MonoBehaviour
 
                     case 5://4 edgeLoop+ 
 
-                        edgeLoop[edgeFlag]=edgeLoop[edgeFlag]+damperEdge*(float)countUnchange;
+                        edgeLoop[edgeFlag]=edgeLoop[edgeFlag]+damperEdge*(float)(1/countUnchange);
                         springForce=Forces[4];
                         edgeFlag+=1;
                         UnchangFlag+=1;
@@ -708,7 +708,7 @@ public class Searcher3 : MonoBehaviour
 
                     case 6://5 edgeLoop-
 
-                        edgeLoop[edgeFlag]=edgeLoop[edgeFlag]-damperEdge*(float)countUnchange;
+                        edgeLoop[edgeFlag]=edgeLoop[edgeFlag]-damperEdge*(float)(1/countUnchange);
                         springForce=Forces[5];
                         edgeFlag+=1;
                         UnchangFlag+=1;
@@ -716,7 +716,7 @@ public class Searcher3 : MonoBehaviour
 
                     case 7://3 Strut+
                         
-                        strutScale[edgeFlag]=strutScale[edgeFlag]+damperStrut*(float)countUnchange;
+                        strutScale[edgeFlag]=strutScale[edgeFlag]+damperStrut*(float)(1/countUnchange);
                         
 
                         springForce=Forces[6];
@@ -727,7 +727,7 @@ public class Searcher3 : MonoBehaviour
                     case 8://3 Strut- 
                         
                         
-                        strutScale[edgeFlag]=strutScale[edgeFlag]-damperStrut*(float)countUnchange;
+                        strutScale[edgeFlag]=strutScale[edgeFlag]-damperStrut*(float)(1/countUnchange);
                         
 
                         springForce=Forces[7];
