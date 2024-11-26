@@ -418,7 +418,7 @@ public class Searcher3 : MonoBehaviour
             //savedata+=",highLoss,"+highLosses.ToString()+",highLoss,"+DiameterLoss[edgeFlag].ToString()+"\n";
             
             float sikiiti=0.11f;
-            string filename="45_3";
+            string filename="45_4";
             
             if(loss<=sikiiti){
                 int photonumber=0;
@@ -914,12 +914,12 @@ public class Searcher3 : MonoBehaviour
         var springlosses = ConculateSpringsLoss(LayerXpositions,LayerZpositions);
 
         //層ごと高さと直径のlossの合成
-        //float allLoss=highLosses.loss+DiameterData.loss+handPositionLoss;
+        float allLoss=highLosses.loss+DiameterData.loss+handPositionLoss;
 
         Debug.Log(highLosses.loss);
         Debug.Log(DiameterData.loss);
         //float allLoss=0.8f*highLosses.loss+1.25f*DiameterData.loss;
-        float allLoss=DiameterData.loss+highLosses.loss;
+        //float allLoss=DiameterData.loss+highLosses.loss;
 
         
         //Debug.Log(allLoss);
