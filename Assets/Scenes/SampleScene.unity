@@ -288,12 +288,26 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3c5979faf4b1b574bacfec4ff9e9eef9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  struts: []
+  end: []
+  position_x: []
+  position_y: []
+  position_z: []
+  y_s: []
+  assembly: {fileID: 0}
+  toggle: 0.1
+  count: 0
   trueRadius:
   - 0.28710955
   - 0.25047505
   - 0.21264085
   - 0.18240954
   - 0.17003731
+  targetLength: 1.522883
+  targetRadius: []
+  numLayer: 0
+  numPrism: 0
+  radiusBase: 0
 --- !u!114 &646062291
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1427,7 +1441,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7302967286791488144, guid: 6ef8a9d6d5dcc9138801b2cfbbede2a5, type: 3}
       propertyPath: initializer
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7302967286791488144, guid: 6ef8a9d6d5dcc9138801b2cfbbede2a5, type: 3}
       propertyPath: springForce

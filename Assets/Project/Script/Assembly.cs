@@ -55,7 +55,7 @@ public class Assembly : MonoBehaviour
     public float SpringDmaper;                                                 //層に比例するばねの強さ
 
 
-    public float StrutScale;
+    public float[] StrutScale;
 
     //edgeの計算方法の選択
     public bool log_x;              //edgeloopの計算にLog(x)を扱うか    (底数が10)
@@ -239,9 +239,7 @@ public class Assembly : MonoBehaviour
                 springForce =PlayerPrefs.GetFloat("SpringForce");
             }
 
-            if(PlayerPrefs.HasKey("StrutScale")){
-                StrutScale=PlayerPrefs.GetFloat("StrutScale");
-            }
+
 
             if(PlayerPrefs.HasKey("edge")){
         
@@ -257,7 +255,6 @@ public class Assembly : MonoBehaviour
         
         diffRadiusLoop=radiusLoop;
         diffspringForce=springForce;
-        diffStrutScale=StrutScale;
 
 
         psi0=90;
@@ -272,6 +269,7 @@ public class Assembly : MonoBehaviour
         float diffRadius = (radiusBase-lastRadiusloop)/((float)(numLayer-1));      //上と下の半径の差
 
         edgeLoop = new float[numLayer];
+        StrutScale=new float[numLayer];
 
         int bases = numLayer/5;
 
@@ -303,6 +301,7 @@ public class Assembly : MonoBehaviour
         if(initializer){
             for (int i=1;i<=numLayer;i++){
                 edgeLoop[i-1]=   (2.0f*(radiusBase - diffRadius*((float)(i)))*(float)Math.Sin(Math.PI/(2*numPrism)))*((float)Math.Cos((diffphi*i*Math.PI)/180));
+                StrutScale[i-1]=0.5f;
             }
 
             //パラメータの引継ぎ
@@ -335,14 +334,15 @@ public class Assembly : MonoBehaviour
 
         else{
 
-            
-
             for (int i=1;i<=numLayer;i++)
             {
             
                 edgeLoop[i-1]=(2.0f*(radiusBase - diffRadius*((float)(i)))*(float)Math.Sin(Math.PI/(2*numPrism)))*((float)Math.Cos((diffphi*i*Math.PI)/180));
                 if(PlayerPrefs.HasKey("edgeLoop"+(i-1).ToString())){
                     edgeLoop[i-1]=PlayerPrefs.GetFloat("edgeLoop"+(i-1).ToString());
+                }
+                if(PlayerPrefs.HasKey("StrutScale"+(i-1).ToString())){
+                    StrutScale[i-1]=PlayerPrefs.GetFloat("StrutScale"+(i-1).ToString());
                 }
                 //4本5層の値
                 //edgeLoop= new float[5] {0.12415123082906993f,0.11031530609675386f,0.10214850457080119f,0.09057431266995283f,0.12024559516481466f};
@@ -399,10 +399,10 @@ public class Assembly : MonoBehaviour
                 radiusBase*(float)Math.Sin(step*i));                                            //z=radiusBase(半径)×sin((2π/ストラットの数)×i)極座標→直交座標への変換プロセス
             baseblocks[i].name = $"Base{i}";                                                    //名前の決定(object管理のため)
             struts[i] = Instantiate(baseStrut, this.transform);                                 //ストラクト(支柱)の制作
-            struts[i].transform.localScale = new Vector3(0.02f,(float)(StrutScale*0.25f),0.02f); //デフォルトは0.25        
+            struts[i].transform.localScale = new Vector3(0.02f,(float)(StrutScale[i]*0.25f),0.02f); //デフォルトは0.25        
             struts[i].transform.position = this.transform.position + new Vector3(               //ストラクトの座標と生成(処理は上と同じ)
                 radiusBase*(float)Math.Cos(step*i), 
-                0.265f*StrutScale
+                0.265f*StrutScale[i]
                 ,                                                                         //土台の高さがある分少し高い？
                 radiusBase*(float)Math.Sin(step*i)
                 );
@@ -424,18 +424,18 @@ public class Assembly : MonoBehaviour
 
                 struts[index(i, j)] = Instantiate(middleStrut, this.transform);                 //生成i,jの2次元配列にすることで，層と層の何個目かわかる
                 if(i<=(bases-1)){
-                    struts[index(i, j)].transform.localScale = new Vector3(0.02f,(float)(StrutScale*0.25f),0.02f); //デフォルトは0.2 StrutScale*
+                    struts[index(i, j)].transform.localScale = new Vector3(0.02f,(float)(StrutScale[i]*0.25f),0.02f); //デフォルトは0.2 StrutScale*
                     struts[index(i, j)].transform.position = this.transform.position + new Vector3( //座標
                         stripeshape*(radiusBase/1.5f)*(float)Math.Cos(step*j+twist*(i%2)),                        
-                        (float)(i+1)*(0.265f*StrutScale),                                                      //y 積みあがる高さ分加算
+                        (float)(i+1)*(0.265f*StrutScale[i]),                                                      //y 積みあがる高さ分加算
                         stripeshape*(radiusBase/1.5f)*(float)Math.Sin(step*j+twist*(i%2))                         //z 
                     );  
                 }
                 else{
-                    struts[index(i, j)].transform.localScale = new Vector3(0.02f,(float)(StrutScale*0.20f),0.02f); //デフォルトは0.2 StrutScale*
+                    struts[index(i, j)].transform.localScale = new Vector3(0.02f,(float)(StrutScale[i]*0.20f),0.02f); //デフォルトは0.2 StrutScale*
                     struts[index(i, j)].transform.position = this.transform.position + new Vector3( //座標
                         stripeshape*(radiusBase/1.5f)*(float)Math.Cos(step*j+twist*(i%2)),                        
-                        (0.265f*StrutScale)*bases+(float)(i-bases)*(0.3f*StrutScale),                                                      //y 積みあがる高さ分加算
+                        (0.265f*StrutScale[i])*bases+(float)(i-bases)*(0.3f*StrutScale[i]),                                                      //y 積みあがる高さ分加算
                         stripeshape*(radiusBase/1.5f)*(float)Math.Sin(step*j+twist*(i%2))                         //z 
                     );  
                 }
@@ -602,14 +602,15 @@ public class Assembly : MonoBehaviour
         for(int i=0;i<numLayer;i++){
             PlayerPrefs.SetFloat("edgeLoop"+(i).ToString(),edgeLoop[i]);
             PlayerPrefs.Save();
+            PlayerPrefs.SetFloat("StrutScale"+(i).ToString(),StrutScale[i]);
+            PlayerPrefs.Save();
         }
 
         PlayerPrefs.SetFloat("RadiusLoop",radiusLoop);
         PlayerPrefs.Save();
         PlayerPrefs.SetFloat("SpringForce",springForce);
         PlayerPrefs.Save();
-        PlayerPrefs.SetFloat("StrutScale",StrutScale);
-        PlayerPrefs.Save();
+        
 
 
         isReady = true;
@@ -622,15 +623,7 @@ public class Assembly : MonoBehaviour
         
         
         
-        if((Time.frameCount%1000)==0){
-            //Debug.Log(StrutScale);
-            
-            
-                
-            
-            diffRadiusLoop=radiusLoop;
-            diffStrutScale=StrutScale;
-        }
+
         
         // Update loop renderers
         for (int i = 0; i <= numLayer ; i++) 
