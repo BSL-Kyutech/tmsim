@@ -23,93 +23,34 @@ public class Searcher3 : MonoBehaviour
     }
 
     //直径の正解値を返す
-    private float ReturnCorrectRadius(float y){
-        //4-5の際の直径
-        float [] trueRadius={0.3232192f,0.2661974f,0.2253503f,0.1690026f,0.1804611f};
-        //4-5の際の層ごとの高さ
-        float [] trueHigh={0.3345878f,0.5892965f,0.8675417f,1.15422f,1.48762f};
-        float radius=0.0f;
-        float gradient=0.0f;
-        float intercept=0.0f;
+    private float ReturnCorrectDiameter(float y,float DiameterBase){
 
-        //それぞれの中間の直径を一次関数で近似
-        if(y<=trueHigh[0]){
-            //0.06ぐらいかえっさせる
-            gradient=(0.44f-trueRadius[0])/(trueHigh[0]-0.0f);
-            intercept=0.44f;
-            radius=-gradient*(y-0.0f)+intercept;
-        }
-        else if(y<=trueHigh[1]){
-            gradient=(trueRadius[0]-trueRadius[1])/(trueHigh[1]-trueHigh[0]);
-            intercept=trueRadius[0];
-            radius=-gradient*(y-trueHigh[0])+intercept;
-        }
-        else if(y<=trueHigh[2]){
-            gradient=(trueRadius[1]-trueRadius[2])/(trueHigh[2]-trueHigh[1]);
-            intercept=trueRadius[1];
-            radius=-gradient*(y-trueHigh[1])+intercept;
-        }
-        else if(y<=trueHigh[3]){
-            gradient=(trueRadius[2]-trueRadius[3])/(trueHigh[3]-trueHigh[2]);
-            intercept=trueRadius[2];
-            radius=-gradient*(y-trueHigh[2])+intercept;
-        }
-        else if(y<=trueHigh[4]){
-            gradient=(trueRadius[3]-trueRadius[4])/(trueHigh[4]-trueHigh[3]);
-            intercept=trueRadius[3];
-            radius=-gradient*(y-trueHigh[3])+intercept;
-        }
-        else{
-            radius=trueRadius[4];
-        }
+        //手先位置の直径
+        float handPosDiameter=0.2f;
+
+        //手先一の高さ
+        float maxHigh=1.5f;
         
-        
-        
-        return radius;
+        //傾き
+        float gradient=0.0f;
+        gradient=(DiameterBase-handPosDiameter)/(0-maxHigh);
+
+        float diameters=gradient*y+DiameterBase;
+
+        return diameters;
         
     }
 
     //高さの正解値を返す
     private float ReturnCorrectHigha(int i,int numLayer){
-        //4-5の際の層ごとの高さ
-        float [] trueHigh={0.3345878f,0.5892965f,0.8675417f,1.15422f,1.48762f};
-        float high=0.0f;
-        float gradient=0.0f;
-        float intercept=0.0f;
+        
 
-        //今の層がどこに位置するか調べる
-        int classifier=numLayer/5;
-        i=i+1;
+        float maxHigh=1.5f;
 
-        //それぞれの中間の高さを一次関数で近似
-        if(i<classifier+1){
-            gradient=(trueHigh[0]-0.0f)/(classifier);
-            intercept=0.0f;
-            high=gradient*i+intercept;
-        }
-        else if(i<(classifier*2)+1){
-            gradient=(trueHigh[1]-trueHigh[0])/(classifier);
-            intercept=trueHigh[0];
-            high=gradient*(i-classifier)+intercept;
-        }
-        else if(i<(classifier*3)+1){
-            gradient=(trueHigh[2]-trueHigh[1])/(classifier);
-            intercept=trueHigh[1];
-            high=gradient*(i-classifier*2)+intercept;
-        }
-        else if(i<(classifier*4)+1){
-            gradient=(trueHigh[3]-trueHigh[2])/(classifier);
-            intercept=trueHigh[2];
-            high=gradient*(i-classifier*3)+intercept;
-        }
-        else if(i<(classifier*5)+1){
-            gradient=(trueHigh[4]-trueHigh[3])/(classifier);
-            intercept=trueHigh[3];
-            high=gradient*(i-classifier*4)+intercept;
-        }
-        else{
-            high=trueHigh[4];
-        }
+        float gradient=maxHigh/numLayer;
+        float high=gradient*(i+1);
+
+
         
         //Debug.Log("high"+(i-1).ToString()+"  "+high.ToString());
         
@@ -193,7 +134,7 @@ public class Searcher3 : MonoBehaviour
     }
 
     //直径の検出
-    private float getRadius(int arrayLength,float[] LayerXpositions,float[] LayerZpositions){
+    private float getDiameter(int arrayLength,float[] LayerXpositions,float[] LayerZpositions){
         float tm_g_x=0.0f;
         float tm_g_z=0.0f;
         float maxDistance=0.0f;
@@ -358,29 +299,29 @@ public class Searcher3 : MonoBehaviour
     }
 
     //直径の損失計算　  優先順位　4
-    private float ConcurateRadiusLoss(float radius, float y){
+    private float ConcurateDiameterLoss(float Diameter, float y,float DiameterBase){
         float loss=0.0f;
 
-        float targetRadius=ReturnCorrectRadius(y);
+        float targetDiameter=ReturnCorrectDiameter(y,DiameterBase);
 
-        Debug.Log("diameters"+" : "+radius.ToString()+" " +" Correct Diameters :" +targetRadius.ToString() );
+        Debug.Log("diameters"+" : "+Diameter.ToString()+" " +" Correct Diameters :" +targetDiameter.ToString() );
 
-        loss=(float)Math.Pow((double)(targetRadius-radius),2);
+        loss=(float)Math.Pow((double)(targetDiameter-Diameter),2);
 
         return loss;
     }
 
     //直径の損失計算(すべて)
-    private (float loss, bool flag) ConcurateAllRadiusLoss(float[] layersRadius/*レイヤーごとの直径*/,float[] layersHigh){
+    private (float loss, bool flag) ConcurateAllDiameterLoss(float[] layersDiameter/*レイヤーごとの直径*/,float[] layersHigh,float DiameterBase){
         float loss=0.0f; //ロス
         bool flag=false; //あくまで念のためのフラグ
 
         
 
         //配列内のlossの計算
-        for (int i=0; i<layersRadius.Length;i++){
+        for (int i=0; i<layersDiameter.Length;i++){
             
-            loss += ConcurateRadiusLoss(layersRadius[i],ReturnCorrectHigha(i,layersRadius.Length));
+            loss += ConcurateDiameterLoss(layersDiameter[i],ReturnCorrectHigha(i,layersDiameter.Length),DiameterBase);
         }
 
         return (loss,flag);
@@ -474,10 +415,10 @@ public class Searcher3 : MonoBehaviour
             for(int i=0;i<numLayer;i++){
                 savedata+=",edgeLoop"+i.ToString() +"," +edgeLoop[i].ToString(); 
             }
-            //savedata+=",highLoss,"+highLosses.ToString()+",highLoss,"+radiusLoss[edgeFlag].ToString()+"\n";
+            //savedata+=",highLoss,"+highLosses.ToString()+",highLoss,"+DiameterLoss[edgeFlag].ToString()+"\n";
             
             float sikiiti=0.11f;
-            string filename="45_2";
+            string filename="45_3";
             
             if(loss<=sikiiti){
                 int photonumber=0;
@@ -870,7 +811,7 @@ public class Searcher3 : MonoBehaviour
         //レイヤー数の取得
         int numLayer=assembly.numLayer;
         int numPrism=assembly.numPrism;
-        float radiusBase=assembly.radiusBase;
+        float DiameterBase=assembly.radiusBase*2.0f;
 
         //手先位置の取得変数
         float tm_g_x=0.0f;
@@ -920,8 +861,8 @@ public class Searcher3 : MonoBehaviour
         float[] maxErrors;
         maxErrors=new float [numLayer];
 
-        float[] radiusLosses;
-        radiusLosses = new float [numLayer];
+        float[] DiameterLosses;
+        DiameterLosses = new float [numLayer];
 
         //層ごとの高さ，直径，ズレの検出
         for(int i=0;i<numLayer;i++){
@@ -938,7 +879,7 @@ public class Searcher3 : MonoBehaviour
 
         
             //配列にそれぞれの直径を格納
-            diameters[i]=getRadius(arrayLength,LayerXpositions,LayerZpositions);
+            diameters[i]=getDiameter(arrayLength,LayerXpositions,LayerZpositions);
             maxDistance=0;
 
 
@@ -960,8 +901,8 @@ public class Searcher3 : MonoBehaviour
         }
         
         //層ごとの半径のロス
-        var radiusData=ConcurateAllRadiusLoss(diameters,tm_g_layers_y);
-        //Debug.Log("radius Loss"+i.ToString() +"  "+radiusData.loss.ToString());
+        var DiameterData=ConcurateAllDiameterLoss(diameters,tm_g_layers_y,DiameterBase);
+        //Debug.Log("Diameter Loss"+i.ToString() +"  "+DiameterData.loss.ToString());
 
         //層ごとの高さのロス
         var highLosses = ConcurateAllHighLoss(tm_g_layers_y);
@@ -973,12 +914,12 @@ public class Searcher3 : MonoBehaviour
         var springlosses = ConculateSpringsLoss(LayerXpositions,LayerZpositions);
 
         //層ごと高さと直径のlossの合成
-        //float allLoss=highLosses.loss+radiusData.loss+handPositionLoss;
+        //float allLoss=highLosses.loss+DiameterData.loss+handPositionLoss;
 
         Debug.Log(highLosses.loss);
-        Debug.Log(radiusData.loss);
-        //float allLoss=0.8f*highLosses.loss+1.25f*radiusData.loss;
-        float allLoss=radiusData.loss+handPositionLoss;
+        Debug.Log(DiameterData.loss);
+        //float allLoss=0.8f*highLosses.loss+1.25f*DiameterData.loss;
+        float allLoss=DiameterData.loss+highLosses.loss;
 
         
         //Debug.Log(allLoss);
