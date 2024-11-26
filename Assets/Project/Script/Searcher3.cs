@@ -304,7 +304,7 @@ public class Searcher3 : MonoBehaviour
 
         bool flag=true;
         //閾値は0.2くらい？(4-5の際の値が0.5532593のため)
-        float threshold=0.02f;
+        float threshold=0.01f;
 
         if(loss<=threshold){
             flag=false;
@@ -470,7 +470,7 @@ public class Searcher3 : MonoBehaviour
             //savedata+=",highLoss,"+highLosses.ToString()+",highLoss,"+radiusLoss[edgeFlag].ToString()+"\n";
             
             float sikiiti=0.11f;
-            string filename="4_14";
+            string filename="45_1";
             
             if(loss<=sikiiti){
                 int photonumber=0;
@@ -1028,7 +1028,7 @@ public class Searcher3 : MonoBehaviour
         if(PlayerPrefs.HasKey("photonumber")){
             photonumber=PlayerPrefs.GetInt("photonumber");
         }
-        if(photonumber<=53948){
+        if(photonumber<=10000){
             SceneManager.LoadScene("SampleScene");
         }
         
