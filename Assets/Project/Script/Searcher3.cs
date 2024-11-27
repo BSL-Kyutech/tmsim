@@ -327,7 +327,7 @@ public class Searcher3 : MonoBehaviour
         return (loss,flag);
     }
     
-    private void parameterChanging(bool springFlag, float loss,int numLayer){
+    private void parameterChanging(bool springFlag, float loss,int numLayer,int numPrism){
         if(springFlag){
             
             float springForce=0.0f;
@@ -418,7 +418,7 @@ public class Searcher3 : MonoBehaviour
             //savedata+=",highLoss,"+highLosses.ToString()+",highLoss,"+DiameterLoss[edgeFlag].ToString()+"\n";
             
             float sikiiti=0.11f;
-            string filename="45_4";
+            string filename="45_6";
             
             if(loss<=sikiiti){
                 int photonumber=0;
@@ -451,7 +451,7 @@ public class Searcher3 : MonoBehaviour
 
 
             //パラメータの調整
-            float damperEdge=0.0005f;
+            float damperEdge=0.000625f*numPrism;
             float damperStrut=0.005f;
             int countUnchange=1;
             if(PlayerPrefs.HasKey("countUnchange")){
@@ -908,24 +908,28 @@ public class Searcher3 : MonoBehaviour
         var highLosses = ConcurateAllHighLoss(tm_g_layers_y);
 
         //手先位置(一番上の高さのロス)
-        float handPositionLoss=(float)(numLayer*numPrism/*重み*/)*ConcurateHighLoss(tm_g_layers_y[numLayer-1],1.48762f);
+        //float handPositionLoss=(float)(numLayer*numPrism/*重み*/)*ConcurateHighLoss(tm_g_layers_y[numLayer-1],1.48762f);
+
+        //手先位置(一番上の高さのロス)
+        float handPositionLoss=ConcurateHighLoss(tm_g_layers_y[numLayer-1],1.5f);
+
 
         //倒れているか確認
         var springlosses = ConculateSpringsLoss(LayerXpositions,LayerZpositions);
 
         //層ごと高さと直径のlossの合成
-        float allLoss=highLosses.loss+DiameterData.loss+handPositionLoss;
+        //float allLoss=highLosses.loss+DiameterData.loss+handPositionLoss;
 
         Debug.Log(highLosses.loss);
         Debug.Log(DiameterData.loss);
         //float allLoss=0.8f*highLosses.loss+1.25f*DiameterData.loss;
-        //float allLoss=DiameterData.loss+highLosses.loss;
+        float allLoss=DiameterData.loss+highLosses.loss+handPositionLoss;
 
         
         //Debug.Log(allLoss);
         
         //パラメータの変更処理
-        parameterChanging(springlosses.flag,allLoss,numLayer);
+        parameterChanging(springlosses.flag,allLoss,numLayer,numPrism);
 
         int photonumber=0;
         

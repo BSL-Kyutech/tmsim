@@ -226,7 +226,7 @@ public class Assembly : MonoBehaviour
     // Start is called before the first frame update        最初の初期起動時の処理
     void Start()
     {
-        Time.timeScale=20.0f;
+        Time.timeScale=100.0f;
 
         //radiusLoopが内部に存在していた場合取得
         
@@ -301,7 +301,7 @@ public class Assembly : MonoBehaviour
         if(initializer){
             for (int i=1;i<=numLayer;i++){
                 edgeLoop[i-1]=   (2.0f*(radiusBase - diffRadius*((float)(i)))*(float)Math.Sin(Math.PI/(2*numPrism)))*((float)Math.Cos((diffphi*i*Math.PI)/180));
-                StrutScale[i-1]=0.5f;
+                StrutScale[i-1]=0.9f;
             }
 
             //パラメータの引継ぎ
