@@ -276,6 +276,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 50f7440f9c61eda4192136e2a68db760, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  struts: []
+  end: []
+  position: []
+  y_s: []
+  assembly: {fileID: 0}
+  toggle: 0.1
+  count: 0
 --- !u!114 &646062290
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1405,11 +1412,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7302967286791488144, guid: 6ef8a9d6d5dcc9138801b2cfbbede2a5, type: 3}
       propertyPath: numLayer
-      value: 5
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 7302967286791488144, guid: 6ef8a9d6d5dcc9138801b2cfbbede2a5, type: 3}
       propertyPath: numPrism
-      value: 4
+      value: 8
       objectReference: {fileID: 0}
     - target: {fileID: 7302967286791488144, guid: 6ef8a9d6d5dcc9138801b2cfbbede2a5, type: 3}
       propertyPath: BaseScale
@@ -1441,11 +1448,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7302967286791488144, guid: 6ef8a9d6d5dcc9138801b2cfbbede2a5, type: 3}
       propertyPath: initializer
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7302967286791488144, guid: 6ef8a9d6d5dcc9138801b2cfbbede2a5, type: 3}
       propertyPath: springForce
-      value: 480
+      value: 1200
       objectReference: {fileID: 0}
     - target: {fileID: 7302967286791488144, guid: 6ef8a9d6d5dcc9138801b2cfbbede2a5, type: 3}
       propertyPath: stripeshape

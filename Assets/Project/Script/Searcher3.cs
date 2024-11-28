@@ -418,7 +418,7 @@ public class Searcher3 : MonoBehaviour
             //savedata+=",highLoss,"+highLosses.ToString()+",highLoss,"+DiameterLoss[edgeFlag].ToString()+"\n";
             
             float sikiiti=0.11f;
-            string filename="45_6";
+            string filename="810_4";
             
             if(loss<=sikiiti){
                 int photonumber=0;
@@ -451,7 +451,7 @@ public class Searcher3 : MonoBehaviour
 
 
             //パラメータの調整
-            float damperEdge=0.000625f*numPrism;
+            float damperEdge=0.001f/numPrism;
             float damperStrut=0.005f;
             int countUnchange=1;
             if(PlayerPrefs.HasKey("countUnchange")){
@@ -775,7 +775,7 @@ public class Searcher3 : MonoBehaviour
                 PlayerPrefs.Save();
             }
             
-            PlayerPrefs.SetFloat("SpringForce",1280.0f);//つぶれ始めるから，毎回リセットかければいいのでは？
+            PlayerPrefs.SetFloat("SpringForce",3600.0f);//つぶれ始めるから，毎回リセットかければいいのでは？
             PlayerPrefs.Save();
             PlayerPrefs.SetInt("compareFlag",compareFlag);
             PlayerPrefs.Save();
