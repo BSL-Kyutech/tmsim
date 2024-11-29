@@ -241,11 +241,11 @@ public class Searcher3 : MonoBehaviour
         //最小二乗法での計算
         float loss=0.0f;
         loss=((float)(Math.Pow((double)(0-x),2))+(float)(Math.Pow((double)(0-z),2)));
-        //Debug.Log("xz loss   "+loss.ToString());
+        Debug.Log("xz loss   "+loss.ToString());
 
         bool flag=true;
         //閾値は0.2くらい？(4-5の際の値が0.5532593のため)
-        float threshold=0.01f;
+        float threshold=0.055f;
 
         if(loss<=threshold){
             flag=false;
@@ -418,7 +418,7 @@ public class Searcher3 : MonoBehaviour
             //savedata+=",highLoss,"+highLosses.ToString()+",highLoss,"+DiameterLoss[edgeFlag].ToString()+"\n";
             
             float sikiiti=0.11f;
-            string filename="810_4";
+            string filename="67_2";
             
             if(loss<=sikiiti){
                 int photonumber=0;
@@ -438,21 +438,18 @@ public class Searcher3 : MonoBehaviour
                 PlayerPrefs.Save();
             }
             else{
-                savedata+=",loss,"+loss.ToString()+",springForce,"+springForce.ToString()+",compareFlag,"+compareFlag.ToString()+"\n";
+                savedata+=",loss,"+loss.ToString()+",springForce,"+springForce.ToString()+",compareFlag,"+compareFlag.ToString();
             }
             
             
-            string path= "C:/Users/Yamauchi Gaito/Desktop/workspace/_tmsim/data/mountingSearc"+filename+".csv";
-            OutputCsv(path,savedata);
-
-            Debug.Log(savedata);
+            
             //Csvの出力
             
 
 
             //パラメータの調整
-            float damperEdge=0.001f/numPrism;
-            float damperStrut=0.005f;
+            float damperEdge=0.005f/numPrism;
+            float damperStrut=0.0025f;
             int countUnchange=1;
             if(PlayerPrefs.HasKey("countUnchange")){
                 countUnchange=PlayerPrefs.GetInt("countUnchange");
@@ -584,6 +581,9 @@ public class Searcher3 : MonoBehaviour
             }
             //Debug.Log(compareFlag);
 
+            //lossの一番小さいやつ データ収集中は-1
+            int mins=-1;
+
             //compareFlag+1されているため，最後のデータは=0の際に取得される。
             if(compareFlag==0){
                 Debug.Log("----------------------- Compare phase -------------------------------");
@@ -608,7 +608,7 @@ public class Searcher3 : MonoBehaviour
 
                 //lossの比較
                 float minloss=10000000.0f;
-                int mins=0;
+                
                 //高さが良いやつを選抜する
      
                 for(int i=0;i<9;i++){
@@ -775,13 +775,21 @@ public class Searcher3 : MonoBehaviour
                 PlayerPrefs.Save();
             }
             
-            PlayerPrefs.SetFloat("SpringForce",3600.0f);//つぶれ始めるから，毎回リセットかければいいのでは？
+            PlayerPrefs.SetFloat("SpringForce",1680.0f);//つぶれ始めるから，毎回リセットかければいいのでは？
             PlayerPrefs.Save();
             PlayerPrefs.SetInt("compareFlag",compareFlag);
             PlayerPrefs.Save();
             
             PlayerPrefs.SetInt("EdgeFlag",edgeFlag);
             PlayerPrefs.Save();
+
+            //出力
+
+            savedata=savedata+",mins,"+mins.ToString()+"\n";
+            string path= "C:/Users/Yamauchi Gaito/Desktop/workspace/_tmsim/data/mountingSearc"+filename+".csv";
+            OutputCsv(path,savedata);
+
+            Debug.Log(savedata);
             
             
             return;
@@ -920,10 +928,10 @@ public class Searcher3 : MonoBehaviour
         //層ごと高さと直径のlossの合成
         //float allLoss=highLosses.loss+DiameterData.loss+handPositionLoss;
 
-        Debug.Log(highLosses.loss);
-        Debug.Log(DiameterData.loss);
+        Debug.Log("high loss" + highLosses.loss.ToString());
+        Debug.Log("diameter loss" + DiameterData.loss.ToString());
         //float allLoss=0.8f*highLosses.loss+1.25f*DiameterData.loss;
-        float allLoss=DiameterData.loss+highLosses.loss+handPositionLoss;
+        float allLoss=DiameterData.loss+highLosses.loss;
 
         
         //Debug.Log(allLoss);
