@@ -394,7 +394,7 @@ public class Assembly : MonoBehaviour
                 struts[index(i, j)].transform.localScale = new Vector3(0.02f,(float)(StrutScale[i]*0.20f),0.02f); //デフォルトは0.2 StrutScale*
                 struts[index(i, j)].transform.position = this.transform.position + new Vector3( //座標
                     stripeshape*(radiusBase/1.5f)*(float)Math.Cos(step*j+twist*(i%2)),                        
-                    (0.215f*StrutScale[0])*bases+(float)(i-bases)*(0.3f*StrutScale[i]),                                                      //y 積みあがる高さ分加算   データ収集後こっちの式でやってみる(0.215f*StrutScale[0])+(float)(i-bases)*(0.3f*StrutScale[i]),
+                    (0.215f*StrutScale[0])+(float)(i-1)*(0.3f*StrutScale[i]),                                                      //y 積みあがる高さ分加算   データ収集後こっちの式でやってみる
                     stripeshape*(radiusBase/1.5f)*(float)Math.Sin(step*j+twist*(i%2))                         //z 
                 );  
                 
