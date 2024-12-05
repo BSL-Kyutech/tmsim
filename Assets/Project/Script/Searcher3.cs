@@ -418,7 +418,7 @@ public class Searcher3 : MonoBehaviour
             //savedata+=",highLoss,"+highLosses.ToString()+",highLoss,"+DiameterLoss[edgeFlag].ToString()+"\n";
             
             float sikiiti=0.11f;
-            string filename="67_2";
+            string filename="1215_1";
             
             if(loss<=sikiiti){
                 int photonumber=0;
@@ -432,7 +432,7 @@ public class Searcher3 : MonoBehaviour
                 
                 OnScrrenCapture(picturePath+filename+"/"+photonumber.ToString()+".png");
                 
-                savedata+=",loss,"+loss.ToString()+",springForce,"+springForce.ToString()+",compareFlag,"+compareFlag.ToString()+",photonumber"+photonumber.ToString()+"\n";
+                savedata+=",loss,"+loss.ToString()+",springForce,"+springForce.ToString()+",compareFlag,"+compareFlag.ToString()+",photonumber"+photonumber.ToString();
                 photonumber+=1;
                 PlayerPrefs.SetInt("photonumber",photonumber);
                 PlayerPrefs.Save();
@@ -779,7 +779,7 @@ public class Searcher3 : MonoBehaviour
 
             Debug.Log("EdgeFlag : "+edgeFlag.ToString());
             
-            PlayerPrefs.SetFloat("SpringForce",1680.0f);//つぶれ始めるから，毎回リセットかければいいのでは？
+            PlayerPrefs.SetFloat("SpringForce",2640.0f);//つぶれ始めるから，毎回リセットかければいいのでは？
             PlayerPrefs.Save();
             PlayerPrefs.SetInt("compareFlag",compareFlag);
             PlayerPrefs.Save();
@@ -952,7 +952,7 @@ public class Searcher3 : MonoBehaviour
         if(PlayerPrefs.HasKey("photonumber")){
             photonumber=PlayerPrefs.GetInt("photonumber");
         }
-        if(photonumber<=10000){
+        if(photonumber<=2000*numLayer){
             SceneManager.LoadScene("SampleScene");
         }
         

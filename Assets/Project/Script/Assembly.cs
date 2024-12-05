@@ -263,6 +263,9 @@ public class Assembly : MonoBehaviour
             }
 
             //StrutScale=new float[10]{0.7112515f,0.7213767f,0.7011681f,0.6990014f,0.6775014f,0.6721681f,0.6682513f,0.6419179f,0.6465013f,0.6452513f};
+            StrutScale=new float[10]{0.7741794f/0.8f,0.7375128f/0.8f,0.805346f,0.778721f,0.7521794f,0.7203458f,0.6996792f,0.6540951f,0.6223454f,0.6304705f};
+            edgeLoop=new float[10]{0.06268743f,0.06676555f,0.06041659f,0.05461974f,0.05392702f,0.05094265f,0.04624995f,0.04400515f,0.04369787f,0.0630364f};
+
             //edgeLoop=new float[10]{0.05607285f,0.05599472f,0.05252077f,0.05004682f,0.05190619f,0.04651557f,0.04581245f,0.03875516f,0.03686455f,0.0277031f};
 
 
@@ -362,10 +365,10 @@ public class Assembly : MonoBehaviour
                 radiusBase*(float)Math.Sin(step*i));                                            //z=radiusBase(半径)×sin((2π/ストラットの数)×i)極座標→直交座標への変換プロセス
             baseblocks[i].name = $"Base{i}";                                                    //名前の決定(object管理のため)
             struts[i] = Instantiate(baseStrut, this.transform);                                 //ストラクト(支柱)の制作
-            struts[i].transform.localScale = new Vector3(0.02f,(float)(StrutScale[i]*0.20f),0.02f); //デフォルトは0.25        
+            struts[i].transform.localScale = new Vector3(0.02f,(float)(StrutScale[0]*0.20f),0.02f); //デフォルトは0.25        
             struts[i].transform.position = this.transform.position + new Vector3(               //ストラクトの座標と生成(処理は上と同じ)
                 radiusBase*(float)Math.Cos(step*i), 
-                0.215f*StrutScale[i]
+                0.215f*StrutScale[0]
                 ,                                                                         //土台の高さがある分少し高い？
                 radiusBase*(float)Math.Sin(step*i)
                 );
@@ -391,7 +394,7 @@ public class Assembly : MonoBehaviour
                 struts[index(i, j)].transform.localScale = new Vector3(0.02f,(float)(StrutScale[i]*0.20f),0.02f); //デフォルトは0.2 StrutScale*
                 struts[index(i, j)].transform.position = this.transform.position + new Vector3( //座標
                     stripeshape*(radiusBase/1.5f)*(float)Math.Cos(step*j+twist*(i%2)),                        
-                    (0.215f*StrutScale[0])+(float)(i)*(0.3f*StrutScale[i]),                                                      //y 積みあがる高さ分加算
+                    (0.215f*StrutScale[0])*bases+(float)(i-bases)*(0.3f*StrutScale[i]),                                                      //y 積みあがる高さ分加算   データ収集後こっちの式でやってみる(0.215f*StrutScale[0])+(float)(i-bases)*(0.3f*StrutScale[i]),
                     stripeshape*(radiusBase/1.5f)*(float)Math.Sin(step*j+twist*(i%2))                         //z 
                 );  
                 

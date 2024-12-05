@@ -4,6 +4,8 @@ using UnityEngine;
 
 using System;
 
+
+//機能確認スクリプト(Debug.用)
 public class renshu : MonoBehaviour
 {
     public GameObject basePlate;

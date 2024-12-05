@@ -1385,11 +1385,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7302967286791488144, guid: 6ef8a9d6d5dcc9138801b2cfbbede2a5, type: 3}
       propertyPath: numLayer
-      value: 7
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 7302967286791488144, guid: 6ef8a9d6d5dcc9138801b2cfbbede2a5, type: 3}
       propertyPath: numPrism
-      value: 6
+      value: 8
       objectReference: {fileID: 0}
     - target: {fileID: 7302967286791488144, guid: 6ef8a9d6d5dcc9138801b2cfbbede2a5, type: 3}
       propertyPath: BaseScale
@@ -1425,7 +1425,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7302967286791488144, guid: 6ef8a9d6d5dcc9138801b2cfbbede2a5, type: 3}
       propertyPath: springForce
-      value: 1680
+      value: 2640
       objectReference: {fileID: 0}
     - target: {fileID: 7302967286791488144, guid: 6ef8a9d6d5dcc9138801b2cfbbede2a5, type: 3}
       propertyPath: stripeshape
