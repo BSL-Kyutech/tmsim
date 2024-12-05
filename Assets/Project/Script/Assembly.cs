@@ -166,52 +166,7 @@ public class Assembly : MonoBehaviour
         return (scale,high,highs);//ここでどうにかして配列返したいな～～～！！！(8/22)
     }*/
 
-    public (float scale,float high, float[] highs) simulateTensegritylength(double diffPhi   /* 地面と平行な線に対するedgeloop一片の角度の変化 */  , double diffPsi /* 地面と平行な線に対するStrutの角度の変化 */, float  diffRadius){
-        //柱の長さ
-        float strutLength=0.0f;
-        float baseStrutLength=0.0f;
-        float scale=1.0f;
-        float edgeloop_=0.0f;
-        float radius=0.0f;
-
-        //テンセグリティの高さ
-        float high=0.0f;
-        //プサイ，φ
-        double psi=0;
-        double phi=0;
-
-        //配列の設定
-        var highs = new float[numLayer]; 
-
-        while(true){
-            strutLength=scale*0.2f;
-            baseStrutLength=scale*0.25f;
-
-            psi=(diffPsi*1)*  (float)Math.PI/180;
-            high=baseStrutLength*(float)Math.Sin(psi);
-            highs[0]=high;
-
-
-            for(int i=2;i<=numLayer; i++){//できたら，iごとのhighを配列に格納したいな～～！！(8/22)
-                phi=(diffPhi*(i-1))*  Math.PI/180;
-                psi=(diffPsi*(i-1))*  Math.PI/180;
-
-                radius=radiusBase-(((1-edgeDampoer)*radiusBase)/1.50f * highs[i-2]);
-                edgeloop_=   2.0f * radius *(float)Math.Sin(Math.PI/(2*numPrism))/((float)Math.Cos((diffPhi*(i-1)*Math.PI)/180));
-
-                high= high+ (strutLength * (float)Math.Sin(psi)) - (edgeloop_ * (float)Math.Cos(phi));
-                highs[i-1]=high;
-
-            } 
-            if(high <= 1.55){
-                break;
-            }
-            scale-=0.0001f;
-            //
-        } 
-
-        return (scale,high,highs);//ここでどうにかして配列返したいな～～～！！！(8/22)
-    }
+    
 
     //Sceneの変更のチェックのトリがー
     private float diffRadiusLoop;
@@ -299,12 +254,18 @@ public class Assembly : MonoBehaviour
         float radius=0.0f;
 
         if(initializer){
-
+            
             for (int i=1;i<=numLayer;i++){
-                edgeLoop[i-1]=   (2.0f*(radiusBase - diffRadius*((float)(i)))*(float)Math.Sin(Math.PI/(2*numPrism)))*0.8f;
+                edgeLoop[i-1]= (2.0f*(radiusBase - diffRadius*((float)(i)))*(float)Math.Sin(Math.PI/(2*numPrism)))*0.8f;
                 
-                StrutScale[i-1]=0.8f-(0.8f-0.75f)/numLayer * (i-1);
+                StrutScale[i-1]=0.70f-(0.70f-0.60f)/numLayer * (i-1);
+                //StrutScale[i-1]=0.85f-(0.85f-0.7f)/numLayer * (i-1);
             }
+
+            //StrutScale=new float[10]{0.7112515f,0.7213767f,0.7011681f,0.6990014f,0.6775014f,0.6721681f,0.6682513f,0.6419179f,0.6465013f,0.6452513f};
+            //edgeLoop=new float[10]{0.05607285f,0.05599472f,0.05252077f,0.05004682f,0.05190619f,0.04651557f,0.04581245f,0.03875516f,0.03686455f,0.0277031f};
+
+
 
             //パラメータの引継ぎ
             for(int i=0;i<numLayer;i++){
@@ -318,8 +279,8 @@ public class Assembly : MonoBehaviour
             //edgeLoop=new float[10]{0.065649f, 0.06289442f, 0.0731718f, 0.04244859f, 0.04472593f, 0.0510033f, 0.05128067f, 0.04755802f, 0.04683538f, 0.03011275f};
             //edgeLoop=new float[10]{0.05314891f, 0.04836987f, 0.04488838f, 0.04350825f, 0.03888217f, 0.03488217f, 0.02922862f, 0.03382276f, 0.03138219f, 0.04899989f};
             initializer=false;
-            PlayerPrefs.SetInt("compareFlag",0);//compareflagの初期化は後でコメントアウト外さないといけない
-            PlayerPrefs.Save();
+            //PlayerPrefs.SetInt("compareFlag",0);//compareflagの初期化は後でコメントアウト外さないといけない
+            //PlayerPrefs.Save();
             PlayerPrefs.SetInt("EdgeFlag",0);
             PlayerPrefs.Save();
             PlayerPrefs.SetInt("countUnchange",1);
@@ -401,10 +362,10 @@ public class Assembly : MonoBehaviour
                 radiusBase*(float)Math.Sin(step*i));                                            //z=radiusBase(半径)×sin((2π/ストラットの数)×i)極座標→直交座標への変換プロセス
             baseblocks[i].name = $"Base{i}";                                                    //名前の決定(object管理のため)
             struts[i] = Instantiate(baseStrut, this.transform);                                 //ストラクト(支柱)の制作
-            struts[i].transform.localScale = new Vector3(0.02f,(float)(StrutScale[i]*0.25f),0.02f); //デフォルトは0.25        
+            struts[i].transform.localScale = new Vector3(0.02f,(float)(StrutScale[i]*0.20f),0.02f); //デフォルトは0.25        
             struts[i].transform.position = this.transform.position + new Vector3(               //ストラクトの座標と生成(処理は上と同じ)
                 radiusBase*(float)Math.Cos(step*i), 
-                0.265f*StrutScale[i]
+                0.215f*StrutScale[i]
                 ,                                                                         //土台の高さがある分少し高い？
                 radiusBase*(float)Math.Sin(step*i)
                 );
@@ -425,22 +386,14 @@ public class Assembly : MonoBehaviour
             {
 
                 struts[index(i, j)] = Instantiate(middleStrut, this.transform);                 //生成i,jの2次元配列にすることで，層と層の何個目かわかる
-                if(i<=(bases-1)){
-                    struts[index(i, j)].transform.localScale = new Vector3(0.02f,(float)(StrutScale[i]*0.25f),0.02f); //デフォルトは0.2 StrutScale*
-                    struts[index(i, j)].transform.position = this.transform.position + new Vector3( //座標
-                        stripeshape*(radiusBase/1.5f)*(float)Math.Cos(step*j+twist*(i%2)),                        
-                        (float)(i+1)*(0.265f*StrutScale[i]),                                                      //y 積みあがる高さ分加算
-                        stripeshape*(radiusBase/1.5f)*(float)Math.Sin(step*j+twist*(i%2))                         //z 
-                    );  
-                }
-                else{
-                    struts[index(i, j)].transform.localScale = new Vector3(0.02f,(float)(StrutScale[i]*0.20f),0.02f); //デフォルトは0.2 StrutScale*
-                    struts[index(i, j)].transform.position = this.transform.position + new Vector3( //座標
-                        stripeshape*(radiusBase/1.5f)*(float)Math.Cos(step*j+twist*(i%2)),                        
-                        (0.265f*StrutScale[i])*bases+(float)(i-bases)*(0.3f*StrutScale[i]),                                                      //y 積みあがる高さ分加算
-                        stripeshape*(radiusBase/1.5f)*(float)Math.Sin(step*j+twist*(i%2))                         //z 
-                    );  
-                }
+                
+
+                struts[index(i, j)].transform.localScale = new Vector3(0.02f,(float)(StrutScale[i]*0.20f),0.02f); //デフォルトは0.2 StrutScale*
+                struts[index(i, j)].transform.position = this.transform.position + new Vector3( //座標
+                    stripeshape*(radiusBase/1.5f)*(float)Math.Cos(step*j+twist*(i%2)),                        
+                    (0.215f*StrutScale[0])+(float)(i)*(0.3f*StrutScale[i]),                                                      //y 積みあがる高さ分加算
+                    stripeshape*(radiusBase/1.5f)*(float)Math.Sin(step*j+twist*(i%2))                         //z 
+                );  
                 
                 
 
