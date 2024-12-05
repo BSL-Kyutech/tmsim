@@ -41,15 +41,20 @@ public class ROS2Interface : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        //ROS2とUnityクラスの呼び出し
         ros2Unity = new ROS2UnityCore();
+        //紐に関する外への通信Pubの生成?
         loopPosPub = new IPublisher<geometry_msgs.msg.PointStamped>[dev.numLayer+1];
+        //Strutに関する外へのROS通信のためのOubの生成?
         strutPosPub = new IPublisher<geometry_msgs.msg.PoseStamped>[dev.numLayer*dev.numPrism];
 
-        if (ros2Unity.Ok()) 
+        if (ros2Unity.Ok()) //Nodeを立てるにはROS2が初期化されている必要があるため，正しく初期化されているか確認
         {
+
+            //ROSのNodeの生成 (ROSにかかわる処理を行うプログラムの実行する処理を担うオブジェクト?)
             ros2Node = ros2Unity.CreateNode("ROS2UnityListenerNode");
             for (int i = 0; i < dev.numLayer+1; i++) 
-            {
+            {   //データを受け取り，発信するためのインスタンスの作成?
                 loopPosPub[i] = ros2Node.CreatePublisher<geometry_msgs.msg.PointStamped>($"/{dev.name}/loop_center{i}"); 
             }
             for (int i = 0; i < dev.numLayer; i++) 
