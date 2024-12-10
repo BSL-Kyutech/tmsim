@@ -249,23 +249,30 @@ public class Assembly : MonoBehaviour
         //diffphi=(float)((edgeparameter_layers-1.0)/numLayer);
         
 
-        float parameter_a=0.0f;
-        float parameter_b=0.0f;
-        float radius=0.0f;
+        float first_edge=0.06676555f;
+        float last_edge=0.04369787f;
+        float onlyedge=0.06268743f;
 
         if(initializer){
             
             for (int i=1;i<=numLayer;i++){
-                edgeLoop[i-1]= (2.0f*(radiusBase - diffRadius*((float)(i)))*(float)Math.Sin(Math.PI/(2*numPrism)))*0.8f;
+                //edgeLoop[i-1]= (2.0f*(radiusBase - diffRadius*((float)(i)))*(float)Math.Sin(Math.PI/(2*numPrism)))*0.65f;
                 
-                StrutScale[i-1]=0.70f-(0.70f-0.60f)/numLayer * (i-1);
-                //StrutScale[i-1]=0.85f-(0.85f-0.7f)/numLayer * (i-1);
+                StrutScale[i-1]=0.8f-(0.8f-0.60f)/numLayer * (i-1);
+                //StrutScale[i-1]=0.85f-(0.8W5f-0.7f)/numLayer * (i-1);
+                if(i==numLayer){
+                    edgeLoop[i-1]=onlyedge;
+                }
+                else if(i==0){
+                    edgeLoop[i-1]=onlyedge*0.9f;
+                }
+                else{
+                    edgeLoop[i-1]=(first_edge-(first_edge-last_edge)/(numLayer-2) * (i-2))*0.65f;
+                }
             }
 
             //StrutScale=new float[10]{0.7112515f,0.7213767f,0.7011681f,0.6990014f,0.6775014f,0.6721681f,0.6682513f,0.6419179f,0.6465013f,0.6452513f};
-            StrutScale=new float[10]{0.7741794f/0.8f,0.7375128f/0.8f,0.805346f,0.778721f,0.7521794f,0.7203458f,0.6996792f,0.6540951f,0.6223454f,0.6304705f};
-            edgeLoop=new float[10]{0.06268743f,0.06676555f,0.06041659f,0.05461974f,0.05392702f,0.05094265f,0.04624995f,0.04400515f,0.04369787f,0.0630364f};
-
+            
             //edgeLoop=new float[10]{0.05607285f,0.05599472f,0.05252077f,0.05004682f,0.05190619f,0.04651557f,0.04581245f,0.03875516f,0.03686455f,0.0277031f};
 
 
@@ -282,8 +289,8 @@ public class Assembly : MonoBehaviour
             //edgeLoop=new float[10]{0.065649f, 0.06289442f, 0.0731718f, 0.04244859f, 0.04472593f, 0.0510033f, 0.05128067f, 0.04755802f, 0.04683538f, 0.03011275f};
             //edgeLoop=new float[10]{0.05314891f, 0.04836987f, 0.04488838f, 0.04350825f, 0.03888217f, 0.03488217f, 0.02922862f, 0.03382276f, 0.03138219f, 0.04899989f};
             initializer=false;
-            //PlayerPrefs.SetInt("compareFlag",0);//compareflagの初期化は後でコメントアウト外さないといけない
-            //PlayerPrefs.Save();
+            PlayerPrefs.SetInt("compareFlag",0);//compareflagの初期化は後でコメントアウト外さないといけない
+            PlayerPrefs.Save();
             PlayerPrefs.SetInt("EdgeFlag",0);
             PlayerPrefs.Save();
             PlayerPrefs.SetInt("countUnchange",1);

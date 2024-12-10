@@ -245,7 +245,7 @@ public class Searcher3 : MonoBehaviour
 
         bool flag=true;
         //閾値は0.2くらい？(4-5の際の値が0.5532593のため)
-        float threshold=0.055f;
+        float threshold=0.004f;
 
         if(loss<=threshold){
             flag=false;
@@ -417,8 +417,8 @@ public class Searcher3 : MonoBehaviour
             }
             //savedata+=",highLoss,"+highLosses.ToString()+",highLoss,"+DiameterLoss[edgeFlag].ToString()+"\n";
             
-            float sikiiti=0.11f;
-            string filename="1215_1";
+            float sikiiti=0.02f*(float)numLayer;
+            string filename="1013_2";
             
             if(loss<=sikiiti){
                 int photonumber=0;
@@ -779,7 +779,7 @@ public class Searcher3 : MonoBehaviour
 
             Debug.Log("EdgeFlag : "+edgeFlag.ToString());
             
-            PlayerPrefs.SetFloat("SpringForce",2640.0f);//つぶれ始めるから，毎回リセットかければいいのでは？
+            PlayerPrefs.SetFloat("SpringForce",3200.0f);//つぶれ始めるから，毎回リセットかければいいのでは？
             PlayerPrefs.Save();
             PlayerPrefs.SetInt("compareFlag",compareFlag);
             PlayerPrefs.Save();
@@ -839,7 +839,7 @@ public class Searcher3 : MonoBehaviour
 
         
 
-        yield return new WaitForSeconds(2.55f);
+        yield return new WaitForSeconds(3.55f);
 
 
         //レイヤー層ごとの高さ
