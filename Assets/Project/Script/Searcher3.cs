@@ -779,7 +779,7 @@ public class Searcher3 : MonoBehaviour
 
             Debug.Log("EdgeFlag : "+edgeFlag.ToString());
             
-            PlayerPrefs.SetFloat("SpringForce",3200.0f);//つぶれ始めるから，毎回リセットかければいいのでは？
+            PlayerPrefs.SetFloat("SpringForce",2720.0f);//つぶれ始めるから，毎回リセットかければいいのでは？
             PlayerPrefs.Save();
             PlayerPrefs.SetInt("compareFlag",compareFlag);
             PlayerPrefs.Save();

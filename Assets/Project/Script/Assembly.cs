@@ -249,25 +249,39 @@ public class Assembly : MonoBehaviour
         //diffphi=(float)((edgeparameter_layers-1.0)/numLayer);
         
 
-        float first_edge=0.06676555f;
-        float last_edge=0.04369787f;
+        float first_edge=0.04676555f;
+        float last_edge=0.03369787f;
         float onlyedge=0.06268743f;
 
         if(initializer){
+
+            //手先位置の直径
+            float handPosDiameter=0.2f;
+
+            //手先一の高さ
+            float maxHigh=1.5f;
+        
+            //傾き
+            float gradient=0.0f;
+            gradient=(0.44f-handPosDiameter)/(0-maxHigh);
+
+            float diameters=0.0f;
             
             for (int i=1;i<=numLayer;i++){
                 //edgeLoop[i-1]= (2.0f*(radiusBase - diffRadius*((float)(i)))*(float)Math.Sin(Math.PI/(2*numPrism)))*0.65f;
                 
-                StrutScale[i-1]=0.8f-(0.8f-0.60f)/numLayer * (i-1);
+                
+                diameters=gradient*(1.5f/(float)numLayer)*(float)i+0.44f;
+
+                StrutScale[i-1]=0.8f-(0.8f-0.4f)/numLayer * (i-1);
                 //StrutScale[i-1]=0.85f-(0.8W5f-0.7f)/numLayer * (i-1);
                 if(i==numLayer){
-                    edgeLoop[i-1]=onlyedge;
+                    edgeLoop[numLayer-1]=onlyedge;
                 }
-                else if(i==0){
-                    edgeLoop[i-1]=onlyedge*0.9f;
-                }
+                
                 else{
-                    edgeLoop[i-1]=(first_edge-(first_edge-last_edge)/(numLayer-2) * (i-2))*0.65f;
+                    //edgeLoop[i-1]=(first_edge-(first_edge-last_edge)/(numLayer-2) * (i-1))*0.5f;
+                    edgeLoop[i-1]=0.5f*diameters*(float)Math.Sin(Math.PI/numPrism)*0.75f;
                 }
             }
 
@@ -353,7 +367,7 @@ public class Assembly : MonoBehaviour
             } 
 
         }
-        
+        float masses= (2.0f)/(float)(numLayer*numPrism);
         
         //edgeLoop= new float[10] {0.05733649f,0.0482649f,0.0458912f,0.04588119f,0.04587119f,0.02872325f,0.02871325f,0.02873325f,0.02870325f,0.02871325f};
         //slackで送ったやつ//edgeLoop= new float[10] {0.05133649f,0.0482649f,0.0458912f,0.04588119f,0.04587119f,0.042439602f,0.039008014f,0.035576425999999994f,0.032144837999999995f,0.02871325f}; //base0.65 scale 0.6 
@@ -383,6 +397,11 @@ public class Assembly : MonoBehaviour
             // Connect joints                                                                   //接続処理
             ConfigurableJoint basejoint = struts[i].GetComponent<ConfigurableJoint>();          //
             basejoint.connectedBody = baseblocks[i].GetComponent<Rigidbody>();                  //
+
+            var baseRigidBody=struts[i].GetComponent<Rigidbody>();
+            //baseRigidBody.mass=0.1f*StrutScale[0];
+            baseRigidBody.mass=masses;
+
         }
 
         // Place the rest layers' struts                                                        //柱の生成
@@ -401,7 +420,7 @@ public class Assembly : MonoBehaviour
                 struts[index(i, j)].transform.localScale = new Vector3(0.02f,(float)(StrutScale[i]*0.20f),0.02f); //デフォルトは0.2 StrutScale*
                 struts[index(i, j)].transform.position = this.transform.position + new Vector3( //座標
                     stripeshape*(radiusBase/1.5f)*(float)Math.Cos(step*j+twist*(i%2)),                        
-                    (0.215f*StrutScale[0])+(float)(i-1)*(0.3f*StrutScale[i]),                                                      //y 積みあがる高さ分加算   データ収集後こっちの式でやってみる
+                    (0.215f*StrutScale[0])+(float)(i)*(0.3f*StrutScale[i]),                                                      //y 積みあがる高さ分加算   データ収集後こっちの式でやってみる
                     stripeshape*(radiusBase/1.5f)*(float)Math.Sin(step*j+twist*(i%2))                         //z 
                 );  
                 
@@ -415,6 +434,10 @@ public class Assembly : MonoBehaviour
                 
                                                                                         //rsinΘ,rcosΘで点の位置(ストラットの先端の位置が決まるが，ばねの最大の長さ，stripeshapeを変更しないと収縮する)
                 struts[index(i, j)].name = $"Strut{index(i,j)}";                                //index関数から返された値の名前を付ける
+
+                var struitRigidBody=struts[i].GetComponent<Rigidbody>();
+                //struitRigidBody.mass=0.1f*StrutScale[i];
+                struitRigidBody.mass=masses;
                 
             }
         }
