@@ -118,6 +118,14 @@ public class Searcher3 : MonoBehaviour
                 //Debug.Log("i"+i.ToString()+",j"+j.ToString()+",Strut"+(j*i).ToString()+",tm_g_y"+end.transform.position.y.ToString());
                 }
             arrayLength=numPrism*2;
+            string output=""; 
+            for(int i=0;i<LayerXpositions.GetLength(0);i++){
+                output=output+"x"+i.ToString()+","+LayerXpositions[i]+",y"+i.ToString()+","+LayerYpositions[i]+",z"+i.ToString()+","+LayerZpositions[i]+"\n";
+            }
+
+            
+            string path= "C:/Users/Yamauchi Gaito/Desktop/workspace/_tmsim/data/mountingSearcPositions.csv";
+            OutputCsv(path,output);
         }
 
             
@@ -418,7 +426,7 @@ public class Searcher3 : MonoBehaviour
             //savedata+=",highLoss,"+highLosses.ToString()+",highLoss,"+DiameterLoss[edgeFlag].ToString()+"\n";
             
             float sikiiti=0.02f*(float)numLayer;
-            string filename="1013_2";
+            string filename="79_3";
             
             if(loss<=sikiiti){
                 int photonumber=0;
@@ -779,7 +787,7 @@ public class Searcher3 : MonoBehaviour
 
             Debug.Log("EdgeFlag : "+edgeFlag.ToString());
             
-            PlayerPrefs.SetFloat("SpringForce",2720.0f);//つぶれ始めるから，毎回リセットかければいいのでは？
+            PlayerPrefs.SetFloat("SpringForce",3280.0f);//つぶれ始めるから，毎回リセットかければいいのでは？
             PlayerPrefs.Save();
             PlayerPrefs.SetInt("compareFlag",compareFlag);
             PlayerPrefs.Save();
@@ -799,6 +807,78 @@ public class Searcher3 : MonoBehaviour
             
             return;
         }
+    }
+
+    private (float sumEdges, float avgedGes) calcurateEdges(float[] LayerXpositions,float[] LayerYpositions,float[] LayerZpositions,int forNumber,int numLayer,int numPrism){
+
+        float sumEdges=0.0f;
+        float[,] positions;
+
+        //手先位置のレイヤーの際
+        if(forNumber==numLayer-1){
+            positions=new float[numPrism,3];
+            for(int i=0;i<numPrism;i++){
+                //座標を2次元配列に格納 [レイヤー数,次元(x=0,y=1,z=2)]
+                positions[i,0]=LayerXpositions[i];
+                positions[i,1]=LayerYpositions[i];
+                positions[i,2]=LayerZpositions[i];
+            }
+        }
+        //手先位置以外のレイヤーの際
+        else{
+            positions=new float[numPrism*2,3];
+            for (int i=0;i<numPrism*2;i=i+2){
+                //座標を2次元配列に格納 [レイヤー数,次元(x=0,y=1,z=2)]
+                positions[i,0]=LayerXpositions[i];
+                positions[i,1]=LayerYpositions[i];
+                positions[i,2]=LayerZpositions[i];
+
+                positions[i+1,0]=LayerXpositions[i];
+                positions[i+1,1]=LayerYpositions[i];
+                positions[i+1,2]=LayerZpositions[i];
+            }
+        }
+
+        float tm_g_x=0.0f;
+        float tm_g_y=0.0f;
+        float tm_g_z=0.0f;
+
+        float avgedGes=0.0f;
+
+        //edgeloopの差を計算
+        for(int i=0;i<positions.GetLength(0)-1;i++){
+            
+            //XとYとZのそれぞれの距離
+            tm_g_x=(float)Math.Pow((double)(positions[i,0]-positions[i+1,0]),2);
+            tm_g_y=(float)Math.Pow((double)(positions[i,1]-positions[i+1,1]),2);
+            tm_g_z=(float)Math.Pow((double)(positions[i,2]-positions[i+1,2]),2);
+
+            sumEdges+=(float)Math.Sqrt(tm_g_x+tm_g_y+tm_g_z);
+        }
+        //手先位置
+        if(forNumber==numLayer-1){
+            //XとYとZのそれぞれの距離
+            tm_g_x=(float)Math.Pow((double)(positions[numPrism-1,0]-positions[0,0]),2);
+            tm_g_y=(float)Math.Pow((double)(positions[numPrism-1,1]-positions[0,1]),2);
+            tm_g_z=(float)Math.Pow((double)(positions[numPrism-1,2]-positions[0,2]),2);
+            sumEdges+=(float)Math.Sqrt(tm_g_x+tm_g_y+tm_g_z);
+            avgedGes=sumEdges/(float)(numPrism*2);
+        }
+        //手先位置以外
+        else{
+            //XとYとZのそれぞれの距離
+            tm_g_x=(float)Math.Pow((double)(positions[numPrism*2-1,0]-positions[0,0]),2);
+            tm_g_y=(float)Math.Pow((double)(positions[numPrism*2-1,1]-positions[0,1]),2);
+            tm_g_z=(float)Math.Pow((double)(positions[numPrism*2-1,2]-positions[0,2]),2);
+            sumEdges+=(float)Math.Sqrt(tm_g_x+tm_g_y+tm_g_z);
+            avgedGes=sumEdges/(float)numPrism;
+        }
+        
+
+        
+        
+        
+        return (sumEdges,avgedGes); 
     }
 
     // Start is called before the first frame update
@@ -890,6 +970,10 @@ public class Searcher3 : MonoBehaviour
             LayerYpositions=positionRetrun.LayerYpositions;
             LayerZpositions=positionRetrun.LayerZpositions;
 
+            var cals=calcurateEdges(LayerXpositions,LayerYpositions,LayerZpositions,i,numLayer,numPrism);
+
+            Debug.Log("Layer"+i.ToString()+","+  " Avg : "+cals.avgedGes.ToString()+"       sum : "+cals.sumEdges.ToString());
+
         
             //配列にそれぞれの直径を格納
             diameters[i]=getDiameter(arrayLength,LayerXpositions,LayerZpositions);
@@ -946,6 +1030,8 @@ public class Searcher3 : MonoBehaviour
         parameterChanging(springlosses.flag,allLoss,numLayer,numPrism);
 
         int photonumber=0;
+
+        
 
         
         
