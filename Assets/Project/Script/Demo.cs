@@ -19,15 +19,18 @@ public class Demo : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        //入力
         input = new double[dev.numLayer*dev.numPrism*2];
         for (int i = 0; i < dev.numLayer*dev.numPrism*2; i++) {
             input[i] = 0.5f;
         }
+        //角速度と角加速度？
         theta = new double[dev.numLayer];
         omega = new double[dev.numLayer];
         for (int i = 0; i < dev.numLayer; i++) {
             theta[i] = 0.0;
             omega[i] = 1 + r.NextDouble();
+            Debug.Log(omega[i]);
         }
     }
 

@@ -8,12 +8,17 @@ public class ROS2Interface : MonoBehaviour
 {
     public Device dev;
 
+    //
     private ROS2UnityCore ros2Unity;
+    //ノードを作成するための最初の処理
     private ROS2Node ros2Node;
+    //配信する側のグローバル変数の作成
     private IPublisher<geometry_msgs.msg.PointStamped>[] loopPosPub;
     private IPublisher<geometry_msgs.msg.PoseStamped>[] strutPosPub;
+    //受信する側のグローバル変数の作成
     private ISubscription<std_msgs.msg.Float32MultiArray> inputSub;
 
+    //InvokeRepaetingのリピートのためのリピートする量
     public float publishRate = 0.01f; //sec
     
     
@@ -43,9 +48,9 @@ public class ROS2Interface : MonoBehaviour
     {
         //ROS2とUnityクラスの呼び出し
         ros2Unity = new ROS2UnityCore();
-        //紐に関する外への通信Pubの生成?
+        //紐に関する外への通信(配信を行う)Pubの生成(グローバル変数への割り当て)
         loopPosPub = new IPublisher<geometry_msgs.msg.PointStamped>[dev.numLayer+1];
-        //Strutに関する外へのROS通信のためのOubの生成?
+        //Strutに関する外へのROS通信(配信を行う)Pubの生成(グローバル変数への割り当て)
         strutPosPub = new IPublisher<geometry_msgs.msg.PoseStamped>[dev.numLayer*dev.numPrism];
 
         if (ros2Unity.Ok()) //Nodeを立てるにはROS2が初期化されている必要があるため，正しく初期化されているか確認
@@ -54,13 +59,14 @@ public class ROS2Interface : MonoBehaviour
             //ROSのNodeの生成 (ROSにかかわる処理を行うプログラムの実行する処理を担うオブジェクト?)
             ros2Node = ros2Unity.CreateNode("ROS2UnityListenerNode");
             for (int i = 0; i < dev.numLayer+1; i++) 
-            {   //データを受け取り，発信するためのインスタンスの作成?
+            {   //データを受け取り，Nodeの作成(おそらく，配列内にloop_center番号の割り当て?)
                 loopPosPub[i] = ros2Node.CreatePublisher<geometry_msgs.msg.PointStamped>($"/{dev.name}/loop_center{i}"); 
             }
             for (int i = 0; i < dev.numLayer; i++) 
             {
                 for (int j = 0; j < dev.numPrism; j++) 
-                {
+                {   
+                    //strutのポジションの配列のノードの作成
                     strutPosPub[i*dev.numPrism+j] = ros2Node.CreatePublisher<geometry_msgs.msg.PoseStamped>($"/{dev.name}/strut{i*dev.numPrism+j}"); 
                 }
             }

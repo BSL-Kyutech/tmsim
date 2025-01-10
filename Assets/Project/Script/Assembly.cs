@@ -118,7 +118,7 @@ public class Assembly : MonoBehaviour
         if (j < 0 || j >= numPrism){
             return -1;                                  //jが0より小さいか，柱の数より大きいと-1を返す(上の処理の例外時?)
         } else {
-            return numPrism * i + j;                    //numPrismが0でないとうまくいかない？どこかでnumPrismは初期に0？どこかで受け取っている？
+            return numPrism * i + j;                    //jの値を上で調整して加算
         }
     }
 

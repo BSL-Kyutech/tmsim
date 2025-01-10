@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 using System;
+using System.IO;
 using System.Threading;
 
 /// <summary>
@@ -68,14 +69,22 @@ public class Device : MonoBehaviour
         // compute the i, j, and k
         var jbias = 0;
         var kbias = 0;
-        if ( index/8 == 0 ) {
+        if ( index/(numPrism*2) == 0 ) {
             jbias = (index+1)%2;
             kbias = (index+1)%2*3;
         }
-        var i = Math.Max(0, index/8 - (index/8 + index%8 + 1)%2);
-        var j = index%8/2 - 1 + jbias;
-        var k = (index/8 + index%8)%2*2 + kbias;
+        //奇数と偶数で層の上下を判別
+        var i = Math.Max(0, index/(numPrism*2) - (index/(numPrism*2) + index%(numPrism*2) + 1)%2);
+        //層による上下の進み方(0,1,2..)のような
+        var j = index%(numPrism*2)/2 - 1 + jbias;
+        var k = (index/(numPrism*2) + index%(numPrism*2))%2*2 + kbias;
         return (i,j,k);
+    }
+
+    private void OutputCsv(string path,string savedata ){
+
+        //File.AppendAllText("C:/Users/Yamauchi Gaito/Desktop/workspace/tmsim/data/data.csv",savedata);
+        File.AppendAllText(path,savedata);
     }
     
     // Start is called before the first frame update
@@ -91,12 +100,21 @@ public class Device : MonoBehaviour
         strutPosition = new Vector3[numLayer*numPrism];
         strutOrientation = new Quaternion[numLayer*numPrism];
 
+        string outputNums="i,idx.i,idx.j,idx.k,springNumber,strut\n";
+
         if (asb.isReady) {
             springs = this.GetComponentsInChildren<SpringJoint>();
+            Debug.Log(springs.Length);
             for (int i = 0; i < numLayer*numPrism*2; i++) {
                 var idx = dec(i);
+                Debug.Log(idx);
+                Debug.Log(numPrism*asb.index(idx.i,idx.j)+idx.k);
                 cylinder[i] = springs[4*asb.index(idx.i,idx.j)+idx.k].spring;
+                Debug.Log(springs[4*asb.index(idx.i,idx.j)+idx.k].connectedBody);
                 input[i] = (cylinder[i] - biasSpringCoeff)/rangeSpringCoeff;
+                outputNums=outputNums+i.ToString()+","+idx.i.ToString()+","+idx.j.ToString()+","+idx.k.ToString()+","+(4*asb.index(idx.i,idx.j)+idx.k).ToString()+","+springs[4*asb.index(idx.i,idx.j)+idx.k].connectedBody.ToString()+"\n";
+
+                
             }
             for (int i = 0; i < numLayer*numPrism; i++) {
                 struts[i] = transform.Find($"Strut{i}").gameObject;
@@ -104,6 +122,8 @@ public class Device : MonoBehaviour
         } else {
             throw new Exception("TM is not ready!");
         }
+         string path= "C:/Users/Yamauchi Gaito/Desktop/workspace/_tmsim/data/strut_idx_iデータ.csv";
+        //OutputCsv(path,outputNums);
     }
 
     // FixedUpdate is called once per physical simulation step
@@ -118,6 +138,7 @@ public class Device : MonoBehaviour
         // update spring coefficients
         for (int i = 0; i < numLayer*numPrism*2; i++) {
             var idx = dec(i);
+            //ここでspringsの数が足りてないからinputができない
             if (Math.Abs(cylinder[i] - springs[4*asb.index(idx.i,idx.j)+idx.k].spring) > maxDelta) {
                 springs[4*asb.index(idx.i,idx.j)+idx.k].spring += Math.Sign(cylinder[i] - springs[4*asb.index(idx.i,idx.j)+idx.k].spring) * maxDelta;
             } else {
