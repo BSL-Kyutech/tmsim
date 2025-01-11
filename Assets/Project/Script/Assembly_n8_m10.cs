@@ -7,11 +7,11 @@ using System;
 using UnityEngine.SceneManagement;
 
 /// <summary>
-/// Class <c>Assembly_n8_m10</c> automatically instantiates a tensegrity manipulator with designated parameters.
+/// Class <c>Assembly</c> automatically instantiates a tensegrity manipulator with designated parameters.
 /// For use, place an Empty object to where the base of the tensegrity manipulator should be, and attach this script.
 /// </summary>
 ///
-public class Assembly_n8_m10 : MonoBehaviour
+public class Assembly : MonoBehaviour
 {
     // Prefabs
     //================================================
@@ -55,8 +55,7 @@ public class Assembly_n8_m10 : MonoBehaviour
     public float SpringDmaper;                                                 //層に比例するばねの強さ
 
 
-    public float StrutScale=0.7f;
-    public float BaseScale=0.7f;
+    public float[] StrutScale;
 
     //edgeの計算方法の選択
     public bool log_x;              //edgeloopの計算にLog(x)を扱うか    (底数が10)
@@ -71,7 +70,6 @@ public class Assembly_n8_m10 : MonoBehaviour
     public float edgeparameter_layers=1.0f;  //レイヤー数とかで変わる減衰率
 
     public float predict;
-    public float a;
     public double psi0;
     public double psiFin;
     public double phi0;
@@ -92,7 +90,7 @@ public class Assembly_n8_m10 : MonoBehaviour
     // //<<As class member:>>
     // public GameObject tmObject;
     // //<<After assigning the tm40 prefab's instance to tmObject>>
-    // Assembly_n8_m10 tm = tm.GetComponent<Assembly_n8_m10>;
+    // Assembly tm = tm.GetComponent<Assembly>;
     // // you can access to the i-th strut as tm.struts[i]
     //================================================
     [HideInInspector]
@@ -120,10 +118,134 @@ public class Assembly_n8_m10 : MonoBehaviour
         if (j < 0 || j >= numPrism){
             return -1;                                  //jが0より小さいか，柱の数より大きいと-1を返す(上の処理の例外時?)
         } else {
-            return numPrism * i + j;                    //numPrismが0でないとうまくいかない？どこかでnumPrismは初期に0？どこかで受け取っている？
+            return numPrism * i + j;                    //jの値を上で調整して加算
         }
     }
 
+
+    private float ReturnCorrectDiameter(float y){
+
+        //手先位置の直径
+        float handPosDiameter=0.2f;
+
+        //手先一の高さ
+        float maxHigh=1.5f;
+        
+        //傾き
+        float gradient=0.0f;
+        gradient=(radiusBase-handPosDiameter)/(0-maxHigh);
+
+        float diameters=0.0f;
+        if(y<maxHigh){
+            diameters=gradient*y+radiusBase;
+        }
+        else{
+            diameters=handPosDiameter;
+        }
+        
+
+        return diameters;
+        
+    }
+    //strutScaleの計算
+    private float[] ReturnAllStrutScale(){
+        
+        //高さ求めるための関数の傾き
+        float gradient=1.5f/(float)numLayer;
+        float high=0.0f;
+        
+        float[] strutScales;
+        strutScales=new float[numLayer];
+        for(int i=0;i<numLayer;i++){
+            //
+            high=gradient*(float)(i+1);
+            strutScales[i]=ReturnStrutScale(high);
+        }
+        return strutScales;
+    }
+    private float ReturnStrutScale(float high){
+
+        float[] gradient;
+        gradient=new float[9]{1.10702915f, -0.00298746f, -0.64582881f, -0.19401275f, -0.01718615f, 0.19404533f,  0.01007787f,  0.012625f,    0.00134541f};
+        float intercept=1.13183542f;
+
+        float scale=intercept;
+
+        //high
+        scale=scale+high*gradient[0];
+        //layer
+        scale=scale+(float)numPrism*gradient[1];
+
+        //high^2
+        scale=scale+(float)Math.Pow((double)high, 2)*gradient[2];
+        //high*layer
+        scale=scale+high*(float)numPrism*gradient[3];
+
+        //layer^2
+        scale=scale+(float)Math.Pow(numPrism, 2)*gradient[4];
+        //high^3
+        scale=scale+(float)Math.Pow((double)high, 3)*gradient[5];
+
+        //high^2 * layer
+        scale=scale+(float)Math.Pow((double)high, 2)*(float)numPrism*gradient[6];
+        //high * layer^2
+        scale=scale+high*(float)Math.Pow(numPrism, 2)*gradient[7];
+
+        // layer^3
+        scale=scale+(float)Math.Pow(numPrism, 3)*gradient[8];
+
+
+        return scale;
+    }
+    //edgeloopの計算
+    private float[] ReturnAllEdgeloops(){
+        float[] edgeloops;
+        edgeloops=new float[numLayer];
+        //高さ求めるための関数の傾き
+        float gradient=1.5f/(float)numLayer;
+        float high=0.0f;
+        
+        for(int i=0;i<numLayer;i++){
+            //
+            high=gradient*(float)(i+1);
+            edgeloops[i]=ReturnEdgeloops(high);
+        }
+        return edgeloops;
+    }
+    private float ReturnEdgeloops(float high){
+
+        float[] gradient;;
+        gradient=new float[9] {-0.04619168f, -0.00131427f, -0.0440207f, 0.00835317f, -0.00755944f, 0.04966269f,  -0.0090757f,  0.00066495f,    0.00061449f};
+        float intercept=0.23052367f;
+
+        float loop=intercept;
+
+        //high
+        loop=loop+high*gradient[0];
+        //layer
+        loop=loop+(float)numPrism*gradient[1];
+
+        //high^2
+        loop=loop+(float)Math.Pow((double)high, 2)*gradient[2];
+        //high*layer
+        loop=loop+high*(float)numPrism*gradient[3];
+
+        //layer^2
+        loop=loop+(float)Math.Pow(numPrism, 2)*gradient[4];
+        //high^3
+        loop=loop+(float)Math.Pow((double)high, 3)*gradient[5];
+
+        //high^2 * layer
+        loop=loop+(float)Math.Pow((double)high, 2)*(float)numPrism*gradient[6];
+        //high * layer^2
+        loop=loop+high*(float)Math.Pow(numPrism, 2)*gradient[7];
+
+        // layer^3
+        loop=loop+(float)Math.Pow(numPrism, 3)*gradient[8];
+
+
+        return loop;
+    }
 
     /*
     public (float scale,float high, float[] highs) simulateTensegritylength(double diffPhi   , double diffPsi , float  diffRadius){
@@ -168,52 +290,7 @@ public class Assembly_n8_m10 : MonoBehaviour
         return (scale,high,highs);//ここでどうにかして配列返したいな～～～！！！(8/22)
     }*/
 
-    public (float scale,float high, float[] highs) simulateTensegritylength(double diffPhi   /* 地面と平行な線に対するedgeloop一片の角度の変化 */  , double diffPsi /* 地面と平行な線に対するStrutの角度の変化 */, float  diffRadius){
-        //柱の長さ
-        float strutLength=0.0f;
-        float baseStrutLength=0.0f;
-        float scale=1.0f;
-        float edgeloop_=0.0f;
-        float radius=0.0f;
-
-        //テンセグリティの高さ
-        float high=0.0f;
-        //プサイ，φ
-        double psi=0;
-        double phi=0;
-
-        //配列の設定
-        var highs = new float[numLayer]; 
-
-        while(true){
-            strutLength=scale*0.2f;
-            baseStrutLength=scale*0.25f;
-
-            psi=(diffPsi*1)*  (float)Math.PI/180;
-            high=baseStrutLength*(float)Math.Sin(psi);
-            highs[0]=high;
-
-
-            for(int i=2;i<=numLayer; i++){//できたら，iごとのhighを配列に格納したいな～～！！(8/22)
-                phi=(diffPhi*(i-1))*  Math.PI/180;
-                psi=(diffPsi*(i-1))*  Math.PI/180;
-
-                radius=radiusBase-(((1-edgeDampoer)*radiusBase)/1.50f * highs[i-2]);
-                edgeloop_=   2.0f * radius *(float)Math.Sin(Math.PI/(2*numPrism))/((float)Math.Cos((diffPhi*(i-1)*Math.PI)/180));
-
-                high= high+ (strutLength * (float)Math.Sin(psi)) - (edgeloop_ * (float)Math.Cos(phi));
-                highs[i-1]=high;
-
-            } 
-            if(high <= 1.55){
-                break;
-            }
-            scale-=0.0001f;
-            //
-        } 
-
-        return (scale,high,highs);//ここでどうにかして配列返したいな～～～！！！(8/22)
-    }
+    
 
     //Sceneの変更のチェックのトリがー
     private float diffRadiusLoop;
@@ -221,38 +298,42 @@ public class Assembly_n8_m10 : MonoBehaviour
     private float diffStrutScale;
 
     private int mode=0;
+
+    //初期化
+    public bool initializer=true;
     
     // Start is called before the first frame update        最初の初期起動時の処理
     void Start()
     {
+        Time.timeScale=1.0f;
 
         //radiusLoopが内部に存在していた場合取得
         
-        if(PlayerPrefs.HasKey("RadiusLoop")){
-            radiusLoop=PlayerPrefs.GetFloat("RadiusLoop");
-        }
+        if (!initializer){
+            if(PlayerPrefs.HasKey("RadiusLoop")){
+            //radiusLoop=PlayerPrefs.GetFloat("RadiusLoop");
+            }
 
-        if(PlayerPrefs.HasKey("SpringForce")){
-            a =PlayerPrefs.GetFloat("SpringForce");
-        }
+            if(PlayerPrefs.HasKey("SpringForce")){
+                springForce =PlayerPrefs.GetFloat("SpringForce");
+            }
 
-        if(PlayerPrefs.HasKey("StrutScale")){
-           //StrutScale=PlayerPrefs.GetFloat("StrutScale");
-        }
 
-        if(PlayerPrefs.HasKey("edge")){
+
+            if(PlayerPrefs.HasKey("edge")){
         
-           //edgeparameter_layers=PlayerPrefs.GetFloat("edge");
+                //edgeparameter_layers=PlayerPrefs.GetFloat("edge");
+            }
+            if(PlayerPrefs.HasKey("mode")){
+                //mode=PlayerPrefs.GetInt("count");
+            }
         }
-        if(PlayerPrefs.HasKey("mode")){
-           mode=PlayerPrefs.GetInt("count");
-        }
+        
+        
 
         
-        a=edgeparameter_layers;
         diffRadiusLoop=radiusLoop;
         diffspringForce=springForce;
-        diffStrutScale=StrutScale;
 
 
         psi0=90;
@@ -267,6 +348,7 @@ public class Assembly_n8_m10 : MonoBehaviour
         float diffRadius = (radiusBase-lastRadiusloop)/((float)(numLayer-1));      //上と下の半径の差
 
         edgeLoop = new float[numLayer];
+        StrutScale=new float[numLayer];
 
         int bases = numLayer/5;
 
@@ -291,70 +373,136 @@ public class Assembly_n8_m10 : MonoBehaviour
         //diffphi=(float)((edgeparameter_layers-1.0)/numLayer);
         
 
-        float parameter_a=0.0f;
-        float parameter_b=0.0f;
-        float radius=0.0f;
+        float first_edge=0.04676555f;
+        float last_edge=0.03369787f;
+        float onlyedge=0.06268743f;
 
-        if(PlayerPrefs.HasKey("baseScale")){
-            //BaseScale=PlayerPrefs.GetFloat("baseScale");
-            
-        }
-        if(PlayerPrefs.HasKey("strutScale")){
-            //StrutScale=PlayerPrefs.GetFloat("strutScale");
-        }
-        //edgeLoop[0]=0.12415123082906993f/2.0f;
-        for(int i=1;i<=numLayer-2;i++){
-            edgeLoop[i]=edgeLoop[0]*(1-(float)((1-0.73)/(numLayer-2)*i));
-        }
-        edgeLoop[numLayer-1]=edgeLoop[0];
+        if(initializer){
 
-        for (int i=1;i<=numLayer;i++)
-        {
-            
-            if(PlayerPrefs.HasKey("edgeLoop"+(i-1).ToString())){
-                edgeLoop[i-1]=PlayerPrefs.GetFloat("edgeLoop"+(i-1).ToString());
-            }
-            
+            //手先位置の直径
+            float handPosDiameter=0.2f;
+
+            //手先一の高さ
+            float maxHigh=1.5f;
+        
+            //傾き
+            float gradient=0.0f;
+            gradient=(0.44f-handPosDiameter)/(0-maxHigh);
+
+            float diameters=0.0f;
             /*
-            if(mode==0){
-                edgeLoop[i-1]=   (2.0f*(radiusBase - diffRadius*((float)(i)))*(float)Math.Sin(Math.PI/(2*numPrism)))*((float)Math.Cos((diffphi*i*Math.PI)/180));
-            }
-            else if(mode==1){
-                radius=radiusBase-(((1-edgeDampoer)*radiusBase)/predict * sumHigh[i-1]);
+            for (int i=1;i<=numLayer;i++){
+                //edgeLoop[i-1]= (2.0f*(radiusBase - diffRadius*((float)(i)))*(float)Math.Sin(Math.PI/(2*numPrism)))*0.65f;
                 
-                edgeLoop[i-1]=   2.0f * radius *(float)Math.Sin(Math.PI/(2*numPrism))*((float)Math.Cos((diffphi*i*Math.PI)/180));
-            }
-           
-            if(mode==0){
-                radius=radiusBase-(((1-edgeDampoer)*radiusBase)/predict * sumHigh[i-1]);
                 
-                edgeLoop[i-1]=   2.0f * radius *(float)Math.Sin(Math.PI/(2*numPrism))/((float)Math.Cos((diffphi*i*Math.PI)/180));
-            }
-            else if(mode==1){
+                diameters=gradient*(1.5f/(float)numLayer)*(float)i+0.44f;
+
+                //StrutScale[i-1]=0.80f-(0.80f-0.1f)/numLayer * (i-1);
+                StrutScale[i-1]=0.9f;
+                //StrutScale[i-1]=0.85f-(0.8W5f-0.7f)/numLayer * (i-1);
+                if(i==numLayer){
+                    edgeLoop[i-1]=1.2f*diameters*(float)Math.Sin(Math.PI/(2*numPrism));
+                }
                 
-                edgeLoop[i-1]=   (2.0f*(radiusBase - diffRadius*((float)(i)))*(float)Math.Sin(Math.PI/(2*numPrism)))*((float)Math.Cos((diffphi*i*Math.PI)/180));
+                else{
+                    //edgeLoop[i-1]=(first_edge-(first_edge-last_edge)/(numLayer-2) * (i-1))*0.5f;
+                    edgeLoop[i-1]=diameters*(float)Math.Sin(Math.PI/(2*numPrism))*0.8f;
+                    edgeLoop[i-1]=0.06f;
+                }
             }
-            else{
-                edgeLoop[i-1]=   (2.0f*(radiusBase - diffRadius*((float)(i)))*(float)Math.Sin(Math.PI/(2*numPrism)))*((float)Math.Cos((diffphi*i*Math.PI)/180));
-            }
-            //Debug.Log(Math.Cos(phi*i));
-            //edgeLoop[i-1] =    StrutScale *    (2.0f *(radiusBase - diffRadius*((float)(i+1)))*(float)Math.Sin(Math.PI/(2*numPrism)));
-            
-            //radius=(0.6f*radiusBase/predict)*
-            //edgeLoop[i-1]=   (2.0f*;
-            //2rsin(θ)/(縦側の角度φのcos)
             */
-        } 
+            StrutScale=ReturnAllStrutScale();
+            edgeLoop=ReturnAllEdgeloops();
+            //StrutScale=new float[13]{0.5066695f,0.4845017f,0.4922935f,0.4921669f,0.5023773f,0.5407119f,0.5237533f,0.5343785f,0.5101283f,0.5261283f,0.5105029f,0.5381283f,0.5263783f};
+
+            
+            //edgeLoop=new float[13]{0.05042118f,0.05176077f,0.0528837f,0.03907325f,0.03636284f,0.03176075f,0.028792f,0.02953992f,0.02667118f,0.02521077f,0.02398368f,0.02277328f,0.03694427f};
+
+
+
+            //パラメータの引継ぎ
+            for(int i=0;i<numLayer;i++){
+                PlayerPrefs.SetFloat("edgeLoop"+(i).ToString(),edgeLoop[i]);
+                PlayerPrefs.Save();
+            }
+            
+           
+
+            //edgeLoop=new float[10]{0.065649f, 0.05787f, 0.05438851111111f, 0.05100837766666666f, 0.04738228702222222f, 0.043882287022222224f, 0.039228702222222f, 0.03882287022222223f, 0.03838228702222223f, 0.054f};
+            //edgeLoop=new float[10]{0.065649f, 0.06289442f, 0.0731718f, 0.04244859f, 0.04472593f, 0.0510033f, 0.05128067f, 0.04755802f, 0.04683538f, 0.03011275f};
+            //edgeLoop=new float[10]{0.05314891f, 0.04836987f, 0.04488838f, 0.04350825f, 0.03888217f, 0.03488217f, 0.02922862f, 0.03382276f, 0.03138219f, 0.04899989f};
+            initializer=false;
+            //PlayerPrefs.SetInt("compareFlag",0);//compareflagの初期化は後でコメントアウト外さないといけない
+            //PlayerPrefs.Save();
+            PlayerPrefs.SetInt("EdgeFlag",0);
+            PlayerPrefs.Save();
+            PlayerPrefs.SetInt("countUnchange",1);
+            PlayerPrefs.Save();
+            PlayerPrefs.SetFloat("diffloss",10000.0f);
+            PlayerPrefs.SetInt("changed",0);
+            PlayerPrefs.Save();
+            PlayerPrefs.SetInt("photonumber",0);
+            PlayerPrefs.Save();
+        }
+
+            
+        
+
+        else{
+
+            for (int i=1;i<=numLayer;i++)
+            {
+            
+                edgeLoop[i-1]=(2.0f*(radiusBase - diffRadius*((float)(i)))*(float)Math.Sin(Math.PI/(2*numPrism)))*((float)Math.Cos((diffphi*i*Math.PI)/180));
+                if(PlayerPrefs.HasKey("edgeLoop"+(i-1).ToString())){
+                    edgeLoop[i-1]=PlayerPrefs.GetFloat("edgeLoop"+(i-1).ToString());
+                }
+                if(PlayerPrefs.HasKey("StrutScale"+(i-1).ToString())){
+                    StrutScale[i-1]=PlayerPrefs.GetFloat("StrutScale"+(i-1).ToString());
+                }
+                //4本5層の値
+                //edgeLoop= new float[5] {0.12415123082906993f,0.11031530609675386f,0.10214850457080119f,0.09057431266995283f,0.12024559516481466f};
+                //edgeLoop=new float[10]{0.05f, 0.04f, 0.03f, 0.02857142857142857f, 0.027142857142857142f, 0.025714285714285714f, 0.024285714285714285f, 0.022857142857142857f, 0.02142857142857143f, 0.02f};
+            
+                /*
+                if(mode==0){
+                    edgeLoop[i-1]=   (2.0f*(radiusBase - diffRadius*((float)(i)))*(float)Math.Sin(Math.PI/(2*numPrism)))*((float)Math.Cos((diffphi*i*Math.PI)/180));
+                }
+                else if(mode==1){
+                    radius=radiusBase-(((1-edgeDampoer)*radiusBase)/predict * sumHigh[i-1]);
+                
+                    edgeLoop[i-1]=   2.0f * radius *(float)Math.Sin(Math.PI/(2*numPrism))*((float)Math.Cos((diffphi*i*Math.PI)/180));
+                }
+           
+                if(mode==0){
+                    radius=radiusBase-(((1-edgeDampoer)*radiusBase)/predict * sumHigh[i-1]);
+                
+                    edgeLoop[i-1]=   2.0f * radius *(float)Math.Sin(Math.PI/(2*numPrism))/((float)Math.Cos((diffphi*i*Math.PI)/180));
+                }
+                else if(mode==1){
+                
+                    edgeLoop[i-1]=   (2.0f*(radiusBase - diffRadius*((float)(i)))*(float)Math.Sin(Math.PI/(2*numPrism)))*((float)Math.Cos((diffphi*i*Math.PI)/180));
+                }
+                else{
+                    edgeLoop[i-1]=   (2.0f*(radiusBase - diffRadius*((float)(i)))*(float)Math.Sin(Math.PI/(2*numPrism)))*((float)Math.Cos((diffphi*i*Math.PI)/180));
+                }
+                //Debug.Log(Math.Cos(phi*i));
+                //edgeLoop[i-1] =    StrutScale *    (2.0f *(radiusBase - diffRadius*((float)(i+1)))*(float)Math.Sin(Math.PI/(2*numPrism)));
+            
+                //radius=(0.6f*radiusBase/predict)*
+                //edgeLoop[i-1]=   (2.0f*;
+                //2rsin(θ)/(縦側の角度φのcos)
+                */
+            } 
+
+        }
+        //float masses= (0.9f)/(float)(numLayer*numPrism);
+        
         //edgeLoop= new float[10] {0.05733649f,0.0482649f,0.0458912f,0.04588119f,0.04587119f,0.02872325f,0.02871325f,0.02873325f,0.02870325f,0.02871325f};
         //slackで送ったやつ//edgeLoop= new float[10] {0.05133649f,0.0482649f,0.0458912f,0.04588119f,0.04587119f,0.042439602f,0.039008014f,0.035576425999999994f,0.032144837999999995f,0.02871325f}; //base0.65 scale 0.6 
         //edgeLoop= new float[10] {0.05133649f, 0.0495571124f,0.0477777348f, 0.0459983572f,0.0442189796f,0.042439602f,0.039008014f,0.035576425999999994f,0.032144837999999995f,0.02871325f}; //base0.65 scale 0.6 
-        //edgeLoop= new float[10] {0.04833649f, 0.0471571124f, 0.04z59777348f, 0.0447983572f,0.0436189796f,0.042439602f,0.039008014f,0.035576425999999994f,0.032144837999999995f,0.02871325f}; //base0.65 scale 0.6 
-        //今のところいいやつ//edgeLoop= new float[10] {0.04833649f, 0.0471571124f, 0.0459777348f, 0.0447983572f,0.0436189796f,0.042439602f,0.039008014f,0.035576425999999994f,0.032144837999999995f,0.02871325f};  //base 0.59 strut 0.63
-        //edgeLoop= new float[10] {0.0586649f, 0.04817131739999999f,0.043131739999999f, 0.0410587919999999f, 0.03404044099999999f, 0.03197500279999999f, 0.029909564599999994f, 0.027844126399999995f, 0.0257786882f, 0.02371325f};  //base 0.58 strut 0.63  2000
-        
-        //keijolusyudoutyousei
-        edgeLoop=new float[10]{0.065649f, 0.05787f, 0.05438851111111f, 0.05100837766666666f, 0.04738228702222222f, 0.043882287022222224f, 0.039228702222222f, 0.03882287022222223f, 0.03838228702222223f, 0.054f};      //base 0.7 strut 0.67 Spring 2560
-
+        //edgeLoop= new float[10] {0.04833649f, 0.0471571124f, 0.0459777348f, 0.0447983572f,0.0436189796f,0.042439602f,0.039008014f,0.035576425999999994f,0.032144837999999995f,0.02871325f}; //base0.65 scale 0.6 
+        //今のところいいやつ//edgeLoop= new float[10] {0.04833649f, 0.0471571124f, 0.0459777348f, 0.0447983572f,0.0436189796f,0.042439602f,0.039008014f,0.035576425999999994f,0.032144837999999995f,0.02871325f}; 
         // Place the bottom layer's parts and connect ball joints　　//一番下の層の制作
         for (int i = 0; i < numPrism ; i++)
         {
@@ -367,10 +515,10 @@ public class Assembly_n8_m10 : MonoBehaviour
                 radiusBase*(float)Math.Sin(step*i));                                            //z=radiusBase(半径)×sin((2π/ストラットの数)×i)極座標→直交座標への変換プロセス
             baseblocks[i].name = $"Base{i}";                                                    //名前の決定(object管理のため)
             struts[i] = Instantiate(baseStrut, this.transform);                                 //ストラクト(支柱)の制作
-            struts[i].transform.localScale = new Vector3(0.02f,(float)(BaseScale*0.25f),0.02f); //デフォルトは0.25        
+            struts[i].transform.localScale = new Vector3(0.02f,(float)(StrutScale[0]*0.20f),0.02f); //デフォルトは0.25        
             struts[i].transform.position = this.transform.position + new Vector3(               //ストラクトの座標と生成(処理は上と同じ)
                 radiusBase*(float)Math.Cos(step*i), 
-                0.265f*BaseScale
+                0.215f*StrutScale[0]
                 ,                                                                         //土台の高さがある分少し高い？
                 radiusBase*(float)Math.Sin(step*i)
                 );
@@ -378,7 +526,16 @@ public class Assembly_n8_m10 : MonoBehaviour
             // Connect joints                                                                   //接続処理
             ConfigurableJoint basejoint = struts[i].GetComponent<ConfigurableJoint>();          //
             basejoint.connectedBody = baseblocks[i].GetComponent<Rigidbody>();                  //
+
+            var baseRigidBody=struts[i].GetComponent<Rigidbody>();
+            //baseRigidBody.mass=0.1f*StrutScale[0];
+            //baseRigidBody.mass=masses;
+
         }
+
+        //Strutのy座標
+        float strutPositionY=0.0f;
+        float strutRadius=0.0f;
 
         // Place the rest layers' struts                                                        //柱の生成
         for (int i = 1; i < numLayer ; i++)                                                     //
@@ -387,26 +544,27 @@ public class Assembly_n8_m10 : MonoBehaviour
             //var twist = Math.PI/numPrism;   
             var twist = Math.PI/numPrism*(1/3);                                                 //ねじれ？
             // Instantiate and place the prefab
+
+            strutPositionY=(0.215f*StrutScale[0])+0.5f*(0.2f*StrutScale[0]);
+            for(int j=1;j<=i;j++){
+                 strutPositionY+=0.3f*StrutScale[j];
+            }
+            strutRadius=ReturnCorrectDiameter(strutPositionY);
+            strutRadius=strutRadius/2.0f;
+
             for (int j = 0; j < numPrism ; j++)
             {
+                
 
                 struts[index(i, j)] = Instantiate(middleStrut, this.transform);                 //生成i,jの2次元配列にすることで，層と層の何個目かわかる
-                if(i<(bases)){
-                    struts[index(i, j)].transform.localScale = new Vector3(0.02f,(float)(BaseScale*0.25f),0.02f); //デフォルトは0.2 StrutScale*
-                    struts[index(i, j)].transform.position = this.transform.position + new Vector3( //座標
-                        stripeshape*(radiusBase/1.5f)*(float)Math.Cos(step*j+twist*(i%2)),                        
-                        (float)(i+1)*(0.265f*BaseScale),                                                      //y 積みあがる高さ分加算
-                        stripeshape*(radiusBase/1.5f)*(float)Math.Sin(step*j+twist*(i%2))                         //z 
-                    );  
-                }
-                else{
-                    struts[index(i, j)].transform.localScale = new Vector3(0.02f,(float)(StrutScale*0.20f),0.02f); //デフォルトは0.2 StrutScale*
-                    struts[index(i, j)].transform.position = this.transform.position + new Vector3( //座標
-                        stripeshape*(radiusBase/1.5f)*(float)Math.Cos(step*j+twist*(i%2)),                        
-                        (0.265f*BaseScale)*bases+(float)(i-bases)*(0.3f*StrutScale),                                                      //y 積みあがる高さ分加算
-                        stripeshape*(radiusBase/1.5f)*(float)Math.Sin(step*j+twist*(i%2))                         //z 
-                    );  
-                }
+                
+
+                struts[index(i, j)].transform.localScale = new Vector3(0.02f,(float)(StrutScale[i]*0.20f),0.02f); //デフォルトは0.2 StrutScale*
+                struts[index(i, j)].transform.position = this.transform.position + new Vector3( //座標
+                    strutRadius*(float)Math.Cos(step*j+twist*(i%2)),                        
+                    strutPositionY,                                                      //y 積みあがる高さ分加算   データ収集後こっちの式でやってみる
+                    strutRadius*(float)Math.Sin(step*j+twist*(i%2))                         //z 
+                );  
                 
                 
 
@@ -418,6 +576,10 @@ public class Assembly_n8_m10 : MonoBehaviour
                 
                                                                                         //rsinΘ,rcosΘで点の位置(ストラットの先端の位置が決まるが，ばねの最大の長さ，stripeshapeを変更しないと収縮する)
                 struts[index(i, j)].name = $"Strut{index(i,j)}";                                //index関数から返された値の名前を付ける
+
+                var struitRigidBody=struts[i].GetComponent<Rigidbody>();
+                //struitRigidBody.mass=0.1f*StrutScale[i];
+                //struitRigidBody.mass=masses;
                 
             }
         }
@@ -449,7 +611,7 @@ public class Assembly_n8_m10 : MonoBehaviour
 
 
                 // Connect springs while dealing with layer-dependent exceptions
-                // #1(縦のばね)
+                // #1
                 if (i == numLayer-1) {
                     
                     target1 = index(i, j+twist_dir);
@@ -468,8 +630,7 @@ public class Assembly_n8_m10 : MonoBehaviour
                 spring[0].enableCollision=springCollision;
                 spring[0].spring=springForce;
                 
-                
-                // #2(横のばね)
+                // #2
                 if (i == numLayer-1) {
                     target2 = index(i, j+twist_dir);
                     spring[1].connectedAnchor = new Vector3(0, 1, 0);
@@ -479,22 +640,26 @@ public class Assembly_n8_m10 : MonoBehaviour
                 spring[1].anchor = new Vector3(0, 1, 0);
                 spring[1].connectedBody = struts[target2].GetComponent<Rigidbody>();
                 if (isMatched) {
-                    spring[1].tolerance = edgeLoop[i]*0.02f;                                        //復元力が働く距離と働かない距離の誤差の設定
-                    spring[1].maxDistance = edgeLoop[i];   
+                    spring[1].tolerance = edgeLoop[i]*0.001f; 
+                                     //復元力が働く距離と働かない距離の誤差の設定
+                    spring[1].minDistance = edgeLoop[i]*0.5f;
+                    spring[1].maxDistance = edgeLoop[i];  
+                    spring[1].spring=Mathf.Infinity;
+                    spring[1].damper=400000;
+
 
                 }
                 spring[1].enableCollision=springCollision;
                 
-                // #3(縦のばね)
+                // #3
                 spring[2].connectedBody = struts[target3].GetComponent<Rigidbody>();
                 spring[2].connectedAnchor = new Vector3(0, -1, 0);
                 spring[2].anchor = new Vector3(0, 1, 0);
                 spring[2].enableCollision=springCollision;
                 spring[2].spring=springForce;
-               
 
 
-                // #4   (横のばね)
+                // #4
                 if (i == 0 && i != numLayer-1) {
                     target4 = index(i+1, j-2*twist_dir);
                     spring[3].connectedAnchor = new Vector3(0, -1, 0);
@@ -506,11 +671,17 @@ public class Assembly_n8_m10 : MonoBehaviour
                 } else {
                     spring[3].connectedAnchor = new Vector3(0, 1, 0);
                     if (isMatched) {
-                        spring[3].tolerance = edgeLoop[i-1]*0.02f;
+                        spring[3].tolerance = edgeLoop[i-1]*0.001f;
+                        spring[3].minDistance = edgeLoop[i-1]*0.5f;
                         spring[3].maxDistance = edgeLoop[i-1];  
+                        spring[3].spring=Mathf.Infinity;
+                        spring[1].damper=400000;
+                        
 
                     }
                 }
+
+                
                 spring[3].connectedBody = struts[target4].GetComponent<Rigidbody>();                //
                 spring[3].anchor = new Vector3(0, -1, 0);
                 spring[3].enableCollision=springCollision;
@@ -569,6 +740,20 @@ public class Assembly_n8_m10 : MonoBehaviour
             }
         }
 
+        for(int i=0;i<numLayer;i++){
+            PlayerPrefs.SetFloat("edgeLoop"+(i).ToString(),edgeLoop[i]);
+            PlayerPrefs.Save();
+            PlayerPrefs.SetFloat("StrutScale"+(i).ToString(),StrutScale[i]);
+            PlayerPrefs.Save();
+        }
+
+        PlayerPrefs.SetFloat("RadiusLoop",radiusLoop);
+        PlayerPrefs.Save();
+        PlayerPrefs.SetFloat("SpringForce",springForce);
+        PlayerPrefs.Save();
+        
+
+
         isReady = true;
     }
 
@@ -578,30 +763,8 @@ public class Assembly_n8_m10 : MonoBehaviour
 
         
         
-        if((Time.frameCount%1000)==0){
-            //Debug.Log(StrutScale);
-            
-            
-                
-            //Debug.Log(StrutScale);
-            if(diffRadiusLoop!=radiusLoop || diffspringForce!=a ||  StrutScale!=diffStrutScale){
-                //変更されていた場合，保存
-            
-                
-                PlayerPrefs.SetFloat("RadiusLoop",radiusLoop);
-                PlayerPrefs.SetFloat("SpringForce",a);
-                PlayerPrefs.SetFloat("StrutScale",StrutScale);
-                PlayerPrefs.Save();
+        
 
-                
-
-                //シーンの再読み込み
-                //SceneManager.LoadScene("SampleScene");
-            }
-            diffRadiusLoop=radiusLoop;
-            diffspringForce=a;
-            diffStrutScale=StrutScale;
-        }
         
         // Update loop renderers
         for (int i = 0; i <= numLayer ; i++) 
