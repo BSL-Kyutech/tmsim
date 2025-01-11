@@ -107,10 +107,10 @@ public class Device : MonoBehaviour
             Debug.Log(springs.Length);
             for (int i = 0; i < numLayer*numPrism*2; i++) {
                 var idx = dec(i);
-                Debug.Log(idx);
-                Debug.Log(numPrism*asb.index(idx.i,idx.j)+idx.k);
+                //Debug.Log(idx);
+                //Debug.Log(numPrism*asb.index(idx.i,idx.j)+idx.k);
                 cylinder[i] = springs[4*asb.index(idx.i,idx.j)+idx.k].spring;
-                Debug.Log(springs[4*asb.index(idx.i,idx.j)+idx.k].connectedBody);
+                //Debug.Log(springs[4*asb.index(idx.i,idx.j)+idx.k].connectedBody);
                 input[i] = (cylinder[i] - biasSpringCoeff)/rangeSpringCoeff;
                 outputNums=outputNums+i.ToString()+","+idx.i.ToString()+","+idx.j.ToString()+","+idx.k.ToString()+","+(4*asb.index(idx.i,idx.j)+idx.k).ToString()+","+springs[4*asb.index(idx.i,idx.j)+idx.k].connectedBody.ToString()+"\n";
 

@@ -29,7 +29,9 @@ public class Demo : MonoBehaviour
         omega = new double[dev.numLayer];
         for (int i = 0; i < dev.numLayer; i++) {
             theta[i] = 0.0;
-            omega[i] = 1 + r.NextDouble();
+            omega[i] = 1 + r.NextDouble(); // 1+ random number (0.0<random number <1.0)
+            omega[i] = 1 + 0.22;
+
             Debug.Log(omega[i]);
         }
     }
