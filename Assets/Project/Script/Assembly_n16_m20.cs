@@ -11,7 +11,7 @@ using UnityEngine.SceneManagement;
 /// For use, place an Empty object to where the base of the tensegrity manipulator should be, and attach this script.
 /// </summary>
 ///
-public class Assembly : MonoBehaviour
+public class Assembly_3 : MonoBehaviour
 {
     // Prefabs
     //================================================

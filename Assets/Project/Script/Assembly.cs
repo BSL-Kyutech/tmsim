@@ -11,6 +11,8 @@ using UnityEngine.SceneManagement;
 /// For use, place an Empty object to where the base of the tensegrity manipulator should be, and attach this script.
 /// </summary>
 ///
+
+[SerializeField]
 public class Assembly : MonoBehaviour
 {
     // Prefabs
@@ -411,8 +413,21 @@ public class Assembly : MonoBehaviour
                 }
             }
             */
-            StrutScale=ReturnAllStrutScale();
-            edgeLoop=ReturnAllEdgeloops();
+            if(numLayer==10){
+                StrutScale=new float[10]{0.7741794f,0.7375128f,0.805346f,0.7799709f,0.7509292f,0.7203457f,0.7009292f,0.6540951f,0.6223454f,0.6304705f};
+                edgeLoop=new float[10]{0.06268743f,0.06676555f,0.06041659f,0.05430724f,0.05361452f,0.05094265f,0.04656245f,0.04400515f,0.04369787f,0.0630364f};
+            
+            }
+            else if(numLayer==8){
+                StrutScale=new float[8]{0.8564691f,0.903886f,0.8937612f,0.879386f,0.7824689f,0.773761f,0.7320107f,0.7030106f};
+                edgeLoop=new float[8]{0.09180925f,0.08973639f,0.08356636f,0.07646576f,0.07029568f,0.06472287f,0.05919171f,0.09743829f};
+            }
+            else{
+                StrutScale=ReturnAllStrutScale();
+                edgeLoop=ReturnAllEdgeloops();
+            }
+
+            
             //StrutScale=new float[13]{0.5066695f,0.4845017f,0.4922935f,0.4921669f,0.5023773f,0.5407119f,0.5237533f,0.5343785f,0.5101283f,0.5261283f,0.5105029f,0.5381283f,0.5263783f};
 
             
@@ -452,14 +467,9 @@ public class Assembly : MonoBehaviour
 
             for (int i=1;i<=numLayer;i++)
             {
-            
-                edgeLoop[i-1]=(2.0f*(radiusBase - diffRadius*((float)(i)))*(float)Math.Sin(Math.PI/(2*numPrism)))*((float)Math.Cos((diffphi*i*Math.PI)/180));
-                if(PlayerPrefs.HasKey("edgeLoop"+(i-1).ToString())){
-                    edgeLoop[i-1]=PlayerPrefs.GetFloat("edgeLoop"+(i-1).ToString());
-                }
-                if(PlayerPrefs.HasKey("StrutScale"+(i-1).ToString())){
-                    StrutScale[i-1]=PlayerPrefs.GetFloat("StrutScale"+(i-1).ToString());
-                }
+                StrutScale[i-1]=PlayerPrefs.GetFloat("StrutScale"+(i-1).ToString());
+                edgeLoop[i-1]=PlayerPrefs.GetFloat("edgeLoop"+(i-1).ToString());
+                
                 //4本5層の値
                 //edgeLoop= new float[5] {0.12415123082906993f,0.11031530609675386f,0.10214850457080119f,0.09057431266995283f,0.12024559516481466f};
                 //edgeLoop=new float[10]{0.05f, 0.04f, 0.03f, 0.02857142857142857f, 0.027142857142857142f, 0.025714285714285714f, 0.024285714285714285f, 0.022857142857142857f, 0.02142857142857143f, 0.02f};

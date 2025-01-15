@@ -426,7 +426,7 @@ public class Searcher3 : MonoBehaviour
             //savedata+=",highLoss,"+highLosses.ToString()+",highLoss,"+DiameterLoss[edgeFlag].ToString()+"\n";
             
             float sikiiti=0.02f*(float)numLayer;
-            string filename="79_3";
+            string filename="45_newTuype_1.5High";
             
             if(loss<=sikiiti){
                 int photonumber=0;
@@ -787,7 +787,7 @@ public class Searcher3 : MonoBehaviour
 
             Debug.Log("EdgeFlag : "+edgeFlag.ToString());
             
-            PlayerPrefs.SetFloat("SpringForce",3280.0f);//つぶれ始めるから，毎回リセットかければいいのでは？
+            PlayerPrefs.SetFloat("SpringForce",640.0f);//つぶれ始めるから，毎回リセットかければいいのでは？
             PlayerPrefs.Save();
             PlayerPrefs.SetInt("compareFlag",compareFlag);
             PlayerPrefs.Save();
@@ -1038,7 +1038,7 @@ public class Searcher3 : MonoBehaviour
         if(PlayerPrefs.HasKey("photonumber")){
             photonumber=PlayerPrefs.GetInt("photonumber");
         }
-        if(photonumber<=2000*numLayer){
+        if(photonumber<=20000*numLayer){
             SceneManager.LoadScene("SampleScene");
         }
         
