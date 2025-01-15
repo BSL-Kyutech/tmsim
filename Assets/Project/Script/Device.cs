@@ -22,6 +22,7 @@ public class Device : MonoBehaviour
     public Vector3[] loopPosition;
     public Vector3[] strutPosition;
     public Quaternion[] strutOrientation;
+    
 
     // parameters
     public float maxDelta = 1.0f;
@@ -104,7 +105,7 @@ public class Device : MonoBehaviour
 
         if (asb.isReady) {
             springs = this.GetComponentsInChildren<SpringJoint>();
-            Debug.Log(springs.Length);
+            //Debug.Log(springs.Length);
             for (int i = 0; i < numLayer*numPrism*2; i++) {
                 var idx = dec(i);
                 //Debug.Log(idx);
@@ -122,13 +123,16 @@ public class Device : MonoBehaviour
         } else {
             throw new Exception("TM is not ready!");
         }
-         string path= "C:/Users/Yamauchi Gaito/Desktop/workspace/_tmsim/data/strut_idx_iデータ.csv";
-        //OutputCsv(path,outputNums);
+         string path= "C:/Users/Yamauchi Gaito/Desktop/workspace/_tmsim/data/strut_idx_iデータ"+numLayer.ToString()+numPrism.ToString()+".csv";
+        OutputCsv(path,outputNums);
     }
 
     // FixedUpdate is called once per physical simulation step
     void FixedUpdate()
     {
+
+        rangeSpringCoeff=200.0f*(float)numPrism;
+        biasSpringCoeff=60.0f*(float)numPrism;
         // translate the input
         for (int i = 0; i < numLayer*numPrism*2; i++) {
             input[i] = Math.Max(0f,input[i]);
@@ -138,7 +142,7 @@ public class Device : MonoBehaviour
         // update spring coefficients
         for (int i = 0; i < numLayer*numPrism*2; i++) {
             var idx = dec(i);
-            //ここでspringsの数が足りてないからinputができない
+            
             if (Math.Abs(cylinder[i] - springs[4*asb.index(idx.i,idx.j)+idx.k].spring) > maxDelta) {
                 springs[4*asb.index(idx.i,idx.j)+idx.k].spring += Math.Sign(cylinder[i] - springs[4*asb.index(idx.i,idx.j)+idx.k].spring) * maxDelta;
             } else {
