@@ -9,6 +9,8 @@ using UnityEngine.SceneManagement;
 public class Searcher3 : MonoBehaviour
 {
 
+    private int counts=0;
+
     //スクショ関数
     void OnScrrenCapture(string path){
         ScreenCapture.CaptureScreenshot(path);
@@ -58,15 +60,18 @@ public class Searcher3 : MonoBehaviour
     }
 
     //座標取得
-    private (float[] LayerXpositions,float[] LayerYpositions,float[] LayerZpositions,int arrayLength) getPosition(int layerNum,int numPrism,int numLayer){
+    private (float[] LayerXpositions,float[] LayerYpositions,float[] LayerZpositions,int arrayLength) getPosition(int layerNum,string manipulatorName){
         
         //Asembly.csの取得
-        GameObject tm_g =GameObject.Find("tm_g");
+        GameObject tm_g =GameObject.Find(manipulatorName);
         Assembly assembly;
         assembly=tm_g.GetComponent<Assembly>();
 
         var strut=tm_g.transform.Find("Strut"+(0).ToString()).gameObject;
         var end=strut.transform.Find("end");
+
+        int numLayer=assembly.numLayer;
+        int numPrism=assembly.numPrism;
 
         //x,y,z座標の取得用配列
         float[] LayerXpositions;
@@ -884,13 +889,83 @@ public class Searcher3 : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {           
-        StartCoroutine(DelayMethod());
+        //StartCoroutine(DelayMethod());
     }
 
     // Update is called once per frame
     void Update()
-    {
+    {   
+        if(Time.realtimeSinceStartup<30.0f){
+            StartCoroutine(getHandPositions());
+            counts++;
+        }  
+    }
+
+    IEnumerator getHandPositions(){
+        //Asembly.csの取得
+        GameObject tm_g =GameObject.Find("tm_g");
+        Assembly assembly;
+        assembly=tm_g.GetComponent<Assembly>();
+        //Debug.Log(assembly.StrutScale);
+        int numLayer=assembly.numLayer;
+        int numPrism=assembly.numPrism;
+
+        //0から計測のため，numLayer-1となる．
+        var positionRetrun = getPosition(numLayer-1,"tm_g");
+
+        //x,y,z座標の取得用配列
+        float[] LayerXpositions;
+        float[] LayerYpositions;
+        float[] LayerZpositions;
+
+        //配列長さはレイヤーが上下の柱より構成されるため2倍
+        LayerXpositions= new float [numPrism*2];
+        LayerYpositions= new float [numPrism*2];
+        LayerZpositions= new float [numPrism*2]; 
+
+        //座標格納
+        LayerXpositions=positionRetrun.LayerXpositions;
+        LayerYpositions=positionRetrun.LayerYpositions;
+        LayerZpositions=positionRetrun.LayerZpositions;
+
+        //平均値の格納
+        float xAverage=0.0f;
+        float yAverage=0.0f;
+        float zAverage=0.0f;
+
+        //平均値の算出(手先位置の座標を知るため)
+        for(int i=0;i<numPrism*2;i++){
+            xAverage+=LayerXpositions[i];
+            yAverage+=LayerYpositions[i];
+            zAverage+=LayerZpositions[i];
+        }
+        xAverage=xAverage/(numPrism*2);
+        yAverage=yAverage/(numPrism*2);
+        zAverage=zAverage/(numPrism*2);
+
+        float timeNow=Time.realtimeSinceStartup;
         
+        string path="C:/Users/Yamauchi Gaito/Desktop/workspace/_tmsim/data/HaaandPosition_layer_"+numLayer.ToString()+"_prism_"+numPrism.ToString()+".csv";
+        if(counts==0){
+            //データの最初のラベル配置
+            string label="time,x,y,z\n";
+            OutputCsv(path,label);
+        }
+        string savedata=timeNow.ToString()+","+xAverage+","+yAverage+","+zAverage+"\n";
+        if(counts%100==0){
+            string picturePath="C:/Users/Yamauchi Gaito/Desktop/workspace/_tmsim/data/picture/hand/HaaandPosition_layer_"+numLayer.ToString()+"_prism_"+numPrism.ToString()+"_"+timeNow.ToString()+".png";
+            OnScrrenCapture(picturePath);
+        }
+        
+                
+                
+        
+        
+        OutputCsv(path,savedata);
+        Debug.Log(savedata);
+
+        //0.05秒の待機
+        yield return new WaitForSeconds(0.03f);
     }
 
     IEnumerator DelayMethod(){
@@ -961,7 +1036,7 @@ public class Searcher3 : MonoBehaviour
         for(int i=0;i<numLayer;i++){
 
             //座標取得
-            var positionRetrun = getPosition(i,numPrism,numLayer);
+            var positionRetrun = getPosition(i,"tm_g");
             
             //配列の長さの確認
             arrayLength=positionRetrun.arrayLength;

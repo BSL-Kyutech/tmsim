@@ -55,7 +55,7 @@ public class Assembly : MonoBehaviour
     //ばね定数の設定
     public float springForce;                                         //ばねの強さ
     public float SpringDmaper;                                                 //層に比例するばねの強さ
-
+    public bool earthConnected;
 
     public float[] StrutScale;
 
@@ -76,6 +76,13 @@ public class Assembly : MonoBehaviour
     public double psiFin;
     public double phi0;
     public double phiFin;
+
+    public bool exportBotton;
+
+    //エッジループとかで固定値扱うか
+    public bool useConstant;
+    //関数使うか？
+    public bool useFunc;
 
 
 
@@ -117,12 +124,15 @@ public class Assembly : MonoBehaviour
         } else if (j >= numPrism) {
             j = j - numPrism;                           //jが柱の数より大きいとjより柱の数を引く
         }
+        
         if (j < 0 || j >= numPrism){
             return -1;                                  //jが0より小さいか，柱の数より大きいと-1を返す(上の処理の例外時?)
         } else {
             return numPrism * i + j;                    //jの値を上で調整して加算
         }
     }
+
+
 
 
     private float ReturnCorrectDiameter(float y){
@@ -349,7 +359,7 @@ public class Assembly : MonoBehaviour
         float lastRadiusloop = radiusBase*edgeDampoer;
         float diffRadius = (radiusBase-lastRadiusloop)/((float)(numLayer-1));      //上と下の半径の差
 
-        edgeLoop = new float[numLayer];
+        
         StrutScale=new float[numLayer];
 
         int bases = numLayer/5;
@@ -413,18 +423,26 @@ public class Assembly : MonoBehaviour
                 }
             }
             */
-            if(numLayer==10){
+            if(numLayer==10 && useConstant){
                 StrutScale=new float[10]{0.7741794f,0.7375128f,0.805346f,0.7799709f,0.7509292f,0.7203457f,0.7009292f,0.6540951f,0.6223454f,0.6304705f};
                 edgeLoop=new float[10]{0.06268743f,0.06676555f,0.06041659f,0.05430724f,0.05361452f,0.05094265f,0.04656245f,0.04400515f,0.04369787f,0.0630364f};
             
             }
-            else if(numLayer==8){
+            else if(numLayer==8 && useConstant){
                 StrutScale=new float[8]{0.8564691f,0.903886f,0.8937612f,0.879386f,0.7824689f,0.773761f,0.7320107f,0.7030106f};
                 edgeLoop=new float[8]{0.09180925f,0.08973639f,0.08356636f,0.07646576f,0.07029568f,0.06472287f,0.05919171f,0.09743829f};
             }
-            else{
+            else if(useFunc){
                 StrutScale=ReturnAllStrutScale();
+                edgeLoop = new float[numLayer];
                 edgeLoop=ReturnAllEdgeloops();
+            }
+
+            else{
+                for(int i=0;i<numLayer;i++){
+
+                    StrutScale[i]=1.0f;
+                }
             }
 
             
@@ -514,16 +532,20 @@ public class Assembly : MonoBehaviour
         //edgeLoop= new float[10] {0.04833649f, 0.0471571124f, 0.0459777348f, 0.0447983572f,0.0436189796f,0.042439602f,0.039008014f,0.035576425999999994f,0.032144837999999995f,0.02871325f}; //base0.65 scale 0.6 
         //今のところいいやつ//edgeLoop= new float[10] {0.04833649f, 0.0471571124f, 0.0459777348f, 0.0447983572f,0.0436189796f,0.042439602f,0.039008014f,0.035576425999999994f,0.032144837999999995f,0.02871325f}; 
         // Place the bottom layer's parts and connect ball joints　　//一番下の層の制作
+        
         for (int i = 0; i < numPrism ; i++)
         {
             var step = 2*Math.PI/numPrism;
-            // Instantiate and place prefabs
-            baseblocks[i] = Instantiate(basePlate, this.transform);                             //basePlateプレハブからobjectを生成し，先ほどの配列に格納                  
-            baseblocks[i].transform.position = this.transform.position + new Vector3(           //baseblocksの座標の配置 
-                radiusBase*(float)Math.Cos(step*i),                                             //x座標はradiusBase(半径)×cos((2π/ストラットの数)×i)極座標→直交座標への変換プロセス
-                0,                                                                              //y=0(土台のため)
-                radiusBase*(float)Math.Sin(step*i));                                            //z=radiusBase(半径)×sin((2π/ストラットの数)×i)極座標→直交座標への変換プロセス
-            baseblocks[i].name = $"Base{i}";                                                    //名前の決定(object管理のため)
+            if(earthConnected==true){
+                // Instantiate and place prefabs
+                baseblocks[i] = Instantiate(basePlate, this.transform);                             //basePlateプレハブからobjectを生成し，先ほどの配列に格納                  
+                baseblocks[i].transform.position = this.transform.position + new Vector3(           //baseblocksの座標の配置 
+                    radiusBase*(float)Math.Cos(step*i),                                             //x座標はradiusBase(半径)×cos((2π/ストラットの数)×i)極座標→直交座標への変換プロセス
+                    0,                                                                              //y=0(土台のため)
+                    radiusBase*(float)Math.Sin(step*i));                                            //z=radiusBase(半径)×sin((2π/ストラットの数)×i)極座標→直交座標への変換プロセス
+                baseblocks[i].name = $"Base{i}";                                                    //名前の決定(object管理のため)
+            
+            }
             struts[i] = Instantiate(baseStrut, this.transform);                                 //ストラクト(支柱)の制作
             struts[i].transform.localScale = new Vector3(0.02f,(float)(StrutScale[0]*0.20f),0.02f); //デフォルトは0.25        
             struts[i].transform.position = this.transform.position + new Vector3(               //ストラクトの座標と生成(処理は上と同じ)
@@ -533,9 +555,23 @@ public class Assembly : MonoBehaviour
                 radiusBase*(float)Math.Sin(step*i)
                 );
             struts[i].name = $"Strut{i}";
-            // Connect joints                                                                   //接続処理
+            // Connect joints                                                                   
             ConfigurableJoint basejoint = struts[i].GetComponent<ConfigurableJoint>();          //
-            basejoint.connectedBody = baseblocks[i].GetComponent<Rigidbody>();                  //
+            //
+
+            //地面から外したらこうなる
+            if(earthConnected==false){
+                basejoint.xMotion=ConfigurableJointMotion.Free;
+                basejoint.yMotion=ConfigurableJointMotion.Free;
+                basejoint.zMotion=ConfigurableJointMotion.Free;
+
+                basejoint.angularXMotion=ConfigurableJointMotion.Free;
+                basejoint.angularYMotion=ConfigurableJointMotion.Free;
+                basejoint.angularZMotion=ConfigurableJointMotion.Free;
+            }
+            else{
+                basejoint.connectedBody = baseblocks[i].GetComponent<Rigidbody>();                  //接続処理
+            }
 
             var baseRigidBody=struts[i].GetComponent<Rigidbody>();
             //baseRigidBody.mass=0.1f*StrutScale[0];
@@ -552,15 +588,16 @@ public class Assembly : MonoBehaviour
         {
             var step = 2*Math.PI/numPrism;                                                      //r-θのθ部分の決定に使う 
             //var twist = Math.PI/numPrism;   
-            var twist = Math.PI/numPrism*(1/3);                                                 //ねじれ？
+            var twist = Math.PI/numPrism*(1/3);                                                 //i%2により，互い違いになるように柱を並べるための変数．これにより，いい感じにずれる．
             // Instantiate and place the prefab
 
             strutPositionY=(0.215f*StrutScale[0])+0.5f*(0.2f*StrutScale[0]);
             for(int j=1;j<=i;j++){
-                 strutPositionY+=0.3f*StrutScale[j];
+                 strutPositionY+=0.5f*StrutScale[j];
             }
             strutRadius=ReturnCorrectDiameter(strutPositionY);
             strutRadius=strutRadius/2.0f;
+            //Debug.Log(strutRadius);
 
             for (int j = 0; j < numPrism ; j++)
             {
@@ -587,7 +624,7 @@ public class Assembly : MonoBehaviour
                                                                                         //rsinΘ,rcosΘで点の位置(ストラットの先端の位置が決まるが，ばねの最大の長さ，stripeshapeを変更しないと収縮する)
                 struts[index(i, j)].name = $"Strut{index(i,j)}";                                //index関数から返された値の名前を付ける
 
-                var struitRigidBody=struts[i].GetComponent<Rigidbody>();
+                //var struitRigidBody=struts[i].GetComponent<Rigidbody>();
                 //struitRigidBody.mass=0.1f*StrutScale[i];
                 //struitRigidBody.mass=masses;
                 
@@ -620,6 +657,8 @@ public class Assembly : MonoBehaviour
                 var target4 = index(i-1, j-twist_dir);
 
 
+
+                //connected anochor のvectorにより，Asset内のプレハブのローカル位置を指定して結び付けしている
                 // Connect springs while dealing with layer-dependent exceptions
                 // #1
                 if (i == numLayer-1) {
@@ -654,8 +693,8 @@ public class Assembly : MonoBehaviour
                                      //復元力が働く距離と働かない距離の誤差の設定
                     spring[1].minDistance = edgeLoop[i]*0.5f;
                     spring[1].maxDistance = edgeLoop[i];  
-                    spring[1].spring=Mathf.Infinity;
-                    spring[1].damper=400000;
+                    //spring[1].spring=Mathf.Infinity;
+                    //spring[1].damper=400000;
 
 
                 }
@@ -684,8 +723,8 @@ public class Assembly : MonoBehaviour
                         spring[3].tolerance = edgeLoop[i-1]*0.001f;
                         spring[3].minDistance = edgeLoop[i-1]*0.5f;
                         spring[3].maxDistance = edgeLoop[i-1];  
-                        spring[3].spring=Mathf.Infinity;
-                        spring[1].damper=400000;
+                        //spring[3].spring=Mathf.Infinity;
+                        //spring[1].damper=400000;
                         
 
                     }
@@ -705,14 +744,19 @@ public class Assembly : MonoBehaviour
         // Add loop renderers  #横の紐の描写?
         for (int i = 0; i <= numLayer ; i++) 
         {
+            
             loops[i] = Instantiate(loopLine, this.transform);
-            loops[i].name = $"Loop Renderer{i}";                        
+            loops[i].name = $"Loop Renderer{i}";   
+            //点と点をつなげるオブジェクト                     
             LineRenderer line = loops[i].GetComponent<LineRenderer>();      //紐の
             line.material = new Material(Shader.Find("Sprites/Default"));
             line.widthMultiplier = 0.005f;                                  //紐の太さ  //当たり判定等を入れれば
             line.loop = true;
             line.numCapVertices = 1;
             line.numCornerVertices = 1;
+
+            
+
             if (i == 0 || i == numLayer) 
             {
                 line.positionCount = numPrism;
@@ -720,6 +764,12 @@ public class Assembly : MonoBehaviour
             else {
                 line.positionCount = numPrism*2;
             }
+
+            loops[i].AddComponent<BoxCollider>();
+
+
+
+            
         }
         //*/
 
@@ -801,6 +851,21 @@ public class Assembly : MonoBehaviour
                     }
                 }
             }
+            if(exportBotton){
+                //メッシュを焼いてFBX化できるようにするためのオブジェクト
+                // **新しい Mesh を作成**
+                Mesh lineMesh = new Mesh();
+                line.BakeMesh(lineMesh, true);
+
+                // メッシュ用の GameObject を作成
+                GameObject meshObject = new GameObject("LineMesh" + i.ToString());
+                meshObject.AddComponent<MeshFilter>().mesh = lineMesh;
+                meshObject.AddComponent<MeshRenderer>().material = line.material;
+                meshObject.transform.parent = this.gameObject.transform;
+
+                
+            }
+            
         }
 
         // Update stripe renderers
@@ -823,6 +888,38 @@ public class Assembly : MonoBehaviour
                     line2.SetPosition(j, struts[index(numLayer-1, i-1)].transform.GetChild(0).transform.position);
                 }
             }
+            if(exportBotton){
+                //メッシュを焼いてFBX化できるようにするためのオブジェクト
+                // **新しい Mesh を作成**
+                Mesh lineMesh = new Mesh();
+                line1.BakeMesh(lineMesh, true);
+
+                // メッシュ用の GameObject を作成
+                GameObject meshObject = new GameObject("LineMesh" + i.ToString());
+                meshObject.AddComponent<MeshFilter>().mesh = lineMesh;
+                meshObject.AddComponent<MeshRenderer>().material = line1.material;
+                meshObject.transform.parent = this.gameObject.transform;
+
+                
+            }
+            if(exportBotton){
+                //メッシュを焼いてFBX化できるようにするためのオブジェクト
+                // **新しい Mesh を作成**
+                Mesh lineMesh = new Mesh();
+                line2.BakeMesh(lineMesh, true);
+
+                // メッシュ用の GameObject を作成
+                GameObject meshObject = new GameObject("LineMesh" + i.ToString());
+                meshObject.AddComponent<MeshFilter>().mesh = lineMesh;
+                meshObject.AddComponent<MeshRenderer>().material = line2.material;
+                meshObject.transform.parent = this.gameObject.transform;
+
+                
+            }
+        }
+
+        if(exportBotton){
+            exportBotton=false;
         }
 
         
