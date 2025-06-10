@@ -896,14 +896,24 @@ public class Searcher3 : MonoBehaviour
     void Update()
     {   
         if(Time.realtimeSinceStartup<30.0f){
-            StartCoroutine(getHandPositions());
+            StartCoroutine(getsHandsPositions());
             counts++;
         }  
     }
 
-    IEnumerator getHandPositions(){
+    IEnumerator getsHandsPositions(){
+        getHandPositions("tm_g_1");
+        getHandPositions("tm_g_2");
+        getHandPositions("tm_g_3");
+
+        //0.05秒の待機
+        yield return new WaitForSeconds(0.03f);
+        
+    } 
+
+    void getHandPositions(string ManipulatoName){
         //Asembly.csの取得
-        GameObject tm_g =GameObject.Find("tm_g");
+        GameObject tm_g =GameObject.Find(ManipulatoName);
         Assembly assembly;
         assembly=tm_g.GetComponent<Assembly>();
         //Debug.Log(assembly.StrutScale);
@@ -911,7 +921,7 @@ public class Searcher3 : MonoBehaviour
         int numPrism=assembly.numPrism;
 
         //0から計測のため，numLayer-1となる．
-        var positionRetrun = getPosition(numLayer-1,"tm_g");
+        var positionRetrun = getPosition(numLayer-1,ManipulatoName);
 
         //x,y,z座標の取得用配列
         float[] LayerXpositions;
@@ -945,7 +955,7 @@ public class Searcher3 : MonoBehaviour
 
         float timeNow=Time.realtimeSinceStartup;
         
-        string path="C:/Users/Yamauchi Gaito/Desktop/workspace/_tmsim/data/HaaandPosition_layer_"+numLayer.ToString()+"_prism_"+numPrism.ToString()+".csv";
+        string path="C:/Users/Yamauchi Gaito/Desktop/workspace/_tmsim/data/handPosition_layer_"+numLayer.ToString()+"_prism_"+numPrism.ToString()+".csv";
         if(counts==0){
             //データの最初のラベル配置
             string label="time,x,y,z\n";
@@ -953,25 +963,22 @@ public class Searcher3 : MonoBehaviour
         }
         string savedata=timeNow.ToString()+","+xAverage+","+yAverage+","+zAverage+"\n";
         if(counts%100==0){
-            string picturePath="C:/Users/Yamauchi Gaito/Desktop/workspace/_tmsim/data/picture/hand/HaaandPosition_layer_"+numLayer.ToString()+"_prism_"+numPrism.ToString()+"_"+timeNow.ToString()+".png";
+            string picturePath="C:/Users/Yamauchi Gaito/Desktop/workspace/_tmsim/data/picture/hand/handPosition_layer_"+numLayer.ToString()+"_prism_"+numPrism.ToString()+"_"+timeNow.ToString()+".png";
             OnScrrenCapture(picturePath);
         }
         
-                
-                
-        
+
         
         OutputCsv(path,savedata);
         Debug.Log(savedata);
 
-        //0.05秒の待機
-        yield return new WaitForSeconds(0.03f);
+        
     }
 
     IEnumerator DelayMethod(){
 
         //Asembly.csの取得
-        GameObject tm_g =GameObject.Find("tm_g");
+        GameObject tm_g =GameObject.Find("tm_g_1");
         Assembly assembly;
         assembly=tm_g.GetComponent<Assembly>();
         //Debug.Log(assembly.StrutScale);
@@ -1036,7 +1043,7 @@ public class Searcher3 : MonoBehaviour
         for(int i=0;i<numLayer;i++){
 
             //座標取得
-            var positionRetrun = getPosition(i,"tm_g");
+            var positionRetrun = getPosition(i,"tm_g_1");
             
             //配列の長さの確認
             arrayLength=positionRetrun.arrayLength;

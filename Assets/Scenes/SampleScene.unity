@@ -335,7 +335,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 646062287}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 745636334d5b822459501b63bf0e1693, type: 3}
   m_Name: 
@@ -347,17 +347,28 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 646062287}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1bba9cd9f1202374b945688b06a2a732, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ctrl1: {fileID: 0}
-  ctrl2: {fileID: 0}
-  ctrl3: {fileID: 0}
+  ctrl1: {fileID: 651570474}
+  ctrl2: {fileID: 1895454027}
+  ctrl3: {fileID: 1233871886}
   Allactive: 0
   AllRandom: 0
   Allbias: 0
+--- !u!114 &651570474 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3091593625016679983, guid: d8fbc758ab700524bbb4c23ccada8a56, type: 3}
+  m_PrefabInstance: {fileID: 8760096320858359830}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7f22adb1071a4594996453916eaa83ac, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &666690587 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 6659988977253097736, guid: 6ef8a9d6d5dcc9138801b2cfbbede2a5, type: 3}
@@ -501,7 +512,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 6659988977253097736, guid: 6ef8a9d6d5dcc9138801b2cfbbede2a5, type: 3}
       propertyPath: m_Name
-      value: tm_g (2)
+      value: tm_g_3
       objectReference: {fileID: 0}
     - target: {fileID: 6659988977253097736, guid: 6ef8a9d6d5dcc9138801b2cfbbede2a5, type: 3}
       propertyPath: m_IsActive
@@ -585,11 +596,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7302967286791488144, guid: 6ef8a9d6d5dcc9138801b2cfbbede2a5, type: 3}
       propertyPath: numLayer
-      value: 5
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 7302967286791488144, guid: 6ef8a9d6d5dcc9138801b2cfbbede2a5, type: 3}
       propertyPath: numPrism
-      value: 4
+      value: 8
       objectReference: {fileID: 0}
     - target: {fileID: 7302967286791488144, guid: 6ef8a9d6d5dcc9138801b2cfbbede2a5, type: 3}
       propertyPath: BaseScale
@@ -625,11 +636,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7302967286791488144, guid: 6ef8a9d6d5dcc9138801b2cfbbede2a5, type: 3}
       propertyPath: springForce
-      value: 540
+      value: 2480
       objectReference: {fileID: 0}
     - target: {fileID: 7302967286791488144, guid: 6ef8a9d6d5dcc9138801b2cfbbede2a5, type: 3}
       propertyPath: stripeshape
       value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7302967286791488144, guid: 6ef8a9d6d5dcc9138801b2cfbbede2a5, type: 3}
+      propertyPath: useConstant
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7302967286791488144, guid: 6ef8a9d6d5dcc9138801b2cfbbede2a5, type: 3}
       propertyPath: SpringDmaper
@@ -944,6 +959,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rotationSpeed: 10
   movementSpeed: 5
+--- !u!114 &1233871886 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3091593625016679983, guid: d8fbc758ab700524bbb4c23ccada8a56, type: 3}
+  m_PrefabInstance: {fileID: 1290191261}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7f22adb1071a4594996453916eaa83ac, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1258276821
 GameObject:
   m_ObjectHideFlags: 0
@@ -1059,7 +1085,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 6659988977253097736, guid: 6ef8a9d6d5dcc9138801b2cfbbede2a5, type: 3}
       propertyPath: m_Name
-      value: tm_g (1)
+      value: tm_g_2
       objectReference: {fileID: 0}
     - target: {fileID: 6659988977253097736, guid: 6ef8a9d6d5dcc9138801b2cfbbede2a5, type: 3}
       propertyPath: m_IsActive
@@ -1143,11 +1169,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7302967286791488144, guid: 6ef8a9d6d5dcc9138801b2cfbbede2a5, type: 3}
       propertyPath: numLayer
-      value: 5
+      value: 8
       objectReference: {fileID: 0}
     - target: {fileID: 7302967286791488144, guid: 6ef8a9d6d5dcc9138801b2cfbbede2a5, type: 3}
       propertyPath: numPrism
-      value: 4
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 7302967286791488144, guid: 6ef8a9d6d5dcc9138801b2cfbbede2a5, type: 3}
       propertyPath: BaseScale
@@ -1183,11 +1209,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7302967286791488144, guid: 6ef8a9d6d5dcc9138801b2cfbbede2a5, type: 3}
       propertyPath: springForce
-      value: 540
+      value: 1120
       objectReference: {fileID: 0}
     - target: {fileID: 7302967286791488144, guid: 6ef8a9d6d5dcc9138801b2cfbbede2a5, type: 3}
       propertyPath: stripeshape
       value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7302967286791488144, guid: 6ef8a9d6d5dcc9138801b2cfbbede2a5, type: 3}
+      propertyPath: useConstant
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7302967286791488144, guid: 6ef8a9d6d5dcc9138801b2cfbbede2a5, type: 3}
       propertyPath: SpringDmaper
@@ -1385,6 +1415,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   basePlate: {fileID: 2882298433554285953, guid: 01fb50f2c4cecd64e9f44291a631867e, type: 3}
   baseStrut: {fileID: 6019696062256689233, guid: 82aa566acbbeb08409376155ace14d3c, type: 3}
+--- !u!114 &1895454027 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3091593625016679983, guid: d8fbc758ab700524bbb4c23ccada8a56, type: 3}
+  m_PrefabInstance: {fileID: 868603577}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7f22adb1071a4594996453916eaa83ac, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &8760096320858359830
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1480,7 +1521,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 6659988977253097736, guid: 6ef8a9d6d5dcc9138801b2cfbbede2a5, type: 3}
       propertyPath: m_Name
-      value: tm_g
+      value: tm_g_1
       objectReference: {fileID: 0}
     - target: {fileID: 6659988977253097736, guid: 6ef8a9d6d5dcc9138801b2cfbbede2a5, type: 3}
       propertyPath: m_IsActive
@@ -1560,7 +1601,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7302967286791488144, guid: 6ef8a9d6d5dcc9138801b2cfbbede2a5, type: 3}
       propertyPath: useFunc
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7302967286791488144, guid: 6ef8a9d6d5dcc9138801b2cfbbede2a5, type: 3}
       propertyPath: numLayer

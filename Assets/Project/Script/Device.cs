@@ -82,6 +82,71 @@ public class Device : MonoBehaviour
         return (i,j,k);
     }
 
+    //ストラットの二点の取得
+    private (Vector3 UpperEndPosition,Vector3 BotomEndPosition) getEndPosition(int num){
+
+        //柱オブジェクトの取得
+        var strut=this.gameObject.transform.Find("Strut"+(num).ToString()).gameObject;
+        if(strut==null){
+            //エラー表示
+            throw new ArgumentNullException($"{nameof(strut)}is null.  You must cast existing strut's number in this tm_g!");
+        }
+        //Debug.Log(num);
+        
+        //上端の取得
+        var UpperEnd=strut.transform.Find("end1");
+        //baseStrut(最下層のストラット)のみendという名称のため最下層なら取り直す
+        if(UpperEnd==null){
+            UpperEnd=strut.transform.Find("end");
+        }
+        //Debug.Log(UpperEnd.transform.position);
+        
+        //下端の取得
+        var BotomEnd=strut.transform.Find("end2");
+        if(BotomEnd==null){
+            BotomEnd=strut.transform.Find("ball_joint");
+        }
+        //Debug.Log(BotomEnd.transform.position);
+        
+        //エンドの座標取得
+        Vector3 UpperEndPosition=UpperEnd.transform.position;
+        Vector3 BotomEndPosition=BotomEnd.transform.position;
+
+        return (UpperEndPosition,BotomEndPosition);
+    }
+
+    //
+    private float mimeticsIMU(){
+        //座標の取得
+        var ends=getEndPosition(1);
+        Vector3 UpperEndPosition=ends.UpperEndPosition;
+        Vector3 BotomEndPosition=ends.BotomEndPosition;
+
+        //ストラットの中点
+        Vector3 AverageEndPosition=Vector3.Lerp(UpperEndPosition,BotomEndPosition,0.5f);
+        //Debug.Log(AverageEndPosition);
+        
+        //ストラット中点と下端の距離
+        float deltaX=AverageEndPosition.x-BotomEndPosition.x;
+        float deltaY=AverageEndPosition.y-BotomEndPosition.y;
+        float deltaZ=AverageEndPosition.z-BotomEndPosition.z;
+        //Debug.Log(deltaX);]
+        //Debug.Log(this.gameObject);
+        //Debug.Log(deltaY);
+        //Debug.Log(MathF.Sqrt(Mathf.Pow(deltaX,2.0f)+Mathf.Pow(deltaZ,2.0f)));
+
+        //角度の計算(IMUの座標は重力方向とストラットの角度のみ計測)
+        float angle = 0.0f;
+        //x軸角度  tan-1(y/x)
+        angle=Mathf.Atan2(MathF.Sqrt(Mathf.Pow(deltaX,2.0f)+Mathf.Pow(deltaZ,2.0f)),deltaY);
+
+        
+        ///Debug.Log((float)(180/Math.PI)*angle);
+
+
+        return angle;
+    }
+
     private void OutputCsv(string path,string savedata ){
 
         //File.AppendAllText("C:/Users/Yamauchi Gaito/Desktop/workspace/tmsim/data/data.csv",savedata);
@@ -130,7 +195,7 @@ public class Device : MonoBehaviour
     // FixedUpdate is called once per physical simulation step
     void FixedUpdate()
     {
-
+        mimeticsIMU();
         rangeSpringCoeff=200.0f*(float)numPrism;
         biasSpringCoeff=60.0f*(float)numPrism;
         // translate the input

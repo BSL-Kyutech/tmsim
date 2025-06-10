@@ -425,12 +425,12 @@ public class Assembly : MonoBehaviour
             */
             if(numLayer==10 && useConstant){
                 StrutScale=new float[10]{0.7741794f,0.7375128f,0.805346f,0.7799709f,0.7509292f,0.7203457f,0.7009292f,0.6540951f,0.6223454f,0.6304705f};
-                edgeLoop=new float[10]{0.06268743f,0.06676555f,0.06041659f,0.05430724f,0.05361452f,0.05094265f,0.04656245f,0.04400515f,0.04369787f,0.0630364f};
+                edgeLoop=new float[10]{0.06268743f,0.06676555f,0.06041659f,0.05430724f,0.05361452f,0.05094265f,0.04656245f,0.04400515f,0.04369787f,0.0630364f};     //2640
             
             }
             else if(numLayer==8 && useConstant){
                 StrutScale=new float[8]{0.8564691f,0.903886f,0.8937612f,0.879386f,0.7824689f,0.773761f,0.7320107f,0.7030106f};
-                edgeLoop=new float[8]{0.09180925f,0.08973639f,0.08356636f,0.07646576f,0.07029568f,0.06472287f,0.05919171f,0.09743829f};
+                edgeLoop=new float[8]{0.09180925f,0.08973639f,0.08356636f,0.07646576f,0.07029568f,0.06472287f,0.05919171f,0.09743829f};     //1120
             }
             else if(useFunc){
                 StrutScale=ReturnAllStrutScale();
@@ -442,9 +442,11 @@ public class Assembly : MonoBehaviour
                 for(int i=0;i<numLayer;i++){
 
                     StrutScale[i]=1.0f;
+                    Debug.Log(edgeLoop[i]);
                 }
             }
 
+ 
             
             //StrutScale=new float[13]{0.5066695f,0.4845017f,0.4922935f,0.4921669f,0.5023773f,0.5407119f,0.5237533f,0.5343785f,0.5101283f,0.5261283f,0.5105029f,0.5381283f,0.5263783f};
 

@@ -23,6 +23,11 @@ public class activeCtrl : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+
+        float timeNow=Time.realtimeSinceStartup;
+        if(timeNow>=5.0f){
+            Allactive=true;
+        }
         if(Allactive==true){
             ctrl1.isActive=true;
             ctrl2.isActive=true;
