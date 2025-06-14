@@ -35,6 +35,9 @@ public class Demo : MonoBehaviour
 
     //破壊されたシリンダの記録
     private bool[] brokenCylinder;
+    //壊れたシリンダの記録をリセット
+    public bool resetsBrokenCylinder;
+
 
     // Start is called before the first frame update
     void Start()
@@ -69,8 +72,16 @@ public class Demo : MonoBehaviour
         if(breaking_Mode){
             brokenCylinder[breakNum]=true;
         }
+        if(resetsBrokenCylinder){
+            for(int i=0;i<dev.numLayer*dev.numPrism*2;i++){
+                brokenCylinder[i]=false;
+            }
+            resetsBrokenCylinder=false;
+        }
         //長い配列(dev.inputと同じ長さ)を用意 bool型
         //リセット用モードをつくる
+
+        
         
 
         
@@ -82,16 +93,14 @@ public class Demo : MonoBehaviour
                     //COSでマイナスに行っても大丈夫なように 0.5が最大値になっているわけか.
                     input[i*2*dev.numPrism + j] = (input[i*2*dev.numPrism + j] + 1f)/2f;
 
+                
 
-                    if(breaking_Mode && brokenCylinder[i*2*dev.numPrism + j]==true){
-                        if(ConstantBroken){
-                            dev.input[i*2*dev.numPrism + j] = BrokenInput;
-                        }
-                        //random入力
-                        else{
-                            dev.input[i*2*dev.numPrism + j] = (float)(1 + r.NextDouble());
-                        }
-                        
+                    if(breaking_Mode && ConstantBroken &&brokenCylinder[i*2*dev.numPrism + j]==true){
+                        dev.input[i*2*dev.numPrism + j] = BrokenInput;
+                    }
+                    else if(breaking_Mode && brokenCylinder[i*2*dev.numPrism + j]==true){
+                        dev.input[i*2*dev.numPrism + j] = (float)(1 + r.NextDouble());
+                        //Debug.Log((i*2*dev.numPrism + j).ToString()+"  "+brokenCylinder[i*2*dev.numPrism + j].ToString());
                     }
                     else{
                         dev.input[i*2*dev.numPrism + j] = (float)input[i*2*dev.numPrism + j];
@@ -101,6 +110,7 @@ public class Demo : MonoBehaviour
                 }
                 theta[i] += omega[i]*Time.fixedDeltaTime;
             }
+            
         }//ランダム入力
 
         if(randomInput){
