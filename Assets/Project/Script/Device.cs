@@ -41,6 +41,20 @@ public class Device : MonoBehaviour
     private GameObject[] struts;
     private Assembly asb;
 
+    //broken mode
+    //破壊されたシリンダの記録
+    public bool[] brokenCylinder;
+    //壊れたシリンダの記録をリセット
+    public bool resetsBrokenCylinder;
+
+    //breakingMode(一部破損時状態で行う際のモード)
+    public bool breaking_Mode;
+    public int breakNum;
+    public float BrokenInput=0;
+    public bool ConstantBroken=true;
+
+    System.Random r = new System.Random(42);
+
     public int enc(int layer, int prism, int numSpring)
     {
         // check parameters' validity
@@ -166,7 +180,7 @@ public class Device : MonoBehaviour
         strutPosition = new Vector3[numLayer*numPrism];
         strutOrientation = new Quaternion[numLayer*numPrism];
 
-        string outputNums="i,idx.i,idx.j,idx.k,springNumber,strut\n";
+        //string outputNums="i,idx.i,idx.j,idx.k,springNumber,strut\n";
 
         if (asb.isReady) {
             springs = this.GetComponentsInChildren<SpringJoint>();
@@ -178,7 +192,7 @@ public class Device : MonoBehaviour
                 cylinder[i] = springs[4*asb.index(idx.i,idx.j)+idx.k].spring;
                 //Debug.Log(springs[4*asb.index(idx.i,idx.j)+idx.k].connectedBody);
                 input[i] = (cylinder[i] - biasSpringCoeff)/rangeSpringCoeff;
-                outputNums=outputNums+i.ToString()+","+idx.i.ToString()+","+idx.j.ToString()+","+idx.k.ToString()+","+(4*asb.index(idx.i,idx.j)+idx.k).ToString()+","+springs[4*asb.index(idx.i,idx.j)+idx.k].connectedBody.ToString()+"\n";
+                //outputNums=outputNums+i.ToString()+","+idx.i.ToString()+","+idx.j.ToString()+","+idx.k.ToString()+","+(4*asb.index(idx.i,idx.j)+idx.k).ToString()+","+springs[4*asb.index(idx.i,idx.j)+idx.k].connectedBody.ToString()+"\n";
 
                 
             }
@@ -188,20 +202,52 @@ public class Device : MonoBehaviour
         } else {
             throw new Exception("TM is not ready!");
         }
-         string path= "C:/Users/Yamauchi Gaito/Desktop/workspace/_tmsim/data/strut_idx_iデータ"+numLayer.ToString()+numPrism.ToString()+".csv";
-        OutputCsv(path,outputNums);
+
+        //破壊扱いのシリンダの記憶配列
+        brokenCylinder=new bool[numLayer*numPrism*2];
+        for(int i=0;i<(numLayer*numPrism*2);i++){
+            brokenCylinder[i]=false;
+        }
+
+        //string path= "C:/Users/Yamauchi Gaito/Desktop/workspace/_tmsim/data/strut_idx_iデータ"+numLayer.ToString()+numPrism.ToString()+".csv";
+        //OutputCsv(path,outputNums);
     }
 
     // FixedUpdate is called once per physical simulation step
     void FixedUpdate()
     {
+
+        //壊れた状態のシリンダの記憶
+        if(breaking_Mode){
+            brokenCylinder[breakNum]=true;
+        }
+        if(resetsBrokenCylinder){
+            for(int i=0;i<numLayer*numPrism*2;i++){
+                brokenCylinder[i]=false;
+            }
+            resetsBrokenCylinder=false;
+        }
+        //長い配列(inputと同じ長さ)を用意 bool型
+        //リセット用モードをつくる
+
         mimeticsIMU();
         rangeSpringCoeff=200.0f*(float)numPrism;
         biasSpringCoeff=60.0f*(float)numPrism;
         // translate the input
         for (int i = 0; i < numLayer*numPrism*2; i++) {
+
+            if(breaking_Mode && ConstantBroken &&brokenCylinder[i]==true){
+                input[i] = BrokenInput;
+            }
+            else if(breaking_Mode && brokenCylinder[i]==true){
+                input[i] = (float)(r.NextDouble());
+                //Debug.Log((i).ToString()+"  "+brokenCylinder[i].ToString());
+            }
+
             input[i] = Math.Max(0f,input[i]);
             input[i] = Math.Min(input[i],1f);
+            
+            
             cylinder[i] = rangeSpringCoeff*(input[i]) + biasSpringCoeff;
         }
         // update spring coefficients

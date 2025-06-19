@@ -23,20 +23,13 @@ public class Demo : MonoBehaviour
 
     public bool standUp;
 
-    //breakingMode(一部破損時状態で行う際のモード)
-    public bool breaking_Mode;
-    public int breakNum;
-    public float BrokenInput=0;
-    public bool ConstantBroken=true;
+
 
 
     System.Random r = new System.Random(42);
 
 
-    //破壊されたシリンダの記録
-    private bool[] brokenCylinder;
-    //壊れたシリンダの記録をリセット
-    public bool resetsBrokenCylinder;
+
 
 
     // Start is called before the first frame update
@@ -57,33 +50,12 @@ public class Demo : MonoBehaviour
             //Debug.Log(omega[i]);
         }
 
-        //破壊扱いのシリンダの記憶配列
-        brokenCylinder=new bool[dev.numLayer*dev.numPrism*2];
-        for(int i=0;i<(dev.numLayer*dev.numPrism*2);i++){
-            brokenCylinder[i]=false;
-        }
+        
     }
 
     // FixedUpdate is called once per physical simulation step
     void FixedUpdate()
     {
-
-        //壊れた状態のシリンダの記憶
-        if(breaking_Mode){
-            brokenCylinder[breakNum]=true;
-        }
-        if(resetsBrokenCylinder){
-            for(int i=0;i<dev.numLayer*dev.numPrism*2;i++){
-                brokenCylinder[i]=false;
-            }
-            resetsBrokenCylinder=false;
-        }
-        //長い配列(dev.inputと同じ長さ)を用意 bool型
-        //リセット用モードをつくる
-
-        
-        
-
         
         if (isActive) {
             for (int i = 0; i < dev.numLayer; i++) {
@@ -93,18 +65,10 @@ public class Demo : MonoBehaviour
                     //COSでマイナスに行っても大丈夫なように 0.5が最大値になっているわけか.
                     input[i*2*dev.numPrism + j] = (input[i*2*dev.numPrism + j] + 1f)/2f;
 
-                
-
-                    if(breaking_Mode && ConstantBroken &&brokenCylinder[i*2*dev.numPrism + j]==true){
-                        dev.input[i*2*dev.numPrism + j] = BrokenInput;
-                    }
-                    else if(breaking_Mode && brokenCylinder[i*2*dev.numPrism + j]==true){
-                        dev.input[i*2*dev.numPrism + j] = (float)(1 + r.NextDouble());
-                        //Debug.Log((i*2*dev.numPrism + j).ToString()+"  "+brokenCylinder[i*2*dev.numPrism + j].ToString());
-                    }
-                    else{
-                        dev.input[i*2*dev.numPrism + j] = (float)input[i*2*dev.numPrism + j];
-                    }
+                    
+                    
+                    dev.input[i*2*dev.numPrism + j] = (float)input[i*2*dev.numPrism + j];
+                    
 
                     
                 }

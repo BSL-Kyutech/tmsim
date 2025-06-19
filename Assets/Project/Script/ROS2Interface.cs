@@ -87,6 +87,7 @@ public class ROS2Interface : MonoBehaviour
     {
 
         for (int i = 0; i < dev.numLayer+1; i++) {
+            //座標のポイントのためのクラスのインスタンス化？
             geometry_msgs.msg.PointStamped msg = new geometry_msgs.msg.PointStamped();
             var pos = ConvVecU2R(dev.loopPosition[i]);
             msg.Point.X = pos.x;
