@@ -219,7 +219,7 @@ public class Device : MonoBehaviour
 
         //壊れた状態のシリンダの記憶
         if(breaking_Mode){
-            brokenCylinder[breakNum]=true;
+            //brokenCylinder[breakNum]=true;
         }
         if(resetsBrokenCylinder){
             for(int i=0;i<numLayer*numPrism*2;i++){
