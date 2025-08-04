@@ -17,6 +17,11 @@ public class broken_searcher : MonoBehaviour
     private GameObject ctrl;
     private Demo demo;
 
+    //シリンダの壊す数
+    public int breaksCount=0;
+    //SetIntのリセット(試行回数)
+    public bool initializer;
+
 
 
     
@@ -106,8 +111,8 @@ public class broken_searcher : MonoBehaviour
             }
 
             
-            string path= "C:/Users/Yamauchi Gaito/Desktop/workspace/_tmsim/data/mountingSearcPositions.csv";
-            OutputCsv(path,output);
+            //string path= "C:/Users/Yamauchi Gaito/Desktop/workspace/_tmsim/data/mountingSearcPositions.csv";
+            //OutputCsv(path,output);
         }
 
             
@@ -166,7 +171,8 @@ public class broken_searcher : MonoBehaviour
         
         
         
-        string path="C:/Users/Yamauchi Gaito/Desktop/workspace/_tmsim/data/broken/handPosition_layer_"+numLayer.ToString()+"_prism_"+numPrism.ToString()+"_process_Count"+processNum.ToString()+".csv";
+        string path="C:/Users/Yamauchi Gaito/Desktop/workspace/_tmsim/data/broken/"+"layer"+assembly.numLayer.ToString()+"_prism"+assembly.numPrism.ToString()+"/"+breaksCount.ToString()+"/handPosition_layer_"+numLayer.ToString()+"_prism_"+numPrism.ToString()+"_process_Count"+processNum.ToString()+".csv";
+        
         if(counts==0){
             //データの最初のラベル配置(t,x,y,z)
             string label="time,x,y,z,";
@@ -204,7 +210,13 @@ public class broken_searcher : MonoBehaviour
         //シリンダのアウトプットの記録
         //inputだと，シータで変化する部分の上書き前のを取るため，シリンダのばね定数を取る
         for(int i=0;i<2*numLayer*numPrism;i++){
-            savedata=savedata+device.cylinder[i].ToString()+",";
+            //最後ならばコンマを消す．
+            if(i==*numLayer*numPrism-1){
+                savedata=savedata+device.cylinder[i].ToString();
+            }
+            else{
+                savedata=savedata+device.cylinder[i].ToString()+",";
+            }
         }
 
         savedata=savedata+"\n";
@@ -224,7 +236,7 @@ public class broken_searcher : MonoBehaviour
         
     } 
 
-    private void zeroInputsRandom(int breaksCount){
+    private void zeroInputsRandom(){
         //randomに壊すのを決める
         System.Random breakNum = new System.Random();
 
@@ -238,6 +250,15 @@ public class broken_searcher : MonoBehaviour
 
         //指定された数の乱数を入れる
         for(int i=0;i<breaksCount;){
+
+            //大きかったら無限ループになるので壊す
+            if(breaksCount>=2*assembly.numLayer*assembly.numPrism){
+                for(int k=0;k<2*assembly.numLayer*assembly.numPrism;k++){
+                    breaksArray[k]=k;
+                }
+                break;
+            }
+
             num=breakNum.Next(2*assembly.numLayer*assembly.numPrism);
             //かぶりをなくす処理
             for(int j=0;j<=i;j++){
@@ -249,10 +270,7 @@ public class broken_searcher : MonoBehaviour
                 breaksArray[i]=num;
                 i++;
             }
-            //大きかったら無限ループになるので壊す
-            if(breaksCount>2*assembly.numLayer*assembly.numPrism){
-                i=breaksCount+1;
-            }
+            
             AlreadyNum=false;
         }
         
@@ -268,6 +286,14 @@ public class broken_searcher : MonoBehaviour
         device.BrokenInput=0;
         //手先位置の記録
 
+        //記録フォルダの作成
+        if(Directory.Exists("C:/Users/Yamauchi Gaito/Desktop/workspace/_tmsim/data/broken/"+"layer"+assembly.numLayer.ToString()+"_prism"+assembly.numPrism.ToString())==false){
+            Directory.CreateDirectory("C:/Users/Yamauchi Gaito/Desktop/workspace/_tmsim/data/broken/"+"layer"+assembly.numLayer.ToString()+"_prism"+assembly.numPrism.ToString());
+        }
+        if(Directory.Exists("C:/Users/Yamauchi Gaito/Desktop/workspace/_tmsim/data/broken/"+"layer"+assembly.numLayer.ToString()+"_prism"+assembly.numPrism.ToString()+"/"+breaksCount.ToString())==false){
+            Directory.CreateDirectory("C:/Users/Yamauchi Gaito/Desktop/workspace/_tmsim/data/broken/"+"layer"+assembly.numLayer.ToString()+"_prism"+assembly.numPrism.ToString()+"/"+breaksCount.ToString());
+        }
+
         
 
     }
@@ -275,6 +301,22 @@ public class broken_searcher : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        Time.timeScale=10.0f;
+        //試行回数の記録
+        int processCount=0;
+        if(PlayerPrefs.HasKey("ProcessCount")){
+            processCount=PlayerPrefs.GetInt("ProcessCount");
+        }
+        if(PlayerPrefs.HasKey("BreaksCount")){
+            breaksCount=PlayerPrefs.GetInt("BreaksCount");
+        }
+        //試行回数を0にする
+        if(initializer==true){
+            PlayerPrefs.SetInt("ProcessCount",0);
+            PlayerPrefs.SetInt("BreaksCount",0);
+            Debug.Log("=============================reseet================================");
+            initializer=false;
+        }
         //オブジェクトへのアクセス
         //変数の確認
 
@@ -289,7 +331,7 @@ public class broken_searcher : MonoBehaviour
         //ctrlオブジェクトの取得
         ctrl=GameObject.Find("ctrl");
         demo=ctrl.GetComponent<Demo>();
-        zeroInputsRandom(10);
+        zeroInputsRandom();
     }
 
     // Update is called once per frame
@@ -300,13 +342,18 @@ public class broken_searcher : MonoBehaviour
         if(PlayerPrefs.HasKey("ProcessCount")){
             processCount=PlayerPrefs.GetInt("ProcessCount");
         }
+        if(PlayerPrefs.HasKey("BreaksCount")){
+            breaksCount=PlayerPrefs.GetInt("BreaksCount");
+        }
+
         //delayを入れる
-        Debug.Log(Time.timeSinceLevelLoad);
+        //Debug.Log(Time.timeSinceLevelLoad);
+        //Debug.Log(processCount);
         
-        if(processCount<=10){
+        if(processCount<10){
             if(Time.timeSinceLevelLoad<30.0f){
                 if(Time.timeSinceLevelLoad>5.0f){
-                    //でも開始
+                    //デモ開始
                     demo.isActive=true;
                 }
                 StartCoroutine(getsHandsPositions(processCount));
@@ -319,6 +366,15 @@ public class broken_searcher : MonoBehaviour
                 //Sceneのリセット
                 processCount++;
                 PlayerPrefs.SetInt("ProcessCount",processCount);
+                SceneManager.LoadScene("SampleScene");
+            }
+        }
+        else{
+            //壊れた数がしリンダの全体数以下なら
+            if(breaksCount<=2*assembly.numLayer*assembly.numPrism){
+                PlayerPrefs.SetInt("ProcessCount",0);
+                breaksCount++;
+                PlayerPrefs.SetInt("BreaksCount",breaksCount);
                 SceneManager.LoadScene("SampleScene");
             }
         }
