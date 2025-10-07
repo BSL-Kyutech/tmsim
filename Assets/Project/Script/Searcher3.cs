@@ -151,18 +151,27 @@ public class Searcher3 : MonoBehaviour
         float tm_g_x=0.0f;
         float tm_g_z=0.0f;
         float maxDistance=0.0f;
-        
-        //直径の計算
-        for(int j=0;j<arrayLength;j++){
+
+        if(arrayLength%2==1){
+            tm_g_x=(float)Math.Pow((double)(LayerXpositions[0]-LayerXpositions[1]),2);
+            tm_g_z=(float)Math.Pow((double)(LayerZpositions[0]-LayerZpositions[1]),2);
+            maxDistance=(float)Math.Sqrt(tm_g_x+tm_g_z)/((float)Math.Tan(Math.PI/arrayLength));
+        }
+        else{
+            //直径の計算
+            for(int j=0;j<arrayLength;j++){
             
-            //XとZのそれぞれの距離
-            tm_g_x=(float)Math.Pow((double)(LayerXpositions[0]-LayerXpositions[j]),2);
-            tm_g_z=(float)Math.Pow((double)(LayerZpositions[0]-LayerZpositions[j]),2);
-            //一番離れている点を直径とする
-            if(maxDistance<=(float)(Math.Sqrt(tm_g_x+tm_g_z))){
-                maxDistance=(float)Math.Sqrt(tm_g_x+tm_g_z);
+                //XとZのそれぞれの距離
+                tm_g_x=(float)Math.Pow((double)(LayerXpositions[0]-LayerXpositions[j]),2);
+                tm_g_z=(float)Math.Pow((double)(LayerZpositions[0]-LayerZpositions[j]),2);
+                //一番離れている点を直径とする
+                if(maxDistance<=(float)(Math.Sqrt(tm_g_x+tm_g_z))){
+                    maxDistance=(float)Math.Sqrt(tm_g_x+tm_g_z);
+                }
             }
         }
+        
+        
 
         return maxDistance;
     }
@@ -431,7 +440,7 @@ public class Searcher3 : MonoBehaviour
             //savedata+=",highLoss,"+highLosses.ToString()+",highLoss,"+DiameterLoss[edgeFlag].ToString()+"\n";
             
             float sikiiti=0.02f*(float)numLayer;
-            string filename="45_newTuype_1.5High";
+            string filename=numLayer.ToString()"_"++numPrism.ToString()"_newTuype_1.5High";
             
             if(loss<=sikiiti){
                 int photonumber=0;
@@ -803,6 +812,14 @@ public class Searcher3 : MonoBehaviour
             //出力
             DateTime days =DateTime.Now;
 
+
+            //フォルダがないなら作成とヘッダーの追加
+            string folderpath="C:/Users/Yamauchi Gaito/Desktop/workspace/_tmsim/data/"+numLayer.ToString()"_"++numPrism.ToString()
+            if (Directory.Exists(folderpath)==false){
+                Directory.CreateDirectory(folderpath);
+                
+            }
+            
             savedata=savedata+",mins,"+mins.ToString()+",time,"+days.ToString()+"\n";
             string path= "C:/Users/Yamauchi Gaito/Desktop/workspace/_tmsim/data/mountingSearc"+filename+".csv";
             OutputCsv(path,savedata);
@@ -889,16 +906,17 @@ public class Searcher3 : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {           
-        //StartCoroutine(DelayMethod());
+        StartCoroutine(DelayMethod());
     }
 
     // Update is called once per frame
     void Update()
-    {   
+    {   /*
         if(Time.realtimeSinceStartup<30.0f){
             StartCoroutine(getsHandsPositions());
             counts++;
         }  
+        */
     }
 
     IEnumerator getsHandsPositions(){
@@ -1120,7 +1138,7 @@ public class Searcher3 : MonoBehaviour
         if(PlayerPrefs.HasKey("photonumber")){
             photonumber=PlayerPrefs.GetInt("photonumber");
         }
-        if(photonumber<=20000*numLayer){
+        if(photonumber<=10000*numLayer){
             SceneManager.LoadScene("SampleScene");
         }
         

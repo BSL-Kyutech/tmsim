@@ -317,13 +317,13 @@ public class Assembly : MonoBehaviour
     // Start is called before the first frame update        最初の初期起動時の処理
     void Start()
     {
-        Time.timeScale=1.0f;
+        Time.timeScale=10.0f;
 
         //radiusLoopが内部に存在していた場合取得
         
         if (!initializer){
             if(PlayerPrefs.HasKey("RadiusLoop")){
-            //radiusLoop=PlayerPrefs.GetFloat("RadiusLoop");
+            radiusLoop=PlayerPrefs.GetFloat("RadiusLoop");
             }
 
             if(PlayerPrefs.HasKey("SpringForce")){
@@ -334,10 +334,10 @@ public class Assembly : MonoBehaviour
 
             if(PlayerPrefs.HasKey("edge")){
         
-                //edgeparameter_layers=PlayerPrefs.GetFloat("edge");
+                edgeparameter_layers=PlayerPrefs.GetFloat("edge");
             }
             if(PlayerPrefs.HasKey("mode")){
-                //mode=PlayerPrefs.GetInt("count");
+                mode=PlayerPrefs.GetInt("count");
             }
         }
         
@@ -359,7 +359,7 @@ public class Assembly : MonoBehaviour
         float lastRadiusloop = radiusBase*edgeDampoer;
         float diffRadius = (radiusBase-lastRadiusloop)/((float)(numLayer-1));      //上と下の半径の差
 
-        
+        edgeLoop=new float[numLayer];
         StrutScale=new float[numLayer];
 
         int bases = numLayer/5;
@@ -429,8 +429,10 @@ public class Assembly : MonoBehaviour
             
             }
             else if(numLayer==8 && useConstant){
-                StrutScale=new float[8]{0.8564691f,0.903886f,0.8937612f,0.879386f,0.7824689f,0.773761f,0.7320107f,0.7030106f};
-                edgeLoop=new float[8]{0.09180925f,0.08973639f,0.08356636f,0.07646576f,0.07029568f,0.06472287f,0.05919171f,0.09743829f};     //1120
+                //StrutScale=new float[8]{0.8564691f,0.903886f,0.8937612f,0.879386f,0.7824689f,0.773761f,0.7320107f,0.7030106f};
+                //edgeLoop=new float[8]{0.09180925f,0.08973639f,0.08356636f,0.07646576f,0.07029568f,0.06472287f,0.05919171f,0.09743829f};     //1120
+                StrutScale=new float[8]{1.089899f,1.016552f,0.9621532f,0.9116253f,0.8568946f,0.8094475f,0.7564716f,0.7444379f};              //640
+                edgeLoop=new float[8]{0.1257394f,0.118149f,0.1103842f,0.1007877f,0.09299219f,0.08393376f,0.07367938f,0.1448224f};     //640
             }
             else if(useFunc){
                 StrutScale=ReturnAllStrutScale();
@@ -456,10 +458,12 @@ public class Assembly : MonoBehaviour
 
 
             //パラメータの引継ぎ
+            /*
             for(int i=0;i<numLayer;i++){
                 PlayerPrefs.SetFloat("edgeLoop"+(i).ToString(),edgeLoop[i]);
                 PlayerPrefs.Save();
             }
+            */
             
            
 
@@ -485,10 +489,13 @@ public class Assembly : MonoBehaviour
 
         else{
 
-            for (int i=1;i<=numLayer;i++)
+            for (int i=0;i<numLayer;i++)
             {
-                StrutScale[i-1]=PlayerPrefs.GetFloat("StrutScale"+(i-1).ToString());
-                edgeLoop[i-1]=PlayerPrefs.GetFloat("edgeLoop"+(i-1).ToString());
+                StrutScale[i]=PlayerPrefs.GetFloat("StrutScale"+(i).ToString());
+                
+                edgeLoop[i]=PlayerPrefs.GetFloat("edgeLoop"+(i).ToString());
+                //Debug.Log("edgeLoop"+(i).ToString());
+                //Debug.Log(edgeLoop[i]);
                 
                 //4本5層の値
                 //edgeLoop= new float[5] {0.12415123082906993f,0.11031530609675386f,0.10214850457080119f,0.09057431266995283f,0.12024559516481466f};
@@ -804,6 +811,8 @@ public class Assembly : MonoBehaviour
 
         for(int i=0;i<numLayer;i++){
             PlayerPrefs.SetFloat("edgeLoop"+(i).ToString(),edgeLoop[i]);
+            //Debug.Log("edgeLoop"+(i).ToString());
+            //Debug.Log(edgeLoop[i]);
             PlayerPrefs.Save();
             PlayerPrefs.SetFloat("StrutScale"+(i).ToString(),StrutScale[i]);
             PlayerPrefs.Save();

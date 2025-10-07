@@ -211,7 +211,7 @@ public class broken_searcher : MonoBehaviour
         //inputだと，シータで変化する部分の上書き前のを取るため，シリンダのばね定数を取る
         for(int i=0;i<2*numLayer*numPrism;i++){
             //最後ならばコンマを消す．
-            if(i==*numLayer*numPrism-1){
+            if(i==2*numLayer*numPrism-1){
                 savedata=savedata+device.cylinder[i].ToString();
             }
             else{
@@ -350,7 +350,7 @@ public class broken_searcher : MonoBehaviour
         //Debug.Log(Time.timeSinceLevelLoad);
         //Debug.Log(processCount);
         
-        if(processCount<10){
+        if(processCount<50){
             if(Time.timeSinceLevelLoad<30.0f){
                 if(Time.timeSinceLevelLoad>5.0f){
                     //デモ開始
