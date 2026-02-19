@@ -129,8 +129,8 @@ public class Searcher3 : MonoBehaviour
             }
 
             
-            string path= "C:/Users/Yamauchi Gaito/Desktop/workspace/_tmsim/data/mountingSearcPositions.csv";
-            OutputCsv(path,output);
+            //string path= "C:/Users/Yamauchi Gaito/Desktop/workspace/_tmsim/data/mountingSearcPositions.csv";
+            //OutputCsv(path,output);
         }
 
             
@@ -426,21 +426,32 @@ public class Searcher3 : MonoBehaviour
 
             //出力
             string savedata="";
-            for(int i=0;i<numLayer;i++){
-                savedata+="strutScale"+i.ToString()+","+strutScale[i].ToString();
-                if(i!=numLayer){
-                    savedata+=",";
+            //念のため15くらいにしておこう
+            for(int i=0;i<15;i++){
+                //配列内なら配列を返し，配列外なら0を返す
+                if(i<numLayer){
+                    savedata+=strutScale[i].ToString()+",";
+                }
+                else{
+                    savedata+="0,"; 
                 }
             }
             
             //Debug.Log(tm_g_y);
-            for(int i=0;i<numLayer;i++){
-                savedata+=",edgeLoop"+i.ToString() +"," +edgeLoop[i].ToString(); 
+            for(int i=0;i<15;i++){
+                if(i<numLayer){
+                    savedata+=edgeLoop[i].ToString()+",";
+                }
+                else{
+                    savedata+="0,";
+                }
+
+                 
             }
             //savedata+=",highLoss,"+highLosses.ToString()+",highLoss,"+DiameterLoss[edgeFlag].ToString()+"\n";
             
             float sikiiti=0.02f*(float)numLayer;
-            string filename=numLayer.ToString()"_"++numPrism.ToString()"_newTuype_1.5High";
+            string filename=numLayer.ToString()+"_"+numPrism.ToString()+"_newTuype_1.5High";
             
             if(loss<=sikiiti){
                 int photonumber=0;
@@ -454,13 +465,13 @@ public class Searcher3 : MonoBehaviour
                 
                 OnScrrenCapture(picturePath+filename+"/"+photonumber.ToString()+".png");
                 
-                savedata+=",loss,"+loss.ToString()+",springForce,"+springForce.ToString()+",compareFlag,"+compareFlag.ToString()+",photonumber"+photonumber.ToString();
+                savedata+=loss.ToString()+","+springForce.ToString()+","+compareFlag.ToString()+","+photonumber.ToString()+","+edgeFlag.ToString();
                 photonumber+=1;
                 PlayerPrefs.SetInt("photonumber",photonumber);
                 PlayerPrefs.Save();
             }
             else{
-                savedata+=",loss,"+loss.ToString()+",springForce,"+springForce.ToString()+",compareFlag,"+compareFlag.ToString()+",edgeFlag,"+edgeFlag.ToString();
+                savedata+=loss.ToString()+","+springForce.ToString()+","+compareFlag.ToString()+",null,"+edgeFlag.ToString();
             }
             
             
@@ -801,7 +812,7 @@ public class Searcher3 : MonoBehaviour
 
             Debug.Log("EdgeFlag : "+edgeFlag.ToString());
             
-            PlayerPrefs.SetFloat("SpringForce",640.0f);//つぶれ始めるから，毎回リセットかければいいのでは？
+            PlayerPrefs.SetFloat("SpringForce",640.0f);//つぶれ始めるから，毎回リセットかければいいのでは？ #640.0ffだが，時間がかかりすぎる
             PlayerPrefs.Save();
             PlayerPrefs.SetInt("compareFlag",compareFlag);
             PlayerPrefs.Save();
@@ -812,16 +823,25 @@ public class Searcher3 : MonoBehaviour
             //出力
             DateTime days =DateTime.Now;
 
-
+            
             //フォルダがないなら作成とヘッダーの追加
-            string folderpath="C:/Users/Yamauchi Gaito/Desktop/workspace/_tmsim/data/"+numLayer.ToString()"_"++numPrism.ToString()
+            string folderpath="C:/Users/Yamauchi Gaito/Desktop/workspace/_tmsim/data/"+numLayer.ToString()+"_"+numPrism.ToString();
+            string path= folderpath+"/mountingSearc"+filename+".csv";
             if (Directory.Exists(folderpath)==false){
                 Directory.CreateDirectory(folderpath);
-                
+                string header="";
+
+                for(int i=1;i<=15;i++){
+                    header+="strutScale"+i.ToString()+",";
+                }
+
+                for(int i=1;i<=15;i++){
+                    header+="edgeloop"+i.ToString()+",";
+                }
+                header+="loss,springForce,compareFlag,photoNumber,edgeflag,min,date\n";
+                OutputCsv(path,header);
             }
-            
-            savedata=savedata+",mins,"+mins.ToString()+",time,"+days.ToString()+"\n";
-            string path= "C:/Users/Yamauchi Gaito/Desktop/workspace/_tmsim/data/mountingSearc"+filename+".csv";
+            savedata=savedata+","+mins.ToString()+","+days.ToString()+"\n";
             OutputCsv(path,savedata);
 
             Debug.Log(savedata);
@@ -906,17 +926,19 @@ public class Searcher3 : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {           
-        StartCoroutine(DelayMethod());
+        //StartCoroutine(DelayMethod());
     }
 
     // Update is called once per frame
     void Update()
-    {   /*
+    {   ///*
         if(Time.realtimeSinceStartup<30.0f){
             StartCoroutine(getsHandsPositions());
             counts++;
         }  
-        */
+        //*/
+
+        //show_handposition();
     }
 
     IEnumerator getsHandsPositions(){
@@ -973,14 +995,14 @@ public class Searcher3 : MonoBehaviour
 
         float timeNow=Time.realtimeSinceStartup;
         
-        string path="C:/Users/Yamauchi Gaito/Desktop/workspace/_tmsim/data/handPosition_layer_"+numLayer.ToString()+"_prism_"+numPrism.ToString()+".csv";
+        string path="C:/Users/Yamauchi Gaito/Desktop/workspace/_tmsim/data/20260206_handPosition_layer_"+numLayer.ToString()+"_prism_"+numPrism.ToString()+".csv";
         if(counts==0){
             //データの最初のラベル配置
             string label="time,x,y,z\n";
             OutputCsv(path,label);
         }
         string savedata=timeNow.ToString()+","+xAverage+","+yAverage+","+zAverage+"\n";
-        if(counts%100==0){
+        if(counts%20==0){
             string picturePath="C:/Users/Yamauchi Gaito/Desktop/workspace/_tmsim/data/picture/hand/handPosition_layer_"+numLayer.ToString()+"_prism_"+numPrism.ToString()+"_"+timeNow.ToString()+".png";
             OnScrrenCapture(picturePath);
         }
@@ -1138,7 +1160,7 @@ public class Searcher3 : MonoBehaviour
         if(PlayerPrefs.HasKey("photonumber")){
             photonumber=PlayerPrefs.GetInt("photonumber");
         }
-        if(photonumber<=10000*numLayer){
+        if(photonumber<=5000*numLayer){
             SceneManager.LoadScene("SampleScene");
         }
         
@@ -1146,7 +1168,52 @@ public class Searcher3 : MonoBehaviour
     }
 
     
+    void show_handposition(){
+        //Asembly.csの取得
+        GameObject tm_g =GameObject.Find("tm_g_1");
+        Assembly assembly;
+        assembly=tm_g.GetComponent<Assembly>();
+        //Debug.Log(assembly.StrutScale);
 
+        //レイヤー数の取得
+        int numLayer=assembly.numLayer;
+        int numPrism=assembly.numPrism;
+        float DiameterBase=assembly.radiusBase*2.0f;
+
+        //手先位置の取得変数
+        float tm_g_x=0.0f;
+        float tm_g_y=0.0f;
+        float tm_g_z=0.0f;
+        float[] tmpos =new float[3];
+
+        //x,y,z座標の取得用配列
+        float[] LayerXpositions;
+        float[] LayerYpositions;
+        float[] LayerZpositions;
+
+
+        //配列長さはレイヤーが上下の柱より構成されるため2倍
+        LayerXpositions= new float [numPrism*2];
+        LayerYpositions= new float [numPrism*2];
+        LayerZpositions= new float [numPrism*2]; 
+
+        var positionRetrun = getPosition(numLayer-1,"tm_g_1");
+
+        
+            
+        //配列の長さの確認
+        int arrayLength=0;
+        arrayLength=positionRetrun.arrayLength;
+        //座標格納
+        LayerXpositions=positionRetrun.LayerXpositions;
+        LayerYpositions=positionRetrun.LayerYpositions;
+        LayerZpositions=positionRetrun.LayerZpositions;
+
+        Debug.Log(getHigh(LayerYpositions,arrayLength));
+
+
+
+    }
     
 }
  

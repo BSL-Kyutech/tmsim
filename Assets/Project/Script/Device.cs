@@ -52,6 +52,8 @@ public class Device : MonoBehaviour
     public int breakNum;
     public float BrokenInput=0;
     public bool ConstantBroken=true;
+    public bool AllBreak=false;
+    public bool HalfBreak=false;
 
     System.Random r = new System.Random(42);
 
@@ -227,6 +229,20 @@ public class Device : MonoBehaviour
             }
             resetsBrokenCylinder=false;
         }
+        //全部壊す
+        if(AllBreak){
+            for(int i=0;i<numLayer*numPrism*2;i++){
+                brokenCylinder[i]=true;
+            }
+            AllBreak=false;
+        }
+        //半分壊す
+        if(HalfBreak){
+            brokenCylinder=new bool[40] {true,false,true,false,true,false,true,true,false,true,false,false,false,true,false,true,false,false,true,true,false,false,false,true,true,true,false,false,true,true,false,true,false,true,true,false,true,true,false,false};
+            HalfBreak=false;
+        }
+
+        
         //長い配列(inputと同じ長さ)を用意 bool型
         //リセット用モードをつくる
 

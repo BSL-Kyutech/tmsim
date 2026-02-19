@@ -154,6 +154,8 @@ MonoBehaviour:
   breakNum: 0
   BrokenInput: 0
   ConstantBroken: 1
+  AllBreak: 0
+  HalfBreak: 0
 --- !u!114 &108762132
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -377,7 +379,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 69a3769cc99352b47b71ae7d96e78aee, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  breaksCount: 0
+  breaksCount: 10
   initializer: 0
 --- !u!114 &651570474 stripped
 MonoBehaviour:
@@ -421,6 +423,8 @@ MonoBehaviour:
   breakNum: 0
   BrokenInput: 0
   ConstantBroken: 1
+  AllBreak: 0
+  HalfBreak: 0
 --- !u!114 &666690594
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -543,7 +547,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6659988977253097736, guid: 6ef8a9d6d5dcc9138801b2cfbbede2a5, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6767115522191957148, guid: 6ef8a9d6d5dcc9138801b2cfbbede2a5, type: 3}
       propertyPath: m_RootOrder
@@ -1116,7 +1120,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6659988977253097736, guid: 6ef8a9d6d5dcc9138801b2cfbbede2a5, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6767115522191957148, guid: 6ef8a9d6d5dcc9138801b2cfbbede2a5, type: 3}
       propertyPath: m_RootOrder
@@ -1200,7 +1204,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7302967286791488144, guid: 6ef8a9d6d5dcc9138801b2cfbbede2a5, type: 3}
       propertyPath: numPrism
-      value: 6
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 7302967286791488144, guid: 6ef8a9d6d5dcc9138801b2cfbbede2a5, type: 3}
       propertyPath: BaseScale
@@ -1236,7 +1240,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7302967286791488144, guid: 6ef8a9d6d5dcc9138801b2cfbbede2a5, type: 3}
       propertyPath: springForce
-      value: 1120
+      value: 1200
       objectReference: {fileID: 0}
     - target: {fileID: 7302967286791488144, guid: 6ef8a9d6d5dcc9138801b2cfbbede2a5, type: 3}
       propertyPath: stripeshape
@@ -1434,6 +1438,8 @@ MonoBehaviour:
   breakNum: 0
   BrokenInput: 0
   ConstantBroken: 1
+  AllBreak: 0
+  HalfBreak: 0
 --- !u!114 &1359497016
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1485,7 +1491,7 @@ PrefabInstance:
       objectReference: {fileID: 666690590}
     - target: {fileID: 3454244960971090149, guid: d8fbc758ab700524bbb4c23ccada8a56, type: 3}
       propertyPath: m_Enabled
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4712326492151569547, guid: d8fbc758ab700524bbb4c23ccada8a56, type: 3}
       propertyPath: m_RootOrder
@@ -1634,15 +1640,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7302967286791488144, guid: 6ef8a9d6d5dcc9138801b2cfbbede2a5, type: 3}
       propertyPath: useFunc
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7302967286791488144, guid: 6ef8a9d6d5dcc9138801b2cfbbede2a5, type: 3}
       propertyPath: numLayer
-      value: 10
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 7302967286791488144, guid: 6ef8a9d6d5dcc9138801b2cfbbede2a5, type: 3}
       propertyPath: numPrism
-      value: 8
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 7302967286791488144, guid: 6ef8a9d6d5dcc9138801b2cfbbede2a5, type: 3}
       propertyPath: BaseScale
@@ -1674,11 +1680,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7302967286791488144, guid: 6ef8a9d6d5dcc9138801b2cfbbede2a5, type: 3}
       propertyPath: initializer
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7302967286791488144, guid: 6ef8a9d6d5dcc9138801b2cfbbede2a5, type: 3}
       propertyPath: springForce
-      value: 2640
+      value: 560
       objectReference: {fileID: 0}
     - target: {fileID: 7302967286791488144, guid: 6ef8a9d6d5dcc9138801b2cfbbede2a5, type: 3}
       propertyPath: stripeshape
@@ -1686,7 +1692,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7302967286791488144, guid: 6ef8a9d6d5dcc9138801b2cfbbede2a5, type: 3}
       propertyPath: useConstant
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7302967286791488144, guid: 6ef8a9d6d5dcc9138801b2cfbbede2a5, type: 3}
       propertyPath: SpringDmaper

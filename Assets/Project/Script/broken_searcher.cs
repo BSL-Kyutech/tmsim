@@ -350,7 +350,7 @@ public class broken_searcher : MonoBehaviour
         //Debug.Log(Time.timeSinceLevelLoad);
         //Debug.Log(processCount);
         
-        if(processCount<50){
+        if(processCount<10){
             if(Time.timeSinceLevelLoad<30.0f){
                 if(Time.timeSinceLevelLoad>5.0f){
                     //デモ開始

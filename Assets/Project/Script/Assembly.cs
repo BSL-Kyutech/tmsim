@@ -329,7 +329,7 @@ public class Assembly : MonoBehaviour
             if(PlayerPrefs.HasKey("SpringForce")){
                 springForce =PlayerPrefs.GetFloat("SpringForce");
             }
-
+            
 
 
             if(PlayerPrefs.HasKey("edge")){
@@ -423,16 +423,116 @@ public class Assembly : MonoBehaviour
                 }
             }
             */
-            if(numLayer==10 && useConstant){
-                StrutScale=new float[10]{0.7741794f,0.7375128f,0.805346f,0.7799709f,0.7509292f,0.7203457f,0.7009292f,0.6540951f,0.6223454f,0.6304705f};
-                edgeLoop=new float[10]{0.06268743f,0.06676555f,0.06041659f,0.05430724f,0.05361452f,0.05094265f,0.04656245f,0.04400515f,0.04369787f,0.0630364f};     //2640
+            if (useConstant==true){
+
             
-            }
-            else if(numLayer==8 && useConstant){
+                if(numLayer==10 && numPrism==8){//
+                    StrutScale=new float[10]{0.7741794f,0.7375128f,0.805346f,0.7799709f,0.7509292f,0.7203457f,0.7009292f,0.6540951f,0.6223454f,0.6304705f};
+                    edgeLoop=new float[10]{0.06268743f,0.06676555f,0.06041659f,0.05430724f,0.05361452f,0.05094265f,0.04656245f,0.04400515f,0.04369787f,0.0630364f};     //640
+            
+                }
+                if(numLayer==10 && numPrism==7){//
+                    StrutScale=new float[10]{1.004277f,0.9194543f,0.8781046f,0.8150301f,0.8156192f,0.7553421f,0.71342f,0.6632004f,0.6456949f,0.6138333f};
+                    edgeLoop=new float[10]{0.08695613f,0.0828373f,0.07941385f,0.07400092f,0.07087807f,0.06425336f,0.06047757f,0.05544934f,0.04867428f,0.09390821f};     //640
+            
+                }
+                if(numLayer==10 && numPrism==6){//
+                    StrutScale=new float[10]{1.027173f,0.9488513f,0.9043089f,0.8632551f,0.8158698f,0.7711644f,0.7323623f,0.6897659f,0.6515551f,0.6174093f};
+                    edgeLoop=new float[10]{0.1031376f,0.09988528f,0.09375463f,0.08812632f,0.08236708f,0.07627424f,0.07092295f,0.06517997f,0.05856487f,0.09897218f};     //640
+            
+                }
+                if(numLayer==10 && numPrism==5){//
+                    StrutScale=new float[10]{0.9954582f,0.9390308f,0.9357504f,0.9445467f,0.9125582f,0.9185466f,0.8610252f,0.8345063f,0.7915034f,0.7884449f};
+                    edgeLoop=new float[10]{0.1124301f,0.1152653f,0.1178389f,0.1132898f,0.1109571f,0.1123632f,0.09783024f,0.0997474f,0.09700358f,0.1247879f};     //880
+            
+                }
+                else if(numLayer==8 && numPrism==5){//
                 //StrutScale=new float[8]{0.8564691f,0.903886f,0.8937612f,0.879386f,0.7824689f,0.773761f,0.7320107f,0.7030106f};
                 //edgeLoop=new float[8]{0.09180925f,0.08973639f,0.08356636f,0.07646576f,0.07029568f,0.06472287f,0.05919171f,0.09743829f};     //1120
-                StrutScale=new float[8]{1.089899f,1.016552f,0.9621532f,0.9116253f,0.8568946f,0.8094475f,0.7564716f,0.7444379f};              //640
-                edgeLoop=new float[8]{0.1257394f,0.118149f,0.1103842f,0.1007877f,0.09299219f,0.08393376f,0.07367938f,0.1448224f};     //640
+                    StrutScale=new float[8]{1.089899f,1.016552f,0.9621532f,0.9116253f,0.8568946f,0.8094475f,0.7564716f,0.7444379f};              //640
+                    edgeLoop=new float[8]{0.1257394f,0.118149f,0.1103842f,0.1007877f,0.09299219f,0.08393376f,0.07367938f,0.1448224f};     //640
+                }   
+                else if(numLayer==8 && numPrism==8){//
+                    StrutScale=new float[8]{1.01541f,0.9374977f,0.891705f,0.852612f,0.8004768f,0.7549734f,0.7101514f,0.6713954f};
+                    edgeLoop=new float[8]{0.07377467f,0.07200986f,0.0667648f,0.06203499f,0.05646168f,0.05149865f,0.04500595f,0.07584359f};     //640
+                }   
+
+                else if(numLayer==4 && numPrism==3){//
+                    StrutScale=new float[4]{1.431883f,1.448337f,1.37506f,1.268907f};
+                    edgeLoop=new float[4]{0.2097509f,0.185938f,0.1771897f,0.2095114f};     //800
+                }   
+                else if(numLayer==4 && numPrism==4){//
+                    StrutScale=new float[4]{1.389812f,1.352098f,1.294913f,1.171735f};
+                    edgeLoop=new float[4]{0.1567681f,0.1381599f,0.121954f,0.1414613f};     //640
+                }
+                else if(numLayer==4 && numPrism==5){//
+                    StrutScale=new float[4]{1.284886f,1.084796f,1.088967f,0.9954147f};
+                    edgeLoop=new float[4]{0.07766558f,0.09534243f,0.06815712f,0.09635011f};     //720
+                }
+                else if(numLayer==4 && numPrism==6){//
+                    StrutScale=new float[4]{1.317688f,1.286952f,1.223615f,1.121616f};
+                    edgeLoop=new float[4]{0.1028999f,0.09467847f,0.08020752f,0.09932601f};     //640
+                }
+                else if(numLayer==4 && numPrism==8){//none
+                    StrutScale=new float[4]{1.149631f,0.9640459f,0.9619905f,0.83283f};
+                    edgeLoop=new float[4]{0.002082939f,-0.128569f,0.00714466f,0.05683319f};     //1520
+                }
+                else if(numLayer==5 && numPrism==4){//
+                    StrutScale=new float[5]{1.258871f,1.21481f,1.166965f,1.167346f,0.9817054f};
+                    edgeLoop=new float[5]{0.1546911f,0.1415395f,0.1383539f,0.1161737f,0.1410651f};     //640
+                }
+                else if(numLayer==5 && numPrism==7){//
+                    StrutScale=new float[5]{1.175833f,1.122695f,1.064568f,1.002691f,0.939831f};
+                    edgeLoop=new float[5]{0.08672506f,0.08115824f,0.07188646f,0.06030932f,0.09528822f};     //640
+                }
+                else if(numLayer==6 && numPrism==4){
+                    StrutScale=new float[6]{1.174267f,1.138367f,1.073669f,1.009512f,0.952307f,0.8609945f};
+                    edgeLoop=new float[6]{0.1522418f,0.144127f,0.1302245f,0.1157298f,0.1017524f,0.1415865f};     //640
+                }
+                else if(numLayer==6 && numPrism==5){//
+                    StrutScale=new float[6]{1.15767f,1.097207f,1.037237f,0.976959f,0.9139902f,0.8725966f};
+                    edgeLoop=new float[6]{0.1250576f,0.1157846f,0.1049821f,0.09368186f,0.07977708f,0.1449054f};     //640
+                }
+                else if(numLayer==6 && numPrism==6){//
+                    StrutScale=new float[6]{1.127176f,1.062826f,1.005244f,0.9504106f,0.8919847f,0.8256059f};
+                    edgeLoop=new float[6]{0.1021722f,0.09579851f,0.08671429f,0.07753801f,0.06732567f,0.09927308f};     //640
+                }
+                else if(numLayer==6 && numPrism==8){//none 
+                    StrutScale=new float[6]{0.8890916f,0.8968414f,0.8968414f,0.7916886f,0.7295395f,0.721164f};
+                    edgeLoop=new float[6]{0.03823249f,0.04800971f,0.04851066f,0.04167225f,0.03886984f,0.05012858f};     //1040
+                }
+                else if(numLayer==7 && numPrism==4){//
+                    StrutScale=new float[7]{1.00664f,1.033036f,1.058159f,1.064581f,1.018653f,1.000438f,1.009503f};
+                    edgeLoop=new float[7]{0.1401186f,0.137489f,0.121433f,0.1284183f,0.1219166f,0.1274466f,0.1894173f};     //800
+                }
+                else if(numLayer==7 && numPrism==5){//
+                    StrutScale=new float[7]{1.084986f,1.027027f,0.9862122f,0.9437142f,0.8776177f,0.8190169f,0.8020871f};
+                    edgeLoop=new float[7]{0.1170012f,0.1141681f,0.1071079f,0.09556685f,0.08723921f,0.07619226f,0.1442267f};     //640
+                }
+                else if(numLayer==7 && numPrism==6){//
+                    StrutScale=new float[7]{1.081339f,1.021421f,0.9597515f,0.9069321f,0.8520491f,0.8037038f,0.7468492f};
+                    edgeLoop=new float[7]{0.1016314f,0.09649281f,0.0883932f,0.08012963f,0.07254038f,0.06358072f,0.09843413f};     //800
+                }
+                else if(numLayer==7 && numPrism==7){//
+                    StrutScale=new float[7]{1.061331f,0.9894107f,0.9334263f,0.8938653f,0.8429952f,0.7789527f,0.7505084f};
+                    edgeLoop=new float[7]{0.0857067f,0.0826979f,0.0755123f,0.06978621f,0.06210569f,0.05418411f,0.09542076f};     //640
+                }
+                else if(numLayer==7 && numPrism==8){//
+                    StrutScale=new float[7]{1.044672f,0.9696441f,0.9240914f,0.8684586f,0.8200766f,0.7746933f,0.7273475f};
+                    edgeLoop=new float[7]{0.07340466f,0.07200859f,0.06498464f,0.05982734f,0.0532186f,0.04739253f,0.07478108f};     //640
+                }
+                else if(numLayer==8 && numPrism==4){//
+                    StrutScale=new float[8]{1.111916f,1.05748f,1.092146f,0.9202463f,0.8956519f,0.8381414f,0.7887803f,0.7243479f};
+                    edgeLoop=new float[8]{0.1539257f,0.1557249f,0.1336584f,0.1278006f,0.1146122f,0.1046207f,0.0936265f,0.1416934f};     //640
+                }
+                else if(numLayer==8 && numPrism==6){//
+                    StrutScale=new float[8]{1.016868f,0.9480168f,0.8878636f,0.9155759f,0.8251612f,0.7715869f,0.7201943f,0.7089073f};
+                    edgeLoop=new float[8]{0.09447099f,0.09396244f,0.08926377f,0.08497817f,0.07454205f,0.06858622f,0.06306095f,0.0926666f};     //640
+                }
+                
+
+
+
             }
             else if(useFunc){
                 StrutScale=ReturnAllStrutScale();
