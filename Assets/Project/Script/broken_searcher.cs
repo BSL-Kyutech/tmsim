@@ -27,8 +27,9 @@ public class broken_searcher : MonoBehaviour
     
 
     //csv 出力
-    private void Output_Csv(string path,string savedata ){
+    private void OutputCsv(string path,string savedata ){
 
+        //File.AppendAllText("C:/Users/Yamauchi Gaito/Desktop/workspace/tmsim/data/data.csv",savedata);
         File.AppendAllText(path,savedata);
     }
 
@@ -41,7 +42,7 @@ public class broken_searcher : MonoBehaviour
     //40は中間発表まで
 
     //座標取得
-    private (float[] LayerXpositions,float[] LayerYpositions,float[] LayerZpositions,int arrayLength) get_Position(int layerNum,string manipulatorName){
+    private (float[] LayerXpositions,float[] LayerYpositions,float[] LayerZpositions,int arrayLength) getPosition(int layerNum,string manipulatorName){
         
         //Asembly.csの取得
         GameObject tm_g =GameObject.Find(manipulatorName);
@@ -67,7 +68,7 @@ public class broken_searcher : MonoBehaviour
 
         //下から生えている柱からend1のx,y,z座標取得する
         for(int j=0;j<numPrism;j++){
-
+            //Debug.Log(j+i*numPrism);
             strut=tm_g.transform.Find("Strut"+(j+layerNum*numPrism).ToString()).gameObject;
                 
             if(layerNum==0){
@@ -82,6 +83,7 @@ public class broken_searcher : MonoBehaviour
             LayerXpositions[j]=end.transform.position.x;
             LayerYpositions[j]=end.transform.position.y;
             LayerZpositions[j]=end.transform.position.z;               
+            //Debug.Log("i"+i.ToString()+",j"+j.ToString()+",Strut"+(j*i).ToString()+",tm_g_y"+end.transform.position.y.ToString());
         }
 
         //上から刺さっている柱からend2x,y,z座標取得する(一番上は除外)
@@ -90,6 +92,7 @@ public class broken_searcher : MonoBehaviour
         }
         else{
             for(int j=0;j<numPrism;j++){
+                //Debug.Log(j+(layerNum+1)*numPrism);
                 strut=tm_g.transform.Find("Strut"+(j+(layerNum+1)*numPrism).ToString()).gameObject;
                 end=strut.transform.Find("end2");
 
@@ -98,6 +101,8 @@ public class broken_searcher : MonoBehaviour
                 LayerXpositions[j+numPrism]=end.transform.position.x;
                 LayerYpositions[j+numPrism]=end.transform.position.y;
                 LayerZpositions[j+numPrism]=end.transform.position.z;
+                //Debug.Log("i"+i.ToString()+",j"+j.ToString()+",Strut"+(j*i).ToString()+",tm_g_y"+end.transform.position.y.ToString());
+                //Debug.Log("i"+i.ToString()+",j"+j.ToString()+",Strut"+(j*i).ToString()+",tm_g_y"+end.transform.position.y.ToString());
                 }
             arrayLength=numPrism*2;
             string output=""; 
@@ -105,6 +110,9 @@ public class broken_searcher : MonoBehaviour
                 output=output+"x"+i.ToString()+","+LayerXpositions[i]+",y"+i.ToString()+","+LayerYpositions[i]+",z"+i.ToString()+","+LayerZpositions[i]+"\n";
             }
 
+            
+            //string path= "C:/Users/Yamauchi Gaito/Desktop/workspace/_tmsim/data/mountingSearcPositions.csv";
+            //OutputCsv(path,output);
         }
 
             
@@ -115,13 +123,15 @@ public class broken_searcher : MonoBehaviour
     
 
     //オブジェクトの先端部の取得
-    void get_Hand_Positions(int processNum){
-
+    void getHandPositions(int processNum){
+        
+        
+        //Debug.Log(assembly.StrutScale);
         int numLayer=assembly.numLayer;
         int numPrism=assembly.numPrism;
 
         //0から計測のため，numLayer-1となる．
-        var positionRetrun = get_Position(numLayer-1,"tm_g_1");
+        var positionRetrun = getPosition(numLayer-1,"tm_g_1");
 
         //x,y,z座標の取得用配列
         float[] LayerXpositions;
@@ -156,11 +166,12 @@ public class broken_searcher : MonoBehaviour
 
 
         //csv出力
+
         float timeNow=Time.realtimeSinceStartup;
         
         
         
-        string path="./data/broken/"+"layer"+assembly.numLayer.ToString()+"_prism"+assembly.numPrism.ToString()+"/"+breaksCount.ToString()+"/handPosition_layer_"+numLayer.ToString()+"_prism_"+numPrism.ToString()+"_process_Count"+processNum.ToString()+".csv";
+        string path="C:/Users/Yamauchi Gaito/Desktop/workspace/_tmsim/data/broken/"+"layer"+assembly.numLayer.ToString()+"_prism"+assembly.numPrism.ToString()+"/"+breaksCount.ToString()+"/handPosition_layer_"+numLayer.ToString()+"_prism_"+numPrism.ToString()+"_process_Count"+processNum.ToString()+".csv";
         
         if(counts==0){
             //データの最初のラベル配置(t,x,y,z)
@@ -180,7 +191,7 @@ public class broken_searcher : MonoBehaviour
             }
             label=label+"\n";
             
-            Output_Csv(path,label);
+            OutputCsv(path,label);
         }
 
         //csv出力
@@ -209,7 +220,7 @@ public class broken_searcher : MonoBehaviour
         }
 
         savedata=savedata+"\n";
-        Output_Csv(path,savedata);
+        OutputCsv(path,savedata);
         Debug.Log(savedata);
 
         
@@ -217,15 +228,15 @@ public class broken_searcher : MonoBehaviour
 
     
 
-    IEnumerator gets_Hands_Positions(int processCount){
-        get_Hand_Positions(processCount);
+    IEnumerator getsHandsPositions(int processCount){
+        getHandPositions(processCount);
 
         //0.05秒の待機
         yield return new WaitForSeconds(0.03f);
         
     } 
 
-    private void zero_Inputs_Random(){
+    private void zeroInputsRandom(){
         //randomに壊すのを決める
         System.Random breakNum = new System.Random();
 
@@ -269,18 +280,18 @@ public class broken_searcher : MonoBehaviour
             device.brokenCylinder[breaksArray[i]]=true;
         }
         //breakingMode始動
-        device.breakingMode=true;
+        device.breaking_Mode=true;
         //0入力の決定
         device.ConstantBroken=true;
         device.BrokenInput=0;
         //手先位置の記録
 
         //記録フォルダの作成
-        if(Directory.Exists("./data/broken/"+"layer"+assembly.numLayer.ToString()+"_prism"+assembly.numPrism.ToString())==false){
-            Directory.CreateDirectory("./data/broken/"+"layer"+assembly.numLayer.ToString()+"_prism"+assembly.numPrism.ToString());
+        if(Directory.Exists("C:/Users/Yamauchi Gaito/Desktop/workspace/_tmsim/data/broken/"+"layer"+assembly.numLayer.ToString()+"_prism"+assembly.numPrism.ToString())==false){
+            Directory.CreateDirectory("C:/Users/Yamauchi Gaito/Desktop/workspace/_tmsim/data/broken/"+"layer"+assembly.numLayer.ToString()+"_prism"+assembly.numPrism.ToString());
         }
-        if(Directory.Exists("./data/broken/"+"layer"+assembly.numLayer.ToString()+"_prism"+assembly.numPrism.ToString()+"/"+breaksCount.ToString())==false){
-            Directory.CreateDirectory("./data/broken/"+"layer"+assembly.numLayer.ToString()+"_prism"+assembly.numPrism.ToString()+"/"+breaksCount.ToString());
+        if(Directory.Exists("C:/Users/Yamauchi Gaito/Desktop/workspace/_tmsim/data/broken/"+"layer"+assembly.numLayer.ToString()+"_prism"+assembly.numPrism.ToString()+"/"+breaksCount.ToString())==false){
+            Directory.CreateDirectory("C:/Users/Yamauchi Gaito/Desktop/workspace/_tmsim/data/broken/"+"layer"+assembly.numLayer.ToString()+"_prism"+assembly.numPrism.ToString()+"/"+breaksCount.ToString());
         }
 
         
@@ -320,7 +331,7 @@ public class broken_searcher : MonoBehaviour
         //ctrlオブジェクトの取得
         ctrl=GameObject.Find("ctrl");
         demo=ctrl.GetComponent<Demo>();
-        zero_Inputs_Random();
+        zeroInputsRandom();
     }
 
     // Update is called once per frame
@@ -336,6 +347,8 @@ public class broken_searcher : MonoBehaviour
         }
 
         //delayを入れる
+        //Debug.Log(Time.timeSinceLevelLoad);
+        //Debug.Log(processCount);
         
         if(processCount<10){
             if(Time.timeSinceLevelLoad<30.0f){
@@ -343,7 +356,7 @@ public class broken_searcher : MonoBehaviour
                     //デモ開始
                     demo.isActive=true;
                 }
-                StartCoroutine(gets_Hands_Positions(processCount));
+                StartCoroutine(getsHandsPositions(processCount));
                 counts++;
                 //引継ぎ
                 PlayerPrefs.SetInt("ProcessCount",processCount);

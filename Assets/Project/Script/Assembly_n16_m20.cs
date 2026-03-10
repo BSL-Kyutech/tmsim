@@ -11,9 +11,7 @@ using UnityEngine.SceneManagement;
 /// For use, place an Empty object to where the base of the tensegrity manipulator should be, and attach this script.
 /// </summary>
 ///
-
-[SerializeField]
-public class Assembly : MonoBehaviour
+public class Assembly_3 : MonoBehaviour
 {
     // Prefabs
     //================================================
@@ -55,7 +53,7 @@ public class Assembly : MonoBehaviour
     //ばね定数の設定
     public float springForce;                                         //ばねの強さ
     public float SpringDmaper;                                                 //層に比例するばねの強さ
-    public bool earthConnected;
+
 
     public float[] StrutScale;
 
@@ -76,13 +74,6 @@ public class Assembly : MonoBehaviour
     public double psiFin;
     public double phi0;
     public double phiFin;
-
-    public bool exportBotton;
-
-    //エッジループとかで固定値扱うか
-    public bool useConstant;
-    //関数使うか？
-    public bool useFunc;
 
 
 
@@ -124,15 +115,12 @@ public class Assembly : MonoBehaviour
         } else if (j >= numPrism) {
             j = j - numPrism;                           //jが柱の数より大きいとjより柱の数を引く
         }
-        
         if (j < 0 || j >= numPrism){
             return -1;                                  //jが0より小さいか，柱の数より大きいと-1を返す(上の処理の例外時?)
         } else {
             return numPrism * i + j;                    //jの値を上で調整して加算
         }
     }
-
-
 
 
     private float ReturnCorrectDiameter(float y){
@@ -317,27 +305,27 @@ public class Assembly : MonoBehaviour
     // Start is called before the first frame update        最初の初期起動時の処理
     void Start()
     {
-        Time.timeScale=10.0f;
+        Time.timeScale=1.0f;
 
         //radiusLoopが内部に存在していた場合取得
         
         if (!initializer){
             if(PlayerPrefs.HasKey("RadiusLoop")){
-            radiusLoop=PlayerPrefs.GetFloat("RadiusLoop");
+            //radiusLoop=PlayerPrefs.GetFloat("RadiusLoop");
             }
 
             if(PlayerPrefs.HasKey("SpringForce")){
                 springForce =PlayerPrefs.GetFloat("SpringForce");
             }
-            
+
 
 
             if(PlayerPrefs.HasKey("edge")){
         
-                edgeparameter_layers=PlayerPrefs.GetFloat("edge");
+                //edgeparameter_layers=PlayerPrefs.GetFloat("edge");
             }
             if(PlayerPrefs.HasKey("mode")){
-                mode=PlayerPrefs.GetInt("count");
+                //mode=PlayerPrefs.GetInt("count");
             }
         }
         
@@ -359,7 +347,7 @@ public class Assembly : MonoBehaviour
         float lastRadiusloop = radiusBase*edgeDampoer;
         float diffRadius = (radiusBase-lastRadiusloop)/((float)(numLayer-1));      //上と下の半径の差
 
-        edgeLoop=new float[numLayer];
+        edgeLoop = new float[numLayer];
         StrutScale=new float[numLayer];
 
         int bases = numLayer/5;
@@ -423,133 +411,8 @@ public class Assembly : MonoBehaviour
                 }
             }
             */
-            if (useConstant==true){
-
-            
-                if(numLayer==10 && numPrism==8){//
-                    StrutScale=new float[10]{0.7741794f,0.7375128f,0.805346f,0.7799709f,0.7509292f,0.7203457f,0.7009292f,0.6540951f,0.6223454f,0.6304705f};
-                    edgeLoop=new float[10]{0.06268743f,0.06676555f,0.06041659f,0.05430724f,0.05361452f,0.05094265f,0.04656245f,0.04400515f,0.04369787f,0.0630364f};     //640
-            
-                }
-                if(numLayer==10 && numPrism==7){//
-                    StrutScale=new float[10]{1.004277f,0.9194543f,0.8781046f,0.8150301f,0.8156192f,0.7553421f,0.71342f,0.6632004f,0.6456949f,0.6138333f};
-                    edgeLoop=new float[10]{0.08695613f,0.0828373f,0.07941385f,0.07400092f,0.07087807f,0.06425336f,0.06047757f,0.05544934f,0.04867428f,0.09390821f};     //640
-            
-                }
-                if(numLayer==10 && numPrism==6){//
-                    StrutScale=new float[10]{1.027173f,0.9488513f,0.9043089f,0.8632551f,0.8158698f,0.7711644f,0.7323623f,0.6897659f,0.6515551f,0.6174093f};
-                    edgeLoop=new float[10]{0.1031376f,0.09988528f,0.09375463f,0.08812632f,0.08236708f,0.07627424f,0.07092295f,0.06517997f,0.05856487f,0.09897218f};     //640
-            
-                }
-                if(numLayer==10 && numPrism==5){//
-                    StrutScale=new float[10]{0.9954582f,0.9390308f,0.9357504f,0.9445467f,0.9125582f,0.9185466f,0.8610252f,0.8345063f,0.7915034f,0.7884449f};
-                    edgeLoop=new float[10]{0.1124301f,0.1152653f,0.1178389f,0.1132898f,0.1109571f,0.1123632f,0.09783024f,0.0997474f,0.09700358f,0.1247879f};     //880
-            
-                }
-                else if(numLayer==8 && numPrism==5){//
-                //StrutScale=new float[8]{0.8564691f,0.903886f,0.8937612f,0.879386f,0.7824689f,0.773761f,0.7320107f,0.7030106f};
-                //edgeLoop=new float[8]{0.09180925f,0.08973639f,0.08356636f,0.07646576f,0.07029568f,0.06472287f,0.05919171f,0.09743829f};     //1120
-                    StrutScale=new float[8]{1.089899f,1.016552f,0.9621532f,0.9116253f,0.8568946f,0.8094475f,0.7564716f,0.7444379f};              //640
-                    edgeLoop=new float[8]{0.1257394f,0.118149f,0.1103842f,0.1007877f,0.09299219f,0.08393376f,0.07367938f,0.1448224f};     //640
-                }   
-                else if(numLayer==8 && numPrism==8){//
-                    StrutScale=new float[8]{1.01541f,0.9374977f,0.891705f,0.852612f,0.8004768f,0.7549734f,0.7101514f,0.6713954f};
-                    edgeLoop=new float[8]{0.07377467f,0.07200986f,0.0667648f,0.06203499f,0.05646168f,0.05149865f,0.04500595f,0.07584359f};     //640
-                }   
-
-                else if(numLayer==4 && numPrism==3){//
-                    StrutScale=new float[4]{1.431883f,1.448337f,1.37506f,1.268907f};
-                    edgeLoop=new float[4]{0.2097509f,0.185938f,0.1771897f,0.2095114f};     //800
-                }   
-                else if(numLayer==4 && numPrism==4){//
-                    StrutScale=new float[4]{1.389812f,1.352098f,1.294913f,1.171735f};
-                    edgeLoop=new float[4]{0.1567681f,0.1381599f,0.121954f,0.1414613f};     //640
-                }
-                else if(numLayer==4 && numPrism==5){//
-                    StrutScale=new float[4]{1.284886f,1.084796f,1.088967f,0.9954147f};
-                    edgeLoop=new float[4]{0.07766558f,0.09534243f,0.06815712f,0.09635011f};     //720
-                }
-                else if(numLayer==4 && numPrism==6){//
-                    StrutScale=new float[4]{1.317688f,1.286952f,1.223615f,1.121616f};
-                    edgeLoop=new float[4]{0.1028999f,0.09467847f,0.08020752f,0.09932601f};     //640
-                }
-                else if(numLayer==4 && numPrism==8){//none
-                    StrutScale=new float[4]{1.149631f,0.9640459f,0.9619905f,0.83283f};
-                    edgeLoop=new float[4]{0.002082939f,-0.128569f,0.00714466f,0.05683319f};     //1520
-                }
-                else if(numLayer==5 && numPrism==4){//
-                    StrutScale=new float[5]{1.258871f,1.21481f,1.166965f,1.167346f,0.9817054f};
-                    edgeLoop=new float[5]{0.1546911f,0.1415395f,0.1383539f,0.1161737f,0.1410651f};     //640
-                }
-                else if(numLayer==5 && numPrism==7){//
-                    StrutScale=new float[5]{1.175833f,1.122695f,1.064568f,1.002691f,0.939831f};
-                    edgeLoop=new float[5]{0.08672506f,0.08115824f,0.07188646f,0.06030932f,0.09528822f};     //640
-                }
-                else if(numLayer==6 && numPrism==4){
-                    StrutScale=new float[6]{1.174267f,1.138367f,1.073669f,1.009512f,0.952307f,0.8609945f};
-                    edgeLoop=new float[6]{0.1522418f,0.144127f,0.1302245f,0.1157298f,0.1017524f,0.1415865f};     //640
-                }
-                else if(numLayer==6 && numPrism==5){//
-                    StrutScale=new float[6]{1.15767f,1.097207f,1.037237f,0.976959f,0.9139902f,0.8725966f};
-                    edgeLoop=new float[6]{0.1250576f,0.1157846f,0.1049821f,0.09368186f,0.07977708f,0.1449054f};     //640
-                }
-                else if(numLayer==6 && numPrism==6){//
-                    StrutScale=new float[6]{1.127176f,1.062826f,1.005244f,0.9504106f,0.8919847f,0.8256059f};
-                    edgeLoop=new float[6]{0.1021722f,0.09579851f,0.08671429f,0.07753801f,0.06732567f,0.09927308f};     //640
-                }
-                else if(numLayer==6 && numPrism==8){//none 
-                    StrutScale=new float[6]{0.8890916f,0.8968414f,0.8968414f,0.7916886f,0.7295395f,0.721164f};
-                    edgeLoop=new float[6]{0.03823249f,0.04800971f,0.04851066f,0.04167225f,0.03886984f,0.05012858f};     //1040
-                }
-                else if(numLayer==7 && numPrism==4){//
-                    StrutScale=new float[7]{1.00664f,1.033036f,1.058159f,1.064581f,1.018653f,1.000438f,1.009503f};
-                    edgeLoop=new float[7]{0.1401186f,0.137489f,0.121433f,0.1284183f,0.1219166f,0.1274466f,0.1894173f};     //800
-                }
-                else if(numLayer==7 && numPrism==5){//
-                    StrutScale=new float[7]{1.084986f,1.027027f,0.9862122f,0.9437142f,0.8776177f,0.8190169f,0.8020871f};
-                    edgeLoop=new float[7]{0.1170012f,0.1141681f,0.1071079f,0.09556685f,0.08723921f,0.07619226f,0.1442267f};     //640
-                }
-                else if(numLayer==7 && numPrism==6){//
-                    StrutScale=new float[7]{1.081339f,1.021421f,0.9597515f,0.9069321f,0.8520491f,0.8037038f,0.7468492f};
-                    edgeLoop=new float[7]{0.1016314f,0.09649281f,0.0883932f,0.08012963f,0.07254038f,0.06358072f,0.09843413f};     //800
-                }
-                else if(numLayer==7 && numPrism==7){//
-                    StrutScale=new float[7]{1.061331f,0.9894107f,0.9334263f,0.8938653f,0.8429952f,0.7789527f,0.7505084f};
-                    edgeLoop=new float[7]{0.0857067f,0.0826979f,0.0755123f,0.06978621f,0.06210569f,0.05418411f,0.09542076f};     //640
-                }
-                else if(numLayer==7 && numPrism==8){//
-                    StrutScale=new float[7]{1.044672f,0.9696441f,0.9240914f,0.8684586f,0.8200766f,0.7746933f,0.7273475f};
-                    edgeLoop=new float[7]{0.07340466f,0.07200859f,0.06498464f,0.05982734f,0.0532186f,0.04739253f,0.07478108f};     //640
-                }
-                else if(numLayer==8 && numPrism==4){//
-                    StrutScale=new float[8]{1.111916f,1.05748f,1.092146f,0.9202463f,0.8956519f,0.8381414f,0.7887803f,0.7243479f};
-                    edgeLoop=new float[8]{0.1539257f,0.1557249f,0.1336584f,0.1278006f,0.1146122f,0.1046207f,0.0936265f,0.1416934f};     //640
-                }
-                else if(numLayer==8 && numPrism==6){//
-                    StrutScale=new float[8]{1.016868f,0.9480168f,0.8878636f,0.9155759f,0.8251612f,0.7715869f,0.7201943f,0.7089073f};
-                    edgeLoop=new float[8]{0.09447099f,0.09396244f,0.08926377f,0.08497817f,0.07454205f,0.06858622f,0.06306095f,0.0926666f};     //640
-                }
-                
-
-
-
-            }
-            else if(useFunc){
-                StrutScale=ReturnAllStrutScale();
-                edgeLoop = new float[numLayer];
-                edgeLoop=ReturnAllEdgeloops();
-            }
-
-            else{
-                for(int i=0;i<numLayer;i++){
-
-                    StrutScale[i]=1.0f;
-                    Debug.Log(edgeLoop[i]);
-                }
-            }
-
- 
-            
+            StrutScale=ReturnAllStrutScale();
+            edgeLoop=ReturnAllEdgeloops();
             //StrutScale=new float[13]{0.5066695f,0.4845017f,0.4922935f,0.4921669f,0.5023773f,0.5407119f,0.5237533f,0.5343785f,0.5101283f,0.5261283f,0.5105029f,0.5381283f,0.5263783f};
 
             
@@ -558,12 +421,10 @@ public class Assembly : MonoBehaviour
 
 
             //パラメータの引継ぎ
-            /*
             for(int i=0;i<numLayer;i++){
                 PlayerPrefs.SetFloat("edgeLoop"+(i).ToString(),edgeLoop[i]);
                 PlayerPrefs.Save();
             }
-            */
             
            
 
@@ -589,14 +450,16 @@ public class Assembly : MonoBehaviour
 
         else{
 
-            for (int i=0;i<numLayer;i++)
+            for (int i=1;i<=numLayer;i++)
             {
-                StrutScale[i]=PlayerPrefs.GetFloat("StrutScale"+(i).ToString());
-                
-                edgeLoop[i]=PlayerPrefs.GetFloat("edgeLoop"+(i).ToString());
-                //Debug.Log("edgeLoop"+(i).ToString());
-                //Debug.Log(edgeLoop[i]);
-                
+            
+                edgeLoop[i-1]=(2.0f*(radiusBase - diffRadius*((float)(i)))*(float)Math.Sin(Math.PI/(2*numPrism)))*((float)Math.Cos((diffphi*i*Math.PI)/180));
+                if(PlayerPrefs.HasKey("edgeLoop"+(i-1).ToString())){
+                    edgeLoop[i-1]=PlayerPrefs.GetFloat("edgeLoop"+(i-1).ToString());
+                }
+                if(PlayerPrefs.HasKey("StrutScale"+(i-1).ToString())){
+                    StrutScale[i-1]=PlayerPrefs.GetFloat("StrutScale"+(i-1).ToString());
+                }
                 //4本5層の値
                 //edgeLoop= new float[5] {0.12415123082906993f,0.11031530609675386f,0.10214850457080119f,0.09057431266995283f,0.12024559516481466f};
                 //edgeLoop=new float[10]{0.05f, 0.04f, 0.03f, 0.02857142857142857f, 0.027142857142857142f, 0.025714285714285714f, 0.024285714285714285f, 0.022857142857142857f, 0.02142857142857143f, 0.02f};
@@ -641,20 +504,16 @@ public class Assembly : MonoBehaviour
         //edgeLoop= new float[10] {0.04833649f, 0.0471571124f, 0.0459777348f, 0.0447983572f,0.0436189796f,0.042439602f,0.039008014f,0.035576425999999994f,0.032144837999999995f,0.02871325f}; //base0.65 scale 0.6 
         //今のところいいやつ//edgeLoop= new float[10] {0.04833649f, 0.0471571124f, 0.0459777348f, 0.0447983572f,0.0436189796f,0.042439602f,0.039008014f,0.035576425999999994f,0.032144837999999995f,0.02871325f}; 
         // Place the bottom layer's parts and connect ball joints　　//一番下の層の制作
-        
         for (int i = 0; i < numPrism ; i++)
         {
             var step = 2*Math.PI/numPrism;
-            if(earthConnected==true){
-                // Instantiate and place prefabs
-                baseblocks[i] = Instantiate(basePlate, this.transform);                             //basePlateプレハブからobjectを生成し，先ほどの配列に格納                  
-                baseblocks[i].transform.position = this.transform.position + new Vector3(           //baseblocksの座標の配置 
-                    radiusBase*(float)Math.Cos(step*i),                                             //x座標はradiusBase(半径)×cos((2π/ストラットの数)×i)極座標→直交座標への変換プロセス
-                    0,                                                                              //y=0(土台のため)
-                    radiusBase*(float)Math.Sin(step*i));                                            //z=radiusBase(半径)×sin((2π/ストラットの数)×i)極座標→直交座標への変換プロセス
-                baseblocks[i].name = $"Base{i}";                                                    //名前の決定(object管理のため)
-            
-            }
+            // Instantiate and place prefabs
+            baseblocks[i] = Instantiate(basePlate, this.transform);                             //basePlateプレハブからobjectを生成し，先ほどの配列に格納                  
+            baseblocks[i].transform.position = this.transform.position + new Vector3(           //baseblocksの座標の配置 
+                radiusBase*(float)Math.Cos(step*i),                                             //x座標はradiusBase(半径)×cos((2π/ストラットの数)×i)極座標→直交座標への変換プロセス
+                0,                                                                              //y=0(土台のため)
+                radiusBase*(float)Math.Sin(step*i));                                            //z=radiusBase(半径)×sin((2π/ストラットの数)×i)極座標→直交座標への変換プロセス
+            baseblocks[i].name = $"Base{i}";                                                    //名前の決定(object管理のため)
             struts[i] = Instantiate(baseStrut, this.transform);                                 //ストラクト(支柱)の制作
             struts[i].transform.localScale = new Vector3(0.02f,(float)(StrutScale[0]*0.20f),0.02f); //デフォルトは0.25        
             struts[i].transform.position = this.transform.position + new Vector3(               //ストラクトの座標と生成(処理は上と同じ)
@@ -664,23 +523,9 @@ public class Assembly : MonoBehaviour
                 radiusBase*(float)Math.Sin(step*i)
                 );
             struts[i].name = $"Strut{i}";
-            // Connect joints                                                                   
+            // Connect joints                                                                   //接続処理
             ConfigurableJoint basejoint = struts[i].GetComponent<ConfigurableJoint>();          //
-            //
-
-            //地面から外したらこうなる
-            if(earthConnected==false){
-                basejoint.xMotion=ConfigurableJointMotion.Free;
-                basejoint.yMotion=ConfigurableJointMotion.Free;
-                basejoint.zMotion=ConfigurableJointMotion.Free;
-
-                basejoint.angularXMotion=ConfigurableJointMotion.Free;
-                basejoint.angularYMotion=ConfigurableJointMotion.Free;
-                basejoint.angularZMotion=ConfigurableJointMotion.Free;
-            }
-            else{
-                basejoint.connectedBody = baseblocks[i].GetComponent<Rigidbody>();                  //接続処理
-            }
+            basejoint.connectedBody = baseblocks[i].GetComponent<Rigidbody>();                  //
 
             var baseRigidBody=struts[i].GetComponent<Rigidbody>();
             //baseRigidBody.mass=0.1f*StrutScale[0];
@@ -697,16 +542,15 @@ public class Assembly : MonoBehaviour
         {
             var step = 2*Math.PI/numPrism;                                                      //r-θのθ部分の決定に使う 
             //var twist = Math.PI/numPrism;   
-            var twist = Math.PI/numPrism*(1/3);                                                 //i%2により，互い違いになるように柱を並べるための変数．これにより，いい感じにずれる．
+            var twist = Math.PI/numPrism*(1/3);                                                 //ねじれ？
             // Instantiate and place the prefab
 
             strutPositionY=(0.215f*StrutScale[0])+0.5f*(0.2f*StrutScale[0]);
             for(int j=1;j<=i;j++){
-                 strutPositionY+=0.5f*StrutScale[j];
+                 strutPositionY+=0.3f*StrutScale[j];
             }
             strutRadius=ReturnCorrectDiameter(strutPositionY);
             strutRadius=strutRadius/2.0f;
-            //Debug.Log(strutRadius);
 
             for (int j = 0; j < numPrism ; j++)
             {
@@ -733,7 +577,7 @@ public class Assembly : MonoBehaviour
                                                                                         //rsinΘ,rcosΘで点の位置(ストラットの先端の位置が決まるが，ばねの最大の長さ，stripeshapeを変更しないと収縮する)
                 struts[index(i, j)].name = $"Strut{index(i,j)}";                                //index関数から返された値の名前を付ける
 
-                //var struitRigidBody=struts[i].GetComponent<Rigidbody>();
+                var struitRigidBody=struts[i].GetComponent<Rigidbody>();
                 //struitRigidBody.mass=0.1f*StrutScale[i];
                 //struitRigidBody.mass=masses;
                 
@@ -766,8 +610,6 @@ public class Assembly : MonoBehaviour
                 var target4 = index(i-1, j-twist_dir);
 
 
-
-                //connected anochor のvectorにより，Asset内のプレハブのローカル位置を指定して結び付けしている
                 // Connect springs while dealing with layer-dependent exceptions
                 // #1
                 if (i == numLayer-1) {
@@ -802,8 +644,8 @@ public class Assembly : MonoBehaviour
                                      //復元力が働く距離と働かない距離の誤差の設定
                     spring[1].minDistance = edgeLoop[i]*0.5f;
                     spring[1].maxDistance = edgeLoop[i];  
-                    //spring[1].spring=Mathf.Infinity;
-                    //spring[1].damper=400000;
+                    spring[1].spring=Mathf.Infinity;
+                    spring[1].damper=400000;
 
 
                 }
@@ -832,8 +674,8 @@ public class Assembly : MonoBehaviour
                         spring[3].tolerance = edgeLoop[i-1]*0.001f;
                         spring[3].minDistance = edgeLoop[i-1]*0.5f;
                         spring[3].maxDistance = edgeLoop[i-1];  
-                        //spring[3].spring=Mathf.Infinity;
-                        //spring[1].damper=400000;
+                        spring[3].spring=Mathf.Infinity;
+                        spring[1].damper=400000;
                         
 
                     }
@@ -853,19 +695,14 @@ public class Assembly : MonoBehaviour
         // Add loop renderers  #横の紐の描写?
         for (int i = 0; i <= numLayer ; i++) 
         {
-            
             loops[i] = Instantiate(loopLine, this.transform);
-            loops[i].name = $"Loop Renderer{i}";   
-            //点と点をつなげるオブジェクト                     
+            loops[i].name = $"Loop Renderer{i}";                        
             LineRenderer line = loops[i].GetComponent<LineRenderer>();      //紐の
             line.material = new Material(Shader.Find("Sprites/Default"));
             line.widthMultiplier = 0.005f;                                  //紐の太さ  //当たり判定等を入れれば
             line.loop = true;
             line.numCapVertices = 1;
             line.numCornerVertices = 1;
-
-            
-
             if (i == 0 || i == numLayer) 
             {
                 line.positionCount = numPrism;
@@ -873,12 +710,6 @@ public class Assembly : MonoBehaviour
             else {
                 line.positionCount = numPrism*2;
             }
-
-            loops[i].AddComponent<BoxCollider>();
-
-
-
-            
         }
         //*/
 
@@ -911,8 +742,6 @@ public class Assembly : MonoBehaviour
 
         for(int i=0;i<numLayer;i++){
             PlayerPrefs.SetFloat("edgeLoop"+(i).ToString(),edgeLoop[i]);
-            //Debug.Log("edgeLoop"+(i).ToString());
-            //Debug.Log(edgeLoop[i]);
             PlayerPrefs.Save();
             PlayerPrefs.SetFloat("StrutScale"+(i).ToString(),StrutScale[i]);
             PlayerPrefs.Save();
@@ -962,21 +791,6 @@ public class Assembly : MonoBehaviour
                     }
                 }
             }
-            if(exportBotton){
-                //メッシュを焼いてFBX化できるようにするためのオブジェクト
-                // **新しい Mesh を作成**
-                Mesh lineMesh = new Mesh();
-                line.BakeMesh(lineMesh, true);
-
-                // メッシュ用の GameObject を作成
-                GameObject meshObject = new GameObject("LineMesh" + i.ToString());
-                meshObject.AddComponent<MeshFilter>().mesh = lineMesh;
-                meshObject.AddComponent<MeshRenderer>().material = line.material;
-                meshObject.transform.parent = this.gameObject.transform;
-
-                
-            }
-            
         }
 
         // Update stripe renderers
@@ -999,38 +813,6 @@ public class Assembly : MonoBehaviour
                     line2.SetPosition(j, struts[index(numLayer-1, i-1)].transform.GetChild(0).transform.position);
                 }
             }
-            if(exportBotton){
-                //メッシュを焼いてFBX化できるようにするためのオブジェクト
-                // **新しい Mesh を作成**
-                Mesh lineMesh = new Mesh();
-                line1.BakeMesh(lineMesh, true);
-
-                // メッシュ用の GameObject を作成
-                GameObject meshObject = new GameObject("LineMesh" + i.ToString());
-                meshObject.AddComponent<MeshFilter>().mesh = lineMesh;
-                meshObject.AddComponent<MeshRenderer>().material = line1.material;
-                meshObject.transform.parent = this.gameObject.transform;
-
-                
-            }
-            if(exportBotton){
-                //メッシュを焼いてFBX化できるようにするためのオブジェクト
-                // **新しい Mesh を作成**
-                Mesh lineMesh = new Mesh();
-                line2.BakeMesh(lineMesh, true);
-
-                // メッシュ用の GameObject を作成
-                GameObject meshObject = new GameObject("LineMesh" + i.ToString());
-                meshObject.AddComponent<MeshFilter>().mesh = lineMesh;
-                meshObject.AddComponent<MeshRenderer>().material = line2.material;
-                meshObject.transform.parent = this.gameObject.transform;
-
-                
-            }
-        }
-
-        if(exportBotton){
-            exportBotton=false;
         }
 
         

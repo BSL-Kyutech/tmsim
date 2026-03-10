@@ -151,12 +151,25 @@ MonoBehaviour:
   brokenCylinder: 
   resetsBrokenCylinder: 0
   breaking_Mode: 0
-  breaking: 0
   breakNum: 0
   BrokenInput: 0
   ConstantBroken: 1
   AllBreak: 0
   HalfBreak: 0
+--- !u!114 &108762132
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 108762130}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4111a5063ce211f43b70941d5b515960, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  basePlate: {fileID: 2882298433554285953, guid: 01fb50f2c4cecd64e9f44291a631867e, type: 3}
+  baseStrut: {fileID: 6019696062256689233, guid: 82aa566acbbeb08409376155ace14d3c, type: 3}
 --- !u!1 &394725794
 GameObject:
   m_ObjectHideFlags: 0
@@ -272,6 +285,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 646062288}
+  - component: {fileID: 646062289}
+  - component: {fileID: 646062290}
   - component: {fileID: 646062291}
   - component: {fileID: 646062292}
   - component: {fileID: 646062293}
@@ -298,6 +313,30 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &646062289
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 646062287}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 50f7440f9c61eda4192136e2a68db760, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &646062290
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 646062287}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3c5979faf4b1b574bacfec4ff9e9eef9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &646062291
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -305,7 +344,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 646062287}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 745636334d5b822459501b63bf0e1693, type: 3}
   m_Name: 
@@ -317,7 +356,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 646062287}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1bba9cd9f1202374b945688b06a2a732, type: 3}
   m_Name: 
@@ -335,7 +374,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 646062287}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 69a3769cc99352b47b71ae7d96e78aee, type: 3}
   m_Name: 
@@ -381,12 +420,25 @@ MonoBehaviour:
   brokenCylinder: 
   resetsBrokenCylinder: 0
   breaking_Mode: 0
-  breaking: 1
   breakNum: 0
   BrokenInput: 0
   ConstantBroken: 1
   AllBreak: 0
   HalfBreak: 0
+--- !u!114 &666690594
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 666690587}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4111a5063ce211f43b70941d5b515960, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  basePlate: {fileID: 2882298433554285953, guid: 01fb50f2c4cecd64e9f44291a631867e, type: 3}
+  baseStrut: {fileID: 6019696062256689233, guid: 82aa566acbbeb08409376155ace14d3c, type: 3}
 --- !u!1 &705507993
 GameObject:
   m_ObjectHideFlags: 0
@@ -693,6 +745,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 6659988977253097736, guid: 6ef8a9d6d5dcc9138801b2cfbbede2a5, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1359497015}
+    - targetCorrespondingSourceObject: {fileID: 6659988977253097736, guid: 6ef8a9d6d5dcc9138801b2cfbbede2a5, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1359497016}
   m_SourcePrefab: {fileID: 100100000, guid: 6ef8a9d6d5dcc9138801b2cfbbede2a5, type: 3}
 --- !u!1001 &868603577
 PrefabInstance:
@@ -1263,6 +1318,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 6659988977253097736, guid: 6ef8a9d6d5dcc9138801b2cfbbede2a5, type: 3}
       insertIndex: -1
       addedObject: {fileID: 108762131}
+    - targetCorrespondingSourceObject: {fileID: 6659988977253097736, guid: 6ef8a9d6d5dcc9138801b2cfbbede2a5, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 108762132}
   m_SourcePrefab: {fileID: 100100000, guid: 6ef8a9d6d5dcc9138801b2cfbbede2a5, type: 3}
 --- !u!1001 &1290191261
 PrefabInstance:
@@ -1377,12 +1435,25 @@ MonoBehaviour:
   brokenCylinder: 
   resetsBrokenCylinder: 0
   breaking_Mode: 0
-  breaking: 0
   breakNum: 0
   BrokenInput: 0
   ConstantBroken: 1
   AllBreak: 0
   HalfBreak: 0
+--- !u!114 &1359497016
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1359497014}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4111a5063ce211f43b70941d5b515960, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  basePlate: {fileID: 2882298433554285953, guid: 01fb50f2c4cecd64e9f44291a631867e, type: 3}
+  baseStrut: {fileID: 6019696062256689233, guid: 82aa566acbbeb08409376155ace14d3c, type: 3}
 --- !u!114 &1895454027 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 3091593625016679983, guid: d8fbc758ab700524bbb4c23ccada8a56, type: 3}
@@ -1691,4 +1762,7 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 6659988977253097736, guid: 6ef8a9d6d5dcc9138801b2cfbbede2a5, type: 3}
       insertIndex: -1
       addedObject: {fileID: 666690590}
+    - targetCorrespondingSourceObject: {fileID: 6659988977253097736, guid: 6ef8a9d6d5dcc9138801b2cfbbede2a5, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 666690594}
   m_SourcePrefab: {fileID: 100100000, guid: 6ef8a9d6d5dcc9138801b2cfbbede2a5, type: 3}

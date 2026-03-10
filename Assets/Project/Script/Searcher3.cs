@@ -12,19 +12,20 @@ public class Searcher3 : MonoBehaviour
     private int counts=0;
 
     //スクショ関数
-    void On_Scrren_Capture(string path){
+    void OnScrrenCapture(string path){
         ScreenCapture.CaptureScreenshot(path);
     }
 
 
     //csv 出力
-    private void Output_Csv(string path,string savedata ){
+    private void OutputCsv(string path,string savedata ){
 
+        //File.AppendAllText("C:/Users/Yamauchi Gaito/Desktop/workspace/tmsim/data/data.csv",savedata);
         File.AppendAllText(path,savedata);
     }
 
     //直径の正解値を返す
-    private float Return_Correct_Diameter(float y,float DiameterBase){
+    private float ReturnCorrectDiameter(float y,float DiameterBase){
 
         //手先位置の直径
         float handPosDiameter=0.2f;
@@ -43,7 +44,7 @@ public class Searcher3 : MonoBehaviour
     }
 
     //高さの正解値を返す
-    private float Return_Correct_High(int i,int numLayer){
+    private float ReturnCorrectHigha(int i,int numLayer){
         
 
         float maxHigh=1.5f;
@@ -51,12 +52,15 @@ public class Searcher3 : MonoBehaviour
         float gradient=maxHigh/numLayer;
         float high=gradient*(i+1);
 
+
+        
+        //Debug.Log("high"+(i-1).ToString()+"  "+high.ToString());
         
         return high;
     }
 
     //座標取得
-    private (float[] LayerXpositions,float[] LayerYpositions,float[] LayerZpositions,int arrayLength) get_Position(int layerNum,string manipulatorName){
+    private (float[] LayerXpositions,float[] LayerYpositions,float[] LayerZpositions,int arrayLength) getPosition(int layerNum,string manipulatorName){
         
         //Asembly.csの取得
         GameObject tm_g =GameObject.Find(manipulatorName);
@@ -82,6 +86,7 @@ public class Searcher3 : MonoBehaviour
 
         //下から生えている柱からend1のx,y,z座標取得する
         for(int j=0;j<numPrism;j++){
+            //Debug.Log(j+i*numPrism);
             strut=tm_g.transform.Find("Strut"+(j+layerNum*numPrism).ToString()).gameObject;
                 
             if(layerNum==0){
@@ -96,7 +101,7 @@ public class Searcher3 : MonoBehaviour
             LayerXpositions[j]=end.transform.position.x;
             LayerYpositions[j]=end.transform.position.y;
             LayerZpositions[j]=end.transform.position.z;                
-            
+            //Debug.Log("i"+i.ToString()+",j"+j.ToString()+",Strut"+(j*i).ToString()+",tm_g_y"+end.transform.position.y.ToString());
         }
 
         //上から刺さっている柱からend2x,y,z座標取得する(一番上は除外)
@@ -105,6 +110,7 @@ public class Searcher3 : MonoBehaviour
         }
         else{
             for(int j=0;j<numPrism;j++){
+                //Debug.Log(j+(layerNum+1)*numPrism);
                 strut=tm_g.transform.Find("Strut"+(j+(layerNum+1)*numPrism).ToString()).gameObject;
                 end=strut.transform.Find("end2");
 
@@ -113,6 +119,8 @@ public class Searcher3 : MonoBehaviour
                 LayerXpositions[j+numPrism]=end.transform.position.x;
                 LayerYpositions[j+numPrism]=end.transform.position.y;
                 LayerZpositions[j+numPrism]=end.transform.position.z;
+                //Debug.Log("i"+i.ToString()+",j"+j.ToString()+",Strut"+(j*i).ToString()+",tm_g_y"+end.transform.position.y.ToString());
+                //Debug.Log("i"+i.ToString()+",j"+j.ToString()+",Strut"+(j*i).ToString()+",tm_g_y"+end.transform.position.y.ToString());
                 }
             arrayLength=numPrism*2;
             string output=""; 
@@ -121,7 +129,8 @@ public class Searcher3 : MonoBehaviour
             }
 
             
-
+            //string path= "C:/Users/Yamauchi Gaito/Desktop/workspace/_tmsim/data/mountingSearcPositions.csv";
+            //OutputCsv(path,output);
         }
 
             
@@ -129,7 +138,7 @@ public class Searcher3 : MonoBehaviour
         return (LayerXpositions,LayerYpositions,LayerZpositions,arrayLength);
     }
 
-    private float get_High(float[] LayerYpositions,int arrayLength){
+    private float getHigh(float[] LayerYpositions,int arrayLength){
         float tm_g_y=0.0f;
         for(int i=0;i<arrayLength;i++){
             tm_g_y+=LayerYpositions[i];
@@ -138,7 +147,7 @@ public class Searcher3 : MonoBehaviour
     }
 
     //直径の検出
-    private float get_Diameter(int arrayLength,float[] LayerXpositions,float[] LayerZpositions){
+    private float getDiameter(int arrayLength,float[] LayerXpositions,float[] LayerZpositions){
         float tm_g_x=0.0f;
         float tm_g_z=0.0f;
         float maxDistance=0.0f;
@@ -168,7 +177,7 @@ public class Searcher3 : MonoBehaviour
     }
 
     //ズレの検出
-    private float get_Deviation(float[] LayerYpositions,int arrayLength){
+    private float getDeviation(float[] LayerYpositions,int arrayLength){
         //end同士のyの差
         float errors=0.0f;
         //その中でも最大値
@@ -181,6 +190,7 @@ public class Searcher3 : MonoBehaviour
                 errors=(float)Math.Sqrt(Math.Pow((double)(LayerYpositions[k]-LayerYpositions[j]),2));
                     
                 if(maxError<=errors){
+                    //Debug.Log("maxError"+errors.ToString());
                     maxError=errors;
                 }
             }   
@@ -190,7 +200,7 @@ public class Searcher3 : MonoBehaviour
     }
     
     //Deviationでさらに確認するやつ
-    private float get_Deviation_Details(float[] LayerYpositions,int arrayLength){
+    private float getDeviationDetails(float[] LayerYpositions,int arrayLength){
         //end同士のyの差
         float errors=0.0f;
         //その中でも最大値
@@ -203,6 +213,7 @@ public class Searcher3 : MonoBehaviour
             errors=(float)Math.Sqrt(Math.Pow((double)(LayerYpositions[j]-LayerYpositions[j+1]),2));
                     
             if(maxError<=errors){
+                //Debug.Log("maxError"+errors.ToString());
                 maxError=errors;
             }
             
@@ -211,6 +222,7 @@ public class Searcher3 : MonoBehaviour
         //numLayer-1と0の床の確認
         errors=(float)Math.Sqrt(Math.Pow((double)(LayerYpositions[0]-LayerYpositions[arrayLength-1]),2));
         if(maxError<=errors){
+            //Debug.Log("maxError"+errors.ToString());
             maxError=errors;
         }
         return maxError;
@@ -218,7 +230,7 @@ public class Searcher3 : MonoBehaviour
 
     //ズレの検出とその損失　優先順位　1
     //損失と動作するかのフラグを返す
-    private (float error, bool flag) Concurate_DeviationLoss(float error){
+    private (float error, bool flag) ConcurateDeviationLoss(float error){
         //閾値は0.05くらい？
         float threshold=0.05f;
         bool flag=false;
@@ -235,7 +247,7 @@ public class Searcher3 : MonoBehaviour
 
     //ばね定数の変更処理　優先順位　2
     //倒れているかどうか確認
-    private (float error, bool flag)  Conculate_Springs_Loss(float[] xArray, float[] zArray){
+    private (float error, bool flag)  ConculateSpringsLoss(float[] xArray, float[] zArray){
 
         //平均を求める(手先位置の真ん中の座標)
         float x=0.0f;
@@ -261,11 +273,12 @@ public class Searcher3 : MonoBehaviour
             flag=false;
         }
 
+        //Debug.Log(flag);
         return (loss,flag);
     }
 
     //すべてのレイヤーの高さの損失計算
-    private (float loss, bool flag) Concurate_All_High_Loss(float[] yArray){
+    private (float loss, bool flag) ConcurateAllHighLoss(float[] yArray){
         //loss
         float loss=0.0f;
         float targetLength=0.0f;
@@ -275,10 +288,10 @@ public class Searcher3 : MonoBehaviour
 
             //レイヤーが目指すべき高さを計算
             
-            targetLength=Return_Correct_High(i,yArray.Length);
+            targetLength=ReturnCorrectHigha(i,yArray.Length);
 
             Debug.Log("High"+i.ToString()+" : "+yArray[i].ToString() +"Correct High"+i.ToString() + " : " + targetLength);
-            loss+=1.0f*Concurate_High_Loss(yArray[i],targetLength);
+            loss+=1.0f*ConcurateHighLoss(yArray[i],targetLength);
             
             
         
@@ -289,34 +302,39 @@ public class Searcher3 : MonoBehaviour
     }
 
     //高さの損失計算  　優先順位　3
-    private float Concurate_High_Loss(float y,float targetLength){
+    private float ConcurateHighLoss(float y,float targetLength){
 
 
         float loss=0.0f;
         //目標値
         //float targetLength = 1.522883f;
 
+        bool flag=false;
 
         loss=(float)Math.Pow((double)(targetLength-y),2);
+        if(Math.Abs((double)loss)>=0.05){
+            flag=true;
+        }
+        //Debug.Log("高さのロス"+loss.ToString());
 
         return loss;
     }
 
     //直径の損失計算　  優先順位　4
-    private float Concurate_Diameter_Loss(float Diameter, float y,float DiameterBase){
+    private float ConcurateDiameterLoss(float Diameter, float y,float DiameterBase){
         float loss=0.0f;
 
-        float target_Diameter=Return_Correct_Diameter(y,DiameterBase);
+        float targetDiameter=ReturnCorrectDiameter(y,DiameterBase);
 
-        Debug.Log("diameters"+" : "+Diameter.ToString()+" " +" Correct Diameters :" +target_Diameter.ToString() );
+        Debug.Log("diameters"+" : "+Diameter.ToString()+" " +" Correct Diameters :" +targetDiameter.ToString() );
 
-        loss=(float)Math.Pow((double)(target_Diameter-Diameter),2);
+        loss=(float)Math.Pow((double)(targetDiameter-Diameter),2);
 
         return loss;
     }
 
     //直径の損失計算(すべて)
-    private (float loss, bool flag) Concurate_All_Diameter_Loss(float[] layersDiameter/*レイヤーごとの直径*/,float[] layersHigh,float DiameterBase){
+    private (float loss, bool flag) ConcurateAllDiameterLoss(float[] layersDiameter/*レイヤーごとの直径*/,float[] layersHigh,float DiameterBase){
         float loss=0.0f; //ロス
         bool flag=false; //あくまで念のためのフラグ
 
@@ -325,13 +343,13 @@ public class Searcher3 : MonoBehaviour
         //配列内のlossの計算
         for (int i=0; i<layersDiameter.Length;i++){
             
-            loss += Concurate_Diameter_Loss(layersDiameter[i],Return_Correct_High(i,layersDiameter.Length),DiameterBase);
+            loss += ConcurateDiameterLoss(layersDiameter[i],ReturnCorrectHigha(i,layersDiameter.Length),DiameterBase);
         }
 
         return (loss,flag);
     }
     
-    private void parameter_Changing(bool springFlag, float loss,int numLayer,int numPrism){
+    private void parameterChanging(bool springFlag, float loss,int numLayer,int numPrism){
         if(springFlag){
             
             float springForce=0.0f;
@@ -352,7 +370,7 @@ public class Searcher3 : MonoBehaviour
             //Strutの調整かエッジループの調整か確認する
             int compareFlag = 0; //0 Strut+edgeLoop- ,1 Strut+edgeLoop+ ,2 Strut-edgeLoop-,3 Strut-edgeLoop+ 
             float springForce=0.0f;
-
+            float diffphaseSpringForce=0.0f;
 
             if(PlayerPrefs.HasKey("compareFlag")){
                 compareFlag =PlayerPrefs.GetInt("compareFlag");
@@ -367,7 +385,9 @@ public class Searcher3 : MonoBehaviour
                 if(PlayerPrefs.HasKey("SpringForce")){
                     springForce =PlayerPrefs.GetFloat("SpringForce");
                 }
-
+                if(PlayerPrefs.HasKey("diffphaseSpringForce")){
+                    springForce =PlayerPrefs.GetFloat("diffphaseSpringForce");
+                }
             }
             
             //どのedgeLoopか確認する
@@ -417,6 +437,7 @@ public class Searcher3 : MonoBehaviour
                 }
             }
             
+            //Debug.Log(tm_g_y);
             for(int i=0;i<15;i++){
                 if(i<numLayer){
                     savedata+=edgeLoop[i].ToString()+",";
@@ -434,7 +455,7 @@ public class Searcher3 : MonoBehaviour
             
             if(loss<=sikiiti){
                 int photonumber=0;
-                string picturePath="./data/picture/";
+                string picturePath="C:/Users/Yamauchi Gaito/Desktop/workspace/_tmsim/data/picture/";
                 if(PlayerPrefs.HasKey("photonumber")){
                     photonumber=PlayerPrefs.GetInt("photonumber");
                 }
@@ -442,7 +463,7 @@ public class Searcher3 : MonoBehaviour
                     System.IO.Directory.CreateDirectory(picturePath+filename);
                 }
                 
-                On_Scrren_Capture(picturePath+filename+"/"+photonumber.ToString()+".png");
+                OnScrrenCapture(picturePath+filename+"/"+photonumber.ToString()+".png");
                 
                 savedata+=loss.ToString()+","+springForce.ToString()+","+compareFlag.ToString()+","+photonumber.ToString()+","+edgeFlag.ToString();
                 photonumber+=1;
@@ -594,6 +615,7 @@ public class Searcher3 : MonoBehaviour
                 
 
             }
+            //Debug.Log(compareFlag);
 
             //lossの一番小さいやつ データ収集中は-1
             int mins=-1;
@@ -610,11 +632,13 @@ public class Searcher3 : MonoBehaviour
                     //変更前のばね定数の保存
                     Forces[i]=springForce;
                     if(PlayerPrefs.HasKey("Loss"+compareFlag.ToString())){
+                        //Debug.Log(PlayerPrefs.GetFloat("Loss"+i.ToString()));
                         losses[i]=PlayerPrefs.GetFloat("Loss"+i.ToString());
                     }  
                     if(PlayerPrefs.HasKey("springForce"+i.ToString())){
                         Forces[i]=PlayerPrefs.GetFloat("springForce"+i.ToString());
                     }
+                    //Debug.Log("losses  "+i.ToString()+"  " +losses[i].ToString());
                 }
 
 
@@ -627,10 +651,25 @@ public class Searcher3 : MonoBehaviour
                     if(minloss>=losses[i]){
                         minloss=losses[i];
                         mins=i;
+                        //Debug.Log(minloss);
                     }
                 }
 
                 
+                        
+                //minlosssを過去のデータと比較．ロスが一個前のやつより小さければ更新
+                /*
+                float diffloss=10000.0f;
+                if(PlayerPrefs.HasKey("diffloss")){
+                    diffloss=PlayerPrefs.GetFloat("diffloss");
+                }
+                if(minloss>=diffloss){
+                    Debug.Log("minloss : "+minloss +"  >  diff loss :"  +diffloss);
+                    mins=-1;
+                    minloss=diffloss;
+                    
+                }
+                */
                 
                 Debug.Log("mins  "+mins.ToString());
                 
@@ -786,8 +825,8 @@ public class Searcher3 : MonoBehaviour
 
             
             //フォルダがないなら作成とヘッダーの追加
-            string folderpath="/data"+numLayer.ToString()+"_"+numPrism.ToString();
-            string path= folderpath+"/mountingSearch"+filename+".csv";
+            string folderpath="C:/Users/Yamauchi Gaito/Desktop/workspace/_tmsim/data/"+numLayer.ToString()+"_"+numPrism.ToString();
+            string path= folderpath+"/mountingSearc"+filename+".csv";
             if (Directory.Exists(folderpath)==false){
                 Directory.CreateDirectory(folderpath);
                 string header="";
@@ -800,10 +839,10 @@ public class Searcher3 : MonoBehaviour
                     header+="edgeloop"+i.ToString()+",";
                 }
                 header+="loss,springForce,compareFlag,photoNumber,edgeflag,min,date\n";
-                Output_Csv(path,header);
+                OutputCsv(path,header);
             }
             savedata=savedata+","+mins.ToString()+","+days.ToString()+"\n";
-            Output_Csv(path,savedata);
+            OutputCsv(path,savedata);
 
             Debug.Log(savedata);
             
@@ -812,7 +851,7 @@ public class Searcher3 : MonoBehaviour
         }
     }
 
-    private (float sumEdges, float avgedGes) calcurate_Edges(float[] LayerXpositions,float[] LayerYpositions,float[] LayerZpositions,int forNumber,int numLayer,int numPrism){
+    private (float sumEdges, float avgedGes) calcurateEdges(float[] LayerXpositions,float[] LayerYpositions,float[] LayerZpositions,int forNumber,int numLayer,int numPrism){
 
         float sumEdges=0.0f;
         float[,] positions;
@@ -894,34 +933,35 @@ public class Searcher3 : MonoBehaviour
     void Update()
     {   ///*
         if(Time.realtimeSinceStartup<30.0f){
-            StartCoroutine(gets_Hands_Positions());
+            StartCoroutine(getsHandsPositions());
             counts++;
         }  
         //*/
 
-        //show_hand_position();
+        //show_handposition();
     }
 
-    IEnumerator gets_Hands_Positions(){
-        get_Hand_Positions("tm_g_1");
-        get_Hand_Positions("tm_g_2");
-        get_Hand_Positions("tm_g_3");
+    IEnumerator getsHandsPositions(){
+        getHandPositions("tm_g_1");
+        getHandPositions("tm_g_2");
+        getHandPositions("tm_g_3");
 
         //0.05秒の待機
         yield return new WaitForSeconds(0.03f);
         
     } 
 
-    void get_Hand_Positions(string ManipulatoName){
+    void getHandPositions(string ManipulatoName){
         //Asembly.csの取得
         GameObject tm_g =GameObject.Find(ManipulatoName);
         Assembly assembly;
         assembly=tm_g.GetComponent<Assembly>();
+        //Debug.Log(assembly.StrutScale);
         int numLayer=assembly.numLayer;
         int numPrism=assembly.numPrism;
 
         //0から計測のため，numLayer-1となる．
-        var positionRetrun = get_Position(numLayer-1,ManipulatoName);
+        var positionRetrun = getPosition(numLayer-1,ManipulatoName);
 
         //x,y,z座標の取得用配列
         float[] LayerXpositions;
@@ -955,21 +995,21 @@ public class Searcher3 : MonoBehaviour
 
         float timeNow=Time.realtimeSinceStartup;
         
-        string path="./data/20260206_handPosition_layer_"+numLayer.ToString()+"_prism_"+numPrism.ToString()+".csv";
+        string path="C:/Users/Yamauchi Gaito/Desktop/workspace/_tmsim/data/20260206_handPosition_layer_"+numLayer.ToString()+"_prism_"+numPrism.ToString()+".csv";
         if(counts==0){
             //データの最初のラベル配置
             string label="time,x,y,z\n";
-            Output_Csv(path,label);
+            OutputCsv(path,label);
         }
         string savedata=timeNow.ToString()+","+xAverage+","+yAverage+","+zAverage+"\n";
         if(counts%20==0){
-            string picturePath="./data/picture/hand/handPosition_layer_"+numLayer.ToString()+"_prism_"+numPrism.ToString()+"_"+timeNow.ToString()+".png";
-            On_Scrren_Capture(picturePath);
+            string picturePath="C:/Users/Yamauchi Gaito/Desktop/workspace/_tmsim/data/picture/hand/handPosition_layer_"+numLayer.ToString()+"_prism_"+numPrism.ToString()+"_"+timeNow.ToString()+".png";
+            OnScrrenCapture(picturePath);
         }
         
 
         
-        Output_Csv(path,savedata);
+        OutputCsv(path,savedata);
         Debug.Log(savedata);
 
         
@@ -981,6 +1021,7 @@ public class Searcher3 : MonoBehaviour
         GameObject tm_g =GameObject.Find("tm_g_1");
         Assembly assembly;
         assembly=tm_g.GetComponent<Assembly>();
+        //Debug.Log(assembly.StrutScale);
 
         //レイヤー数の取得
         int numLayer=assembly.numLayer;
@@ -988,6 +1029,9 @@ public class Searcher3 : MonoBehaviour
         float DiameterBase=assembly.radiusBase*2.0f;
 
         //手先位置の取得変数
+        float tm_g_x=0.0f;
+        float tm_g_y=0.0f;
+        float tm_g_z=0.0f;
         float[] tmpos =new float[3];
 
         //高さの取得
@@ -1015,12 +1059,20 @@ public class Searcher3 : MonoBehaviour
         LayerZpositions= new float [numPrism*2]; 
         //試行回数
         int arrayLength=0;
+        //一番長い距離
+        float maxDistance=0;
 
         //直径の記録
         float[] diameters;
         diameters=new float [numLayer];
 
+        //ずれの検出の計算用変数
+        float errors=0.0f;
+
+        //一番誤差のあるレイヤーナンバー
+        int maxErrorLayerNo=-1;
         //レイヤー内で一番誤差のある長さ
+        float maxError=0.0f;
         float[] maxErrors;
         maxErrors=new float [numLayer];
 
@@ -1031,7 +1083,7 @@ public class Searcher3 : MonoBehaviour
         for(int i=0;i<numLayer;i++){
 
             //座標取得
-            var positionRetrun = get_Position(i,"tm_g_1");
+            var positionRetrun = getPosition(i,"tm_g_1");
             
             //配列の長さの確認
             arrayLength=positionRetrun.arrayLength;
@@ -1040,37 +1092,49 @@ public class Searcher3 : MonoBehaviour
             LayerYpositions=positionRetrun.LayerYpositions;
             LayerZpositions=positionRetrun.LayerZpositions;
 
-            var cals=calcurate_Edges(LayerXpositions,LayerYpositions,LayerZpositions,i,numLayer,numPrism);
+            var cals=calcurateEdges(LayerXpositions,LayerYpositions,LayerZpositions,i,numLayer,numPrism);
 
             Debug.Log("Layer"+i.ToString()+","+  " Avg : "+cals.avgedGes.ToString()+"       sum : "+cals.sumEdges.ToString());
 
         
             //配列にそれぞれの直径を格納
-            diameters[i]=get_Diameter(arrayLength,LayerXpositions,LayerZpositions);
+            diameters[i]=getDiameter(arrayLength,LayerXpositions,LayerZpositions);
+            maxDistance=0;
 
 
             //配列にそれぞれの層の高さを格納
-            tm_g_layers_y[i]=get_High(LayerYpositions,arrayLength);
+            tm_g_layers_y[i]=getHigh(LayerYpositions,arrayLength);
             
 
             //配列にそれぞれの層のずれ(end同士の高さの差)を格納
-            maxErrors[i]=get_Deviation(LayerYpositions,arrayLength);
-       
+            maxErrors[i]=getDeviation(LayerYpositions,arrayLength);
+
+
+            
+
+            //ReturnCorrectHigha(i,numLayer);
+
+            
+             
            
         }
         
         //層ごとの半径のロス
-        var DiameterData=Concurate_All_Diameter_Loss(diameters,tm_g_layers_y,DiameterBase);
+        var DiameterData=ConcurateAllDiameterLoss(diameters,tm_g_layers_y,DiameterBase);
+        //Debug.Log("Diameter Loss"+i.ToString() +"  "+DiameterData.loss.ToString());
 
         //層ごとの高さのロス
-        var highLosses = Concurate_All_High_Loss(tm_g_layers_y);
+        var highLosses = ConcurateAllHighLoss(tm_g_layers_y);
 
         //手先位置(一番上の高さのロス)
-        float handPositionLoss=Concurate_High_Loss(tm_g_layers_y[numLayer-1],1.5f);
+        //float handPositionLoss=(float)(numLayer*numPrism/*重み*/)*ConcurateHighLoss(tm_g_layers_y[numLayer-1],1.48762f);
+
+        //手先位置(一番上の高さのロス)
+        float handPositionLoss=ConcurateHighLoss(tm_g_layers_y[numLayer-1],1.5f);
 
 
         //倒れているか確認
-        var springlosses = Conculate_Springs_Loss(LayerXpositions,LayerZpositions);
+        var springlosses = ConculateSpringsLoss(LayerXpositions,LayerZpositions);
 
         //層ごと高さと直径のlossの合成
         float allLoss=highLosses.loss+DiameterData.loss+handPositionLoss;
@@ -1078,11 +1142,14 @@ public class Searcher3 : MonoBehaviour
         Debug.Log("hand loss" + handPositionLoss.ToString());
         Debug.Log("high loss" + highLosses.loss.ToString());
         Debug.Log("diameter loss" + DiameterData.loss.ToString());
+        //float allLoss=0.8f*highLosses.loss+1.25f*DiameterData.loss;
+        //float allLoss=DiameterData.loss+highLosses.loss;
 
         
+        //Debug.Log(allLoss);
         
         //パラメータの変更処理
-        parameter_Changing(springlosses.flag,allLoss,numLayer,numPrism);
+        parameterChanging(springlosses.flag,allLoss,numLayer,numPrism);
 
         int photonumber=0;
 
@@ -1101,11 +1168,12 @@ public class Searcher3 : MonoBehaviour
     }
 
     
-    void show_hand_position(){
+    void show_handposition(){
         //Asembly.csの取得
         GameObject tm_g =GameObject.Find("tm_g_1");
         Assembly assembly;
         assembly=tm_g.GetComponent<Assembly>();
+        //Debug.Log(assembly.StrutScale);
 
         //レイヤー数の取得
         int numLayer=assembly.numLayer;
@@ -1113,6 +1181,9 @@ public class Searcher3 : MonoBehaviour
         float DiameterBase=assembly.radiusBase*2.0f;
 
         //手先位置の取得変数
+        float tm_g_x=0.0f;
+        float tm_g_y=0.0f;
+        float tm_g_z=0.0f;
         float[] tmpos =new float[3];
 
         //x,y,z座標の取得用配列
@@ -1126,7 +1197,7 @@ public class Searcher3 : MonoBehaviour
         LayerYpositions= new float [numPrism*2];
         LayerZpositions= new float [numPrism*2]; 
 
-        var positionRetrun = get_Position(numLayer-1,"tm_g_1");
+        var positionRetrun = getPosition(numLayer-1,"tm_g_1");
 
         
             
@@ -1138,7 +1209,7 @@ public class Searcher3 : MonoBehaviour
         LayerYpositions=positionRetrun.LayerYpositions;
         LayerZpositions=positionRetrun.LayerZpositions;
 
-        Debug.Log(get_High(LayerYpositions,arrayLength));
+        Debug.Log(getHigh(LayerYpositions,arrayLength));
 
 
 

@@ -48,8 +48,7 @@ public class Device : MonoBehaviour
     public bool resetsBrokenCylinder;
 
     //breakingMode(一部破損時状態で行う際のモード)
-    public bool breakingMode;
-    public bool breaking;
+    public bool breaking_Mode;
     public int breakNum;
     public float BrokenInput=0;
     public bool ConstantBroken=true;
@@ -108,6 +107,7 @@ public class Device : MonoBehaviour
             //エラー表示
             throw new ArgumentNullException($"{nameof(strut)}is null.  You must cast existing strut's number in this tm_g!");
         }
+        //Debug.Log(num);
         
         //上端の取得
         var UpperEnd=strut.transform.Find("end1");
@@ -115,12 +115,14 @@ public class Device : MonoBehaviour
         if(UpperEnd==null){
             UpperEnd=strut.transform.Find("end");
         }
+        //Debug.Log(UpperEnd.transform.position);
         
         //下端の取得
         var BotomEnd=strut.transform.Find("end2");
         if(BotomEnd==null){
             BotomEnd=strut.transform.Find("ball_joint");
         }
+        //Debug.Log(BotomEnd.transform.position);
         
         //エンドの座標取得
         Vector3 UpperEndPosition=UpperEnd.transform.position;
@@ -138,12 +140,16 @@ public class Device : MonoBehaviour
 
         //ストラットの中点
         Vector3 AverageEndPosition=Vector3.Lerp(UpperEndPosition,BotomEndPosition,0.5f);
+        //Debug.Log(AverageEndPosition);
         
         //ストラット中点と下端の距離
         float deltaX=AverageEndPosition.x-BotomEndPosition.x;
         float deltaY=AverageEndPosition.y-BotomEndPosition.y;
         float deltaZ=AverageEndPosition.z-BotomEndPosition.z;
-
+        //Debug.Log(deltaX);]
+        //Debug.Log(this.gameObject);
+        //Debug.Log(deltaY);
+        //Debug.Log(MathF.Sqrt(Mathf.Pow(deltaX,2.0f)+Mathf.Pow(deltaZ,2.0f)));
 
         //角度の計算(IMUの座標は重力方向とストラットの角度のみ計測)
         float angle = 0.0f;
@@ -151,12 +157,15 @@ public class Device : MonoBehaviour
         angle=Mathf.Atan2(MathF.Sqrt(Mathf.Pow(deltaX,2.0f)+Mathf.Pow(deltaZ,2.0f)),deltaY);
 
         
+        ///Debug.Log((float)(180/Math.PI)*angle);
 
 
         return angle;
     }
 
     private void OutputCsv(string path,string savedata ){
+
+        //File.AppendAllText("C:/Users/Yamauchi Gaito/Desktop/workspace/tmsim/data/data.csv",savedata);
         File.AppendAllText(path,savedata);
     }
     
@@ -173,13 +182,20 @@ public class Device : MonoBehaviour
         strutPosition = new Vector3[numLayer*numPrism];
         strutOrientation = new Quaternion[numLayer*numPrism];
 
+        //string outputNums="i,idx.i,idx.j,idx.k,springNumber,strut\n";
 
         if (asb.isReady) {
             springs = this.GetComponentsInChildren<SpringJoint>();
+            //Debug.Log(springs.Length);
             for (int i = 0; i < numLayer*numPrism*2; i++) {
                 var idx = dec(i);
+                //Debug.Log(idx);
+                //Debug.Log(numPrism*asb.index(idx.i,idx.j)+idx.k);
                 cylinder[i] = springs[4*asb.index(idx.i,idx.j)+idx.k].spring;
+                //Debug.Log(springs[4*asb.index(idx.i,idx.j)+idx.k].connectedBody);
                 input[i] = (cylinder[i] - biasSpringCoeff)/rangeSpringCoeff;
+                //outputNums=outputNums+i.ToString()+","+idx.i.ToString()+","+idx.j.ToString()+","+idx.k.ToString()+","+(4*asb.index(idx.i,idx.j)+idx.k).ToString()+","+springs[4*asb.index(idx.i,idx.j)+idx.k].connectedBody.ToString()+"\n";
+
                 
             }
             for (int i = 0; i < numLayer*numPrism; i++) {
@@ -194,6 +210,9 @@ public class Device : MonoBehaviour
         for(int i=0;i<(numLayer*numPrism*2);i++){
             brokenCylinder[i]=false;
         }
+
+        //string path= "C:/Users/Yamauchi Gaito/Desktop/workspace/_tmsim/data/strut_idx_iデータ"+numLayer.ToString()+numPrism.ToString()+".csv";
+        //OutputCsv(path,outputNums);
     }
 
     // FixedUpdate is called once per physical simulation step
@@ -201,9 +220,8 @@ public class Device : MonoBehaviour
     {
 
         //壊れた状態のシリンダの記憶
-        if(breaking ){
-            //
-            brokenCylinder[breakNum]=true;
+        if(breaking_Mode){
+            //brokenCylinder[breakNum]=true;
         }
         if(resetsBrokenCylinder){
             for(int i=0;i<numLayer*numPrism*2;i++){
@@ -234,11 +252,12 @@ public class Device : MonoBehaviour
         // translate the input
         for (int i = 0; i < numLayer*numPrism*2; i++) {
 
-            if(breakingMode && ConstantBroken &&brokenCylinder[i]==true){
+            if(breaking_Mode && ConstantBroken &&brokenCylinder[i]==true){
                 input[i] = BrokenInput;
             }
-            else if(breakingMode && brokenCylinder[i]==true){
+            else if(breaking_Mode && brokenCylinder[i]==true){
                 input[i] = (float)(r.NextDouble());
+                //Debug.Log((i).ToString()+"  "+brokenCylinder[i].ToString());
             }
 
             input[i] = Math.Max(0f,input[i]);
