@@ -100,7 +100,7 @@ public class Device : MonoBehaviour
     }
 
     //ストラットの二点の取得
-    private (Vector3 UpperEndPosition,Vector3 BotomEndPosition) getEndPosition(int num){
+    private (Vector3 UpperEndPosition,Vector3 BotomEndPosition) get_End_Position(int num){
 
         //柱オブジェクトの取得
         var strut=this.gameObject.transform.Find("Strut"+(num).ToString()).gameObject;
@@ -129,10 +129,10 @@ public class Device : MonoBehaviour
         return (UpperEndPosition,BotomEndPosition);
     }
 
-    //
-    private float mimeticsIMU(){
+    //プロトタイプ　実際の動作と同様の機能を行うかは未検証
+    private float mimetics_IMU(){
         //座標の取得
-        var ends=getEndPosition(1);
+        var ends=get_End_Position(1);
         Vector3 UpperEndPosition=ends.UpperEndPosition;
         Vector3 BotomEndPosition=ends.BotomEndPosition;
 
@@ -156,7 +156,7 @@ public class Device : MonoBehaviour
         return angle;
     }
 
-    private void OutputCsv(string path,string savedata ){
+    private void Output_Csv(string path,string savedata ){
         File.AppendAllText(path,savedata);
     }
     
@@ -228,7 +228,7 @@ public class Device : MonoBehaviour
         //長い配列(inputと同じ長さ)を用意 bool型
         //リセット用モードをつくる
 
-        mimeticsIMU();
+        mimetics_IMU();
         rangeSpringCoeff=200.0f*(float)numPrism;
         biasSpringCoeff=60.0f*(float)numPrism;
         // translate the input
