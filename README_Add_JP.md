@@ -67,38 +67,37 @@
   - `"/{dev.name}/input"`: (Subscribe) `Input` of `Dev` stored in `std_msgs.msg.Float32MultiArray` type message.
 
 
-### Investigation of Optimal Lengths for Struts and Edge Loops
-- Enable `searcher(debugobject)` by clicking the checkbox in the Inspector.
-- Enable `Searcher3.cs` inside `searcher(debugobject)`.
-- Check the `Initializer` in the Inspector inside `tm_g_1` and set it to `true` to configure `numLayer` and `numPrism`.
-- Press `Play` at the top of the screen once to run Unity. This initializes the saved variables.
-- After stopping, uncheck the `Initializer` in the `tm_g_1` Inspector and set it to `false`. Leave it alone to let the automatic adjustment algorithm proceed.
-- Parameters are saved as `mountingSearch.csv` in `./data/(numLayer)_(numPrism)`. Select the one with the lowest loss.
-- Add the parameters inside `Useconst` within `Assembly.cs` in the source directory.
+### ストラットとエッジループの最適長さの調査
+- `searcher(debugobject)`を`Inspector`内のチェックボックスをクリックして有効化します
+- `searcher(debugobject)`内部の`Searcher3.cs`を有効化します
+- `tm_g_1`内部の`Inspector`にある`Initializer`をチェックして`true`にして，`numLayer`と`numPrism`を設定します．
+- 一度画面上部の`Play`を押して，Unityの実行を行います．これにより，保存されている変数の初期化が行われます.
+- 停止後は`tm_g_1`内部の`Inspector`にある`Initializer`をチェックを外して`false`に変更後は放置することで，自動で調整アルゴリズムが進みます．
+- パラメータが`./data/(numLayer)_(numPrism)`に`mountingSearch.csv`として保存されているので，その中でlossが低いものを選択します
+- source内の`Assembly.cs`内の`Useconst`内にパラメータを追加します
 
 
-
-### Faults Cylinder
-- Click the checkbox for `BreakingMode`
-- Enter the cylinder number you want to break in `Break_Num`
-- Check the `Breaking` box
-
-
-### All Cylinder Failure
-- Click the checkbox for `BreakingMode`
-- Check the `All Break` box
-- Checking `constantBroken` allows you to input the number entered in `Broken Input` into the cylinders
+### 指定したシリンダの故障
+- `Breaking_Mode`のチェックをクリック
+- `Break_Num`に壊したいシリンダの番号を入力
+- `Breaking`にチェックを入れる
 
 
-### Operation with Randomly Failure Actuators
-- Enable `searcher(debugobject)` by clicking the checkbox in the `Inspector`
-- Enable `Broken_searcher`
-- Check `initializer` and run. This initializes saved variables
-- Stop execution at an appropriate point
-- Assign a number to `breaks Count` to determine the number of repetitions
-- Running the script automatically determines the malfunctioning manipulator and acquires the trajectory data for the end-effector position in the malfunction state, outputting it as a CSV file
+### 全てのシリンダの故障
+- `Breaking_Mode`のチェックをクリック
+- `All Break`にチェックを入れる
+- `constantBroken`にチェックを入れることで，`Broken Input`内に入力した数字をシリンダに入力できる
 
 
-### Exporting the manipulator's 3D model
-- Click the `export Button` in the `inspector` for `tm_g_1`, `tm_g_2`, etc.
-- An fbx file with the same name as the manipulator model will be saved in `/Assets`
+### ランダムにアクチュエータを壊した状態での動作
+- `searcher(debugobject)`を`Inspector`内のチェックボックスをクリックして有効化します
+- `Breoken_searcher`を有効化する
+- `initializer`にチェックを入れて実行を行います．これにより保存している変数を初期化します
+- 実行を適当なところで止めます
+- `breaks Count`に数字を代入し，繰り返す回数を決定する
+- 実行を行うことで自動で故障されたマニピュレータの決定と故障状態の手先位置の軌道データを取得してcsvとして出力します
+
+
+###　マニピュレータの3Dモデルの出力
+- `tm_g_1`，`tm_g_2`...などの`inspector`内の`export Botton`をクリック
+- `/Assets` 内にマニピュレータモデルと同じ名前のfbxファイルが保存される

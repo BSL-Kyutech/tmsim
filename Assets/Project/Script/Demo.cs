@@ -47,7 +47,6 @@ public class Demo : MonoBehaviour
             theta[i] = 0.0;
             //omega[i] = 1 + r.NextDouble(); // 1+ random number (0.0<random number <1.0)
             omega[i] = 1.2;
-            //Debug.Log(omega[i]);
         }
 
         
@@ -97,7 +96,6 @@ public class Demo : MonoBehaviour
                 
                 dev.input[i]=(float)input[i];
                 
-                //Debug.Log(omega[i]);
             }
             randomInput=false;
         }
@@ -115,8 +113,6 @@ public class Demo : MonoBehaviour
                     input[i*2*dev.numPrism + j] = (input[i*2*dev.numPrism + j] + 1f)/2f;
                     dev.input[i*2*dev.numPrism + j] = (float)input[i*2*dev.numPrism + j];
                 }
-
-                //Debug.Log(omega[i]);
             }
             randomInput=false;
         }*/
@@ -133,8 +129,6 @@ public class Demo : MonoBehaviour
                 for (int j = 0; j < 2*dev.numPrism; j++) {
                     dev.input[i*2*dev.numPrism + j] =  0.5f;;
                 }
-            
-                //Debug.Log(omega[i]);
             }
             standUp=false;
             
