@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
 using ROS2;
 
 public class ROS2Interface : MonoBehaviour
@@ -10,103 +9,94 @@ public class ROS2Interface : MonoBehaviour
 
     private ROS2UnityCore ros2Unity;
     private ROS2Node ros2Node;
-    private IPublisher<geometry_msgs.msg.PointStamped>[] loopPosPub;
-    private IPublisher<geometry_msgs.msg.PoseStamped>[] strutPosPub;
+
+    // IMU data publishers 
+    private IPublisher<geometry_msgs.msg.Vector3>[] linearAccPub;
+    private IPublisher<geometry_msgs.msg.Vector3>[] angularVelPub;
+
+    // Command subscriber
     private ISubscription<std_msgs.msg.Float32MultiArray> inputSub;
 
-    public float publishRate = 0.01f; //sec
-    
-    
-    public Vector3 ConvVecU2R( Vector3 unityVec)
-    {
-        return new Vector3(unityVec.z, -unityVec.x, unityVec.y);
-    }
+    // Throttle
+    private int fixedUpdateCounter = 0;
+    private const int IMU_PUBLISH_DIVIDER = 4;  // 250 Hz
 
-    public Vector3 ConvVecR2U( Vector3 rosVec)
-    {
-        return new Vector3(-rosVec.y, rosVec.z, rosVec.x);
-    }
+    // Coordinate conversions 
+    public Vector3 ConvVecU2R(Vector3 unityVec) { return new Vector3(unityVec.z, -unityVec.x, unityVec.y); }
+    public Vector3 ConvVecR2U(Vector3 rosVec) { return new Vector3(-rosVec.y, rosVec.z, rosVec.x); }
+    public Quaternion ConvQuaU2R(Quaternion unityQua) { return new Quaternion(unityQua.z, -unityQua.x, unityQua.y, -unityQua.w); }
+    public Quaternion ConvQuaR2U(Quaternion rosQua) { return new Quaternion(-rosQua.y, rosQua.z, rosQua.x, -rosQua.w); }
 
-    public Quaternion ConvQuaU2R( Quaternion unityQua)
-    {
-        return new Quaternion(unityQua.z, -unityQua.x, unityQua.y, -unityQua.w);
-    }
-
-    public Quaternion ConvQuaR2U( Quaternion rosQua)
-    {
-        return new Quaternion(-rosQua.y, rosQua.z, rosQua.x, -rosQua.w);
-    }
-    
-
-    // Start is called before the first frame update
     void Start()
     {
         ros2Unity = new ROS2UnityCore();
-        loopPosPub = new IPublisher<geometry_msgs.msg.PointStamped>[dev.numLayer+1];
-        strutPosPub = new IPublisher<geometry_msgs.msg.PoseStamped>[dev.numLayer*dev.numPrism];
+        int numStruts = dev.numLayer * dev.numPrism;
 
-        if (ros2Unity.Ok()) 
+        linearAccPub = new IPublisher<geometry_msgs.msg.Vector3>[numStruts];
+        angularVelPub = new IPublisher<geometry_msgs.msg.Vector3>[numStruts];
+
+        if (ros2Unity.Ok())
         {
             ros2Node = ros2Unity.CreateNode("ROS2UnityListenerNode");
-            for (int i = 0; i < dev.numLayer+1; i++) 
+
+            // IMU publishers 
+            for (int i = 0; i < numStruts; i++)
             {
-                loopPosPub[i] = ros2Node.CreatePublisher<geometry_msgs.msg.PointStamped>($"/{dev.name}/loop_center{i}"); 
-            }
-            for (int i = 0; i < dev.numLayer; i++) 
-            {
-                for (int j = 0; j < dev.numPrism; j++) 
-                {
-                    strutPosPub[i*dev.numPrism+j] = ros2Node.CreatePublisher<geometry_msgs.msg.PoseStamped>($"/{dev.name}/strut{i*dev.numPrism+j}"); 
-                }
+                linearAccPub[i] = ros2Node.CreatePublisher<geometry_msgs.msg.Vector3>(
+                    $"/{dev.name}/strut{i}/accel");
+                angularVelPub[i] = ros2Node.CreatePublisher<geometry_msgs.msg.Vector3>(
+                    $"/{dev.name}/strut{i}/gyro");
             }
 
-            // register a subscription callback
-            inputSub = ros2Node.CreateSubscription<std_msgs.msg.Float32MultiArray>($"/{dev.name}/input", 
-            msg => {
-                for (int i = 0;i < dev.numLayer*dev.numPrism; i++) 
-                {
-                    dev.input[i] = (float)msg.Data[i];
-                }
-            });
-            InvokeRepeating(nameof(PublisherCallback), 1.0f, publishRate); // Publish every second
+            // Input subscription – full array length
+            int totalInputs = dev.numLayer * dev.numPrism * 2;
+            inputSub = ros2Node.CreateSubscription<std_msgs.msg.Float32MultiArray>(
+                $"/{dev.name}/input",
+                msg => {
+                    for (int i = 0; i < totalInputs; i++)
+                        dev.input[i] = (float)msg.Data[i];
+                });
+
+         
         }
     }
 
-    void PublisherCallback()
+    void FixedUpdate()
     {
+        if (!ros2Unity.Ok()) return;
 
-        for (int i = 0; i < dev.numLayer+1; i++) {
-            geometry_msgs.msg.PointStamped msg = new geometry_msgs.msg.PointStamped();
-            var pos = ConvVecU2R(dev.loopPosition[i]);
-            msg.Point.X = pos.x;
-            msg.Point.Y = pos.y;
-            msg.Point.Z = pos.z;
-            loopPosPub[i].Publish(msg);
-        }
-        
-        for (int i = 0; i < dev.numLayer; i++) 
-        {
-            for (int j = 0; j < dev.numPrism; j++) 
-            {
-                geometry_msgs.msg.PoseStamped msg = new geometry_msgs.msg.PoseStamped();
-                var point = ConvVecU2R(dev.strutPosition[i]);
-                var orientation = ConvQuaU2R(dev.strutOrientation[i]);
-                msg.Pose.Position.X = point.x;
-                msg.Pose.Position.Y = point.y;
-                msg.Pose.Position.Z = point.z;
-                msg.Pose.Orientation.X = orientation.x;
-                msg.Pose.Orientation.Y = orientation.y;
-                msg.Pose.Orientation.Z = orientation.z;
-                msg.Pose.Orientation.W = orientation.w;
-                strutPosPub[i*dev.numPrism+j].Publish(msg);
-            }
-        }
+        fixedUpdateCounter++;
+        if (fixedUpdateCounter % IMU_PUBLISH_DIVIDER != 0) return;
 
+        // Publish IMU data as separate Vector3 messages
+	for (int i = 0; i < dev.numLayer * dev.numPrism; i++)
+	{
+	    // Get the transform of the current strut
+	    Transform strutTransform = dev.GetStrut(i).transform;
+
+	    // Compute specific force , world frame  to body frame
+	    Vector3 worldAcc = dev.strutAcceleration[i];
+	    Vector3 specificForceWorld = worldAcc - Physics.gravity;
+	    Vector3 specificForceBody = strutTransform.InverseTransformDirection(specificForceWorld);
+
+	    // Compute angular velocity ,world frame  to body frame
+	    Vector3 angularVelWorld = dev.strutAngularVelocity[i];
+	    Vector3 angularVelBody = strutTransform.InverseTransformDirection(angularVelWorld);
+
+	    // Convert to ROS coordinate convention
+	    Vector3 accRos = ConvVecU2R(specificForceBody);
+	    Vector3 angRos = ConvVecU2R(angularVelBody);
+
+	    // Publish
+	    var accMsg = new geometry_msgs.msg.Vector3();
+	    accMsg.X = accRos.x; accMsg.Y = accRos.y; accMsg.Z = accRos.z;
+	    linearAccPub[i].Publish(accMsg);
+
+	    var angMsg = new geometry_msgs.msg.Vector3();
+	    angMsg.X = angRos.x; angMsg.Y = angRos.y; angMsg.Z = angRos.z;
+	    angularVelPub[i].Publish(angMsg);
+	}
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    void Update() { }
 }
