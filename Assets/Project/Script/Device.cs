@@ -5,22 +5,17 @@ using UnityEngine;
 using System;
 using System.Threading;
 
-/// <summary>
-/// Class <c>Device</c> manages variables used for control and observation of the automatically assembled tensegrity manipulator.
-/// For use, attach this script to the Empty object having Class <c>Assembly</c>.
-/// </summary>
-///
+
 public class Device : MonoBehaviour
 {
-    // **NOTE**
-    // This script has to have a lower priority than the Assembly script
 
-    // information to be provided
     public float[] input;
     public float[] cylinder;
     public Vector3[] loopPosition;
     public Vector3[] strutPosition;
     public Quaternion[] strutOrientation;
+    public Vector3[] strutAcceleration;      // worldframe linear acceleration
+    public Vector3[] strutAngularVelocity;   // world frame angular velocity
 
     // parameters
     public float maxDelta = 1.0f;
@@ -35,23 +30,28 @@ public class Device : MonoBehaviour
     public int numPrism;
 
     // tm's components
+
     private SpringJoint[] springs;
-    private GameObject[] struts;
+    public GameObject[] struts;
+
+    public GameObject GetStrut(int i) => struts[i];
     private Assembly asb;
+    private Vector3[] prevVelocity;   // finite difference acceleration
+
 
     public int enc(int layer, int prism, int numSpring)
     {
-        // check parameters' validity
+
         if (numSpring == 1) {
             return -1;
         }
         if (prism+numPrism < 0 || prism-numPrism >= numPrism) {
-            return -1;            
+            return -1;
         }
         if (layer < 0 || layer >= numLayer) {
             return -1;
         }
-        // compute the index
+
         var bias = 0;
         if (numSpring == 0) {
             bias = 2*numPrism;
@@ -61,7 +61,6 @@ public class Device : MonoBehaviour
 
     public (int i, int j, int k) dec(int index)
     {
-        // check parameters' validity
         if (index >= numLayer*numPrism*2){
             return (-1,-1,-1);
         }
@@ -77,13 +76,16 @@ public class Device : MonoBehaviour
         var k = (index/8 + index%8)%2*2 + kbias;
         return (i,j,k);
     }
-    
-    // Start is called before the first frame update
+
+
     void Start()
     {
         asb = this.GetComponent<Assembly>();
         numLayer = asb.numLayer;
         numPrism = asb.numPrism;
+        strutAcceleration = new Vector3[numLayer * numPrism];
+	strutAngularVelocity = new Vector3[numLayer * numPrism];
+	prevVelocity = new Vector3[numLayer * numPrism];
         struts = new GameObject[numLayer*numPrism];
         cylinder = new float[numLayer*numPrism*2];
         input = new float[numLayer*numPrism*2];
@@ -100,6 +102,8 @@ public class Device : MonoBehaviour
             }
             for (int i = 0; i < numLayer*numPrism; i++) {
                 struts[i] = transform.Find($"Strut{i}").gameObject;
+                Rigidbody rb = struts[i].GetComponent<Rigidbody>();   //
+                if (rb != null) prevVelocity[i] = rb.velocity; //
             }
         } else {
             throw new Exception("TM is not ready!");
@@ -143,5 +147,26 @@ public class Device : MonoBehaviour
             strutPosition[i] = struts[i].transform.position;
             strutOrientation[i] = struts[i].transform.rotation;
         }
-    }
+
+        // Compute IMU quantities (world frame)
+        for (int i = 0; i < numLayer * numPrism; i++)
+        {
+            Rigidbody rb = struts[i].GetComponent<Rigidbody>();
+            if (rb != null)
+            {
+                Vector3 currentVel = rb.velocity;
+                // finite‑difference linear acceleration
+                strutAcceleration[i] = (currentVel - prevVelocity[i]) / Time.fixedDeltaTime;
+                prevVelocity[i] = currentVel;
+                // angular velocity directly from PhysX
+                strutAngularVelocity[i] = rb.angularVelocity;
+            }
+            else
+            {
+                strutAcceleration[i] = Vector3.zero;
+                strutAngularVelocity[i] = Vector3.zero;
+            }
+        }
+
+        }
 }
